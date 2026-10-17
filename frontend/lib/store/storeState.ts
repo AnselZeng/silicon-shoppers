@@ -117,12 +117,13 @@ export const useStorefront = create<StorefrontState>((set) => ({
   browseFilters: "",
   sessionNonce: 0,
   setLayout: (layout, presetName) =>
-    set((state) => ({
+    set({
       layout: cloneLayout(layout),
       layoutPresetName: presetName ?? null,
       layoutToast: presetName ? `Layout personalized for: ${presetName}` : null,
-      popupOpen: layout.popupEnabled ? state.popupOpen : false,
-    })),
+      popupOpen: false,
+      popupDismissed: !layout.popupEnabled,
+    }),
   dismissToast: () => set({ layoutToast: null }),
   setCursor: (patch) => set((state) => ({ cursor: { ...state.cursor, ...patch } })),
   setCursorSpeed: (speed) => set({ cursorSpeed: speed }),

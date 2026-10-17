@@ -1,6 +1,7 @@
 "use client"
 
 import { PERSONA_ACCENTS, UI_CONFIG } from "@/config/ui"
+import { previewLayout } from "@/lib/layout/preview"
 import { DEFAULT_LAYOUT, PERSONA_LAYOUTS } from "@/lib/layout/presets"
 import { PERSONA_LABEL, isPersonaId, type PersonaId } from "@/lib/personas/schema"
 import { agentPolicy, createMemory, type AgentMemory } from "@/lib/sim/agent"
@@ -48,6 +49,8 @@ class SimulationRunner {
     const payload = parsed.payload
     if (payload.type === "store_ready") {
       this.readyWaiters.splice(0).forEach((resolve) => resolve())
+      const status = useSimStore.getState().status
+      if (status !== "running" && status !== "paused") this.pushPreview()
       return
     }
     if (payload.type === "page_state") {
@@ -64,6 +67,14 @@ class SimulationRunner {
     if (payload.type === "store_event") {
       this.onStoreEvent(payload.event)
     }
+  }
+
+  private pushPreview() {
+    const { layout, presetName } = previewLayout(
+      useSimStore.getState().layoutPreview,
+      usePersonaStore.getState().personas,
+    )
+    this.send({ type: "set_layout", layout, presetName: presetName ?? undefined })
   }
 
   private send(payload: ParentPayload) {
@@ -175,6 +186,7 @@ class SimulationRunner {
       logs.push("layout", `${changed ? "reclassified" : "classified"} ${name} · adaptive off`)
       return
     }
+    useSimStore.getState().setLayoutPreview(useSimStore.getState().activePersonaId ?? personaId)
     this.send({ type: "set_layout", layout, presetName: name })
     const concierge = layout.conciergeEnabled ? layout.conciergeTone : "off"
     logs.push(
@@ -212,6 +224,7 @@ class SimulationRunner {
       classified: false,
       eventCount: 0,
     })
+    sim.setLayoutPreview("default")
     sim.setActivePersonaId(persona.id)
     sim.setStatus("running")
     const runId = `run_${sim.seed}_${persona.id}`

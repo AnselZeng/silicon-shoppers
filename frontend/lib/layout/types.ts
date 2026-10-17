@@ -25,6 +25,9 @@ export type CheckoutVariant = "guest_fast" | "click_to_pay" | "saved_card" | "lo
 
 export type ConciergeTone = "deals" | "drops" | "mission" | "loyalty"
 
+/** How one garment is shown. The palette stays the house colors. */
+export type ColorMerchandising = "swatches" | "hover_preview" | "split_colors" | "color_locked"
+
 export interface LayoutConfig {
   defaultSort: SortOption
   filterOrder: FilterSectionId[]
@@ -44,6 +47,7 @@ export interface LayoutConfig {
   conciergeEnabled: boolean
   conciergeTone: ConciergeTone
   loyaltyPrompt: boolean
+  colorMerchandising: ColorMerchandising
 }
 
 export const FILTER_LABEL: Record<FilterSectionId, string> = {

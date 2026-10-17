@@ -1,6 +1,12 @@
 import type { LayoutConfig } from "@/lib/layout/types"
 import type { PersonaId } from "@/lib/personas/schema"
 
+/**
+ * House rulebook: stone, black, and the garment palette only.
+ * A persona may change structure — hero, section order, sort, filters,
+ * grid, checkout, and how a colorway is merchandised — not the brand colors.
+ */
+
 export const DEFAULT_LAYOUT: LayoutConfig = {
   defaultSort: "relevance",
   filterOrder: ["category", "size", "color", "price", "collection", "sale"],
@@ -20,6 +26,7 @@ export const DEFAULT_LAYOUT: LayoutConfig = {
   conciergeEnabled: false,
   conciergeTone: "drops",
   loyaltyPrompt: false,
+  colorMerchandising: "swatches",
 }
 
 export const PERSONA_LAYOUTS: Record<PersonaId, LayoutConfig> = {
@@ -42,6 +49,7 @@ export const PERSONA_LAYOUTS: Record<PersonaId, LayoutConfig> = {
     conciergeEnabled: true,
     conciergeTone: "deals",
     loyaltyPrompt: false,
+    colorMerchandising: "color_locked",
   },
   trend_seeker: {
     defaultSort: "newest",
@@ -62,6 +70,7 @@ export const PERSONA_LAYOUTS: Record<PersonaId, LayoutConfig> = {
     conciergeEnabled: true,
     conciergeTone: "drops",
     loyaltyPrompt: false,
+    colorMerchandising: "hover_preview",
   },
   mission_shopper: {
     defaultSort: "relevance",
@@ -82,6 +91,7 @@ export const PERSONA_LAYOUTS: Record<PersonaId, LayoutConfig> = {
     conciergeEnabled: true,
     conciergeTone: "mission",
     loyaltyPrompt: false,
+    colorMerchandising: "color_locked",
   },
   brand_loyalist: {
     defaultSort: "bestsellers",
@@ -102,6 +112,7 @@ export const PERSONA_LAYOUTS: Record<PersonaId, LayoutConfig> = {
     conciergeEnabled: true,
     conciergeTone: "loyalty",
     loyaltyPrompt: true,
+    colorMerchandising: "split_colors",
   },
 }
 

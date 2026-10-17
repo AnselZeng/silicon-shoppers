@@ -23,6 +23,7 @@ interface SimState {
   route: string
   showElementIds: boolean
   viewport: ViewportChoice
+  layoutPreview: string
   activePersonaId: string | null
   inference: InferenceView
   iframe: HTMLIFrameElement | null
@@ -33,6 +34,7 @@ interface SimState {
   setRoute: (route: string) => void
   setShowElementIds: (show: boolean) => void
   setViewport: (viewport: ViewportChoice) => void
+  setLayoutPreview: (preview: string) => void
   setActivePersonaId: (id: string | null) => void
   setInference: (inference: InferenceView) => void
   setIframe: (iframe: HTMLIFrameElement | null) => void
@@ -50,6 +52,7 @@ export const useSimStore = create<SimState>((set) => ({
   route: "/store",
   showElementIds: false,
   viewport: "web",
+  layoutPreview: "default",
   activePersonaId: null,
   inference: {
     personaId: null,
@@ -65,6 +68,7 @@ export const useSimStore = create<SimState>((set) => ({
   setRoute: (route) => set({ route }),
   setShowElementIds: (show) => set({ showElementIds: show }),
   setViewport: (viewport) => set({ viewport }),
+  setLayoutPreview: (layoutPreview) => set({ layoutPreview }),
   setActivePersonaId: (id) => set({ activePersonaId: id }),
   setInference: (inference) => set({ inference }),
   setIframe: (iframe) => set({ iframe }),

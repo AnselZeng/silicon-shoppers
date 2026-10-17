@@ -3,14 +3,29 @@
 import Link from "next/link"
 import { useEffect } from "react"
 import { Hero } from "@/components/store/Hero"
-import { ProductCard } from "@/components/store/ProductCard"
+import { ProductGrid } from "@/components/store/ProductGrid"
 import { UI_CONFIG } from "@/config/ui"
-import type { HomeSectionId } from "@/lib/layout/types"
+import { FILTER_LABEL, type ColorMerchandising, type HomeSectionId } from "@/lib/layout/types"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { sortProducts } from "@/lib/store/sorting"
 import { useStorefront } from "@/lib/store/storeState"
 import { COLLECTIONS, type Product } from "@/lib/store/types"
 import { collectionSlug } from "@/lib/utils"
+
+const SORT_LINE = {
+  relevance: "Sorted by relevance",
+  newest: "Sorted by newest",
+  price_asc: "Sorted by price, low to high",
+  price_desc: "Sorted by price, high to low",
+  bestsellers: "Sorted by bestsellers",
+} as const
+
+const MERCH_LINE: Record<ColorMerchandising, string> = {
+  swatches: "One piece, colors as swatches",
+  hover_preview: "Hover the piece to preview color",
+  split_colors: "Each color shown as its own piece",
+  color_locked: "One colorway per piece",
+}
 
 const SECTION_TITLE: Record<HomeSectionId, string> = {
   new_in: "New in",
@@ -37,12 +52,13 @@ export function HomeView() {
     useStorefront.getState().setBrowse(layout.defaultSort, "")
   }, [layout.defaultSort])
 
-  const cols =
-    layout.gridDensity === 2 ? "grid-cols-2" : layout.gridDensity === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2 md:grid-cols-3"
-
   return (
     <div>
       <Hero />
+      <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
+        {SORT_LINE[layout.defaultSort]} · Filters lead with {FILTER_LABEL[layout.filterOrder[0] ?? "category"]} ·{" "}
+        {MERCH_LINE[layout.colorMerchandising]}
+      </p>
       {layout.homeSectionOrder.map((section) => (
         <section key={section} className="px-6 py-10">
           <div className="mb-6 flex items-baseline justify-between">
@@ -70,11 +86,7 @@ export function HomeView() {
               })}
             </div>
           ) : (
-            <div className={`grid gap-5 ${cols}`}>
-              {sectionProducts(section).map((product) => (
-                <ProductCard key={`${section}-${product.id}`} product={product} />
-              ))}
-            </div>
+            <ProductGrid products={sectionProducts(section)} />
           )}
         </section>
       ))}
