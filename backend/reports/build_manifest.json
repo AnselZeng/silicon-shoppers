@@ -1,0 +1,254 @@
+{
+  "dataset_version": "v1-2026-10-04",
+  "schema_version": "1.0",
+  "seed": 20261004,
+  "python": "3.12.11",
+  "smoke": false,
+  "freeze_points": [
+    {
+      "name": "A",
+      "rules_version": "v1",
+      "recorded_at": "2026-10-04T17:21:45",
+      "git": {
+        "commit": "b2208694cf0d87722a06139cb660191083f9078f",
+        "dirty": true
+      },
+      "config_sha256": "1d9daf5e1c626cdb3df21e73e6e54d6b0336b1f07101dc4e0894bf8c3737d963",
+      "layout_rules_sha256": "dfbae1414127c7d33104134d3a406431ad19e9d511dcad10f59d64b127c53e81",
+      "cutoffs": {
+        "dev": "2020-07-29",
+        "final": "2020-08-26"
+      },
+      "cohort_selected": {
+        "light": 25000,
+        "lower_mid": 25000,
+        "upper_mid": 25000,
+        "heavy": 25000
+      },
+      "stage_runtimes_s": {
+        "ingest": 23.2,
+        "verify": 8.3,
+        "splits": 0.0,
+        "cohort": 10.6,
+        "build": 229.2,
+        "evaluate": 4.4,
+        "export": 7.1,
+        "leakage-check": 110.9
+      },
+      "source_snapshot": "data/snapshots/freeze_a_rules_v1_src.tar.gz",
+      "note": "Freeze A: rules v1 (spec 8.9). Outputs renamed *_v1 before rules v2."
+    },
+    {
+      "name": "dataset-v1",
+      "rules_version": null,
+      "recorded_at": "2026-10-04T17:26:19",
+      "git": {
+        "commit": "b2208694cf0d87722a06139cb660191083f9078f",
+        "dirty": true
+      },
+      "config_sha256": "1d9daf5e1c626cdb3df21e73e6e54d6b0336b1f07101dc4e0894bf8c3737d963",
+      "layout_rules_sha256": "dfbae1414127c7d33104134d3a406431ad19e9d511dcad10f59d64b127c53e81",
+      "cutoffs": {
+        "dev": "2020-07-29",
+        "final": "2020-08-26"
+      },
+      "cohort_selected": {
+        "light": 25000,
+        "lower_mid": 25000,
+        "upper_mid": 25000,
+        "heavy": 25000
+      },
+      "stage_runtimes_s": {
+        "ingest": 23.2,
+        "verify": 8.3,
+        "splits": 0.0,
+        "cohort": 10.6,
+        "build": 229.2,
+        "evaluate": 4.4,
+        "export": 7.1,
+        "leakage-check": 110.9
+      },
+      "source_snapshot": null,
+      "note": "Dataset v1 frozen: profiles (dev, final x E 1/3/10/all), halves, splits, cohort, unit groups, held-out targets, references, vocabularies, catalog. Scope is data preparation only; rules v2 (M3.5) stopped before any run. Cutoff 2019-08-26 is reserved and untouched for the model's final test.",
+      "artifacts_sha256": {
+        "data/ingested/articles.parquet": "e0a038b688517aed4720ccc3c63eb0a0d4e70e92be9bca50646bba0513bf296d",
+        "data/ingested/customer_index.parquet": "12ff803eecb04913749c96180c2ac133a2ed3348d93605bf9082aa2e4157c9b8",
+        "data/ingested/customers.parquet": "a9e263d0a199531f0f306aebf03865807ca7296a9021bf688802b09bf4fddf10",
+        "data/ingested/customers_audit.parquet": "d44c7a8b57e6e98099cf4c2b2c1c917febb6d7dad9896f20317d01f0b7b87141",
+        "data/ingested/transactions.parquet": "3e3a1a54fbab45cf63cbd06e02b56189f7224cbb557dd1e9d94cc4aa38da16ce",
+        "reports/split_manifest.json": "863faf1a7d7a52c951c838aa8e617cfc0a51f787f020dc56b559026b14098cc4",
+        "data/processed/cohort.parquet": "bfaee74d2be272ff4715cd741b7c0835960054d70be65f56567486fdb14cbd4f",
+        "data/processed/vocabularies.json": "3e65adc62deed50474a3c49fa3c00078f6baadee9ded9c2a4568b441caf61357",
+        "artifacts/frontend/catalog.json": "cc3eb6006f2f7ff49a84c47440d4d85cc5f2b05182eba9c62042f1c3e91df5fd",
+        "data/processed/profiles_dev_E1.parquet": "a0ed4d83bd1599153dd1f941a632c499b8c8d76d0e199911d332ba1fe2558293",
+        "data/processed/profiles_dev_E10.parquet": "4a0e022090d588807069e1071b3f8f821c60f6e1d626187144febbe731315e27",
+        "data/processed/profiles_dev_E3.parquet": "711d9e2fef195bef9110f296b1b9062502e68820d2d1686f757f25ab3c78a466",
+        "data/processed/profiles_dev_Eall.parquet": "87eba61729545533eb671668420ba3761e382b819c8a54d97cca3064ae0cab6b",
+        "data/processed/profiles_final_E1.parquet": "1bc68040f87b3ce80eb97525015e0679ab1e711f8ea1d544b30bb7145083865b",
+        "data/processed/profiles_final_E10.parquet": "bc6f2b0575661cb97b2a85a593ae3a2764d252411adb6b2bee8ef010583fb1ce",
+        "data/processed/profiles_final_E3.parquet": "729c2ebdd66f5b2b72047ec0806cc64099203a9cd39a279b8f20adb88ae0bb77",
+        "data/processed/profiles_final_Eall.parquet": "f8f896b86d14a98da177273d0fc3267bebf27e3381f6ba5c19a6833c7bfdbe47",
+        "data/processed/halves_dev.parquet": "6adbdbeb1dfb6dad8f8ba8202e59834ed8e71ba6821f3f3adecabf57a119e933",
+        "data/processed/halves_final.parquet": "6c97a20fa756478ea548c8b4828d75313dff76b772baaa492aaab03f9188f650",
+        "data/interim/units_dev.parquet": "6a8bb857224149624f595927e51de5b14df124c7221cbb6b3149f222197143b7",
+        "data/interim/units_final.parquet": "713558d7bff3bd3a7c87437264cc3fd9502c8864295438451928f483b1b2bbc4",
+        "data/interim/targets_dev.parquet": "0341b5094ab417d03434598f4f1de6879cbe71d7fc8c7ca06ad41e02b8acae2f",
+        "data/interim/targets_final.parquet": "3505f4cb664aecd95575c168cc30c19cf0bf167dc7ad05ec6efe4c7834b8b899",
+        "data/processed/references_dev/anchor_cells.parquet": "6d67b641304afe836c83268bec7a96abfb02a2fc9dd68f4ff9cbc81b627bad69",
+        "data/processed/references_dev/article_ref.parquet": "f3ca89c9db1590aa2b5e0a10e1e5b8f8f43677d12e51b3ea76a0689237b391ca",
+        "data/processed/references_dev/meta.json": "05ecf21501e3dba35fa7be1a0e91b1be566b9064ec3c7d7fc18f926f9f963435",
+        "data/processed/references_dev/pop_mainstream_score.npy": "673db07fd58b8a47f591f3ad356881def074f10b334748c7092469e7df85714b",
+        "data/processed/references_dev/pop_price_level.npy": "8840ab520467d3ceeb0b22ea8232f6d937d568522b66f075dc44e4637674f45b",
+        "data/processed/references_dev/pop_purchase_frequency.npy": "47d79873dd98e88be9a12c52b08ab2e9b1f0cad89afda9788179ed587419371e",
+        "data/processed/references_dev/priors.json": "52b5711d7e09e39d1134e8c766ac5802c5199a46cfc12079b68ae6fe1aafe54e",
+        "data/processed/references_dev/quantile_tables.json": "28ad883db440ebdfff0df26188996c17a3acc9d187a7d8e7fb92b1ea9308c49d",
+        "data/processed/references_final/anchor_cells.parquet": "02c94db6c32998e59352485afc76efc28a646d310559a2d3b0e543b07495e598",
+        "data/processed/references_final/article_ref.parquet": "640dfe209c814847d81f72fece177b5fc24f6155cc5142bf3b6ed5dfce66db5b",
+        "data/processed/references_final/meta.json": "a3205f3ad2f9b4080601dae1a61771a21f0fdc309cbf19fd2d3f3d123274b3a5",
+        "data/processed/references_final/pop_mainstream_score.npy": "0c577a04f7e8081d2e97ce59611982de8cda4ae692987b27dd7552b49ed98ee0",
+        "data/processed/references_final/pop_price_level.npy": "d293b35fd2bb6e333c4d6ee589bb9d62f48e9397db23491591f20646e4b43861",
+        "data/processed/references_final/pop_purchase_frequency.npy": "1a664a1bb9d0890981baf87f18d4e5da5483f1a86fc41a985a390e550bb27294",
+        "data/processed/references_final/priors.json": "3a8c8400d2359c87be7cc7240858a92ddee03e9d4e4920a70cb5ab9ae1a8cf8a",
+        "data/processed/references_final/quantile_tables.json": "1d1a57f5f59b6aee387bfbf268696d5eefc3c2788707e65f2167c580239570fa"
+      }
+    },
+    {
+      "name": "C",
+      "rules_version": "v1 (hand-written baseline, scoring harness only)",
+      "recorded_at": "2026-10-04T18:24:50",
+      "git": {
+        "commit": "b2208694cf0d87722a06139cb660191083f9078f",
+        "dirty": true
+      },
+      "config_sha256": "aa7540c5eb03b49266d03a4280ac9461dde1340945fa830259d7c7c89965eba2",
+      "layout_rules_sha256": "4c0b338d85a3f1ac99fea440285ae0d990c487e9e7ea77516cb0065858dc78e6",
+      "cutoffs": {
+        "dev": "2020-07-29",
+        "final": "2020-08-26"
+      },
+      "cohort_selected": {
+        "light": 25000,
+        "lower_mid": 25000,
+        "upper_mid": 25000,
+        "heavy": 25000
+      },
+      "stage_runtimes_s": {
+        "ingest": 23.2,
+        "verify": 8.3,
+        "splits": 0.0,
+        "cohort": 10.6,
+        "build": 229.2,
+        "evaluate": 4.8,
+        "export": 6.2,
+        "leakage-check": 97.0,
+        "validity": 28.6,
+        "compress": 66.5,
+        "audit": 742.7,
+        "manifest": 5.6
+      },
+      "source_snapshot": null,
+      "note": "Data-only build: dataset v1 + compressed representations (all E x D x precision) + exposure audit + data card + docs/PIPELINE.md. No utility-based selection; canonical size left to the model stage. Cutoff 2019-08-26 reserved, untouched."
+    }
+  ],
+  "freeze_reached": "C",
+  "git": {
+    "commit": "b2208694cf0d87722a06139cb660191083f9078f",
+    "dirty": true
+  },
+  "packages": {
+    "attrs": "26.1.0",
+    "bleach": "6.4.0",
+    "certifi": "2026.7.22",
+    "charset-normalizer": "3.5.2",
+    "cloudpickle": "3.1.2",
+    "contourpy": "1.4.0",
+    "cycler": "0.12.1",
+    "duckdb": "1.5.6",
+    "fastjsonschema": "2.22.2",
+    "fonttools": "4.66.1",
+    "idna": "3.20",
+    "iniconfig": "2.3.0",
+    "joblib": "1.6.0",
+    "jsonschema": "4.26.0",
+    "jsonschema-specifications": "2025.9.1",
+    "jupyter-core": "5.9.1",
+    "jupytext": "1.19.6",
+    "kaggle": "2.2.4",
+    "kagglesdk": "0.1.37",
+    "kiwisolver": "1.5.1",
+    "markdown-it-py": "4.2.0",
+    "matplotlib": "3.11.2",
+    "mdit-py-plugins": "0.6.1",
+    "mdurl": "0.1.2",
+    "narwhals": "2.26.0",
+    "nbformat": "5.11.1",
+    "numpy": "2.5.3",
+    "packaging": "26.3",
+    "pandas": "3.0.6",
+    "pillow": "12.3.0",
+    "platformdirs": "4.12.3",
+    "pluggy": "1.6.0",
+    "protobuf": "7.36.2",
+    "pyarrow": "25.0.1",
+    "pygments": "2.21.0",
+    "pyparsing": "3.3.3",
+    "pytest": "9.1.1",
+    "python-dateutil": "2.9.0.post0",
+    "python-dotenv": "1.2.4",
+    "python-slugify": "9.1.2",
+    "pyyaml": "6.0.3",
+    "referencing": "0.37.0",
+    "requests": "2.34.2",
+    "rpds-py": "2026.9.1",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "six": "1.17.0",
+    "text-unidecode": "1.3",
+    "threadpoolctl": "3.7.0",
+    "tqdm": "4.70.1",
+    "traitlets": "5.16.1",
+    "typing-extensions": "4.16.0",
+    "urllib3": "2.8.0",
+    "webencodings": "0.6.1"
+  },
+  "config_sha256": "aa7540c5eb03b49266d03a4280ac9461dde1340945fa830259d7c7c89965eba2",
+  "layout_rules_sha256": "4c0b338d85a3f1ac99fea440285ae0d990c487e9e7ea77516cb0065858dc78e6",
+  "cutoffs": {
+    "dev": "2020-07-29",
+    "final": "2020-08-26"
+  },
+  "reserved_cutoff": {
+    "cutoff": "2019-08-26",
+    "status": "untouched, reserved for the model's final test"
+  },
+  "cohort_counts": {
+    "eligible": {
+      "light": 251002,
+      "lower_mid": 238863,
+      "upper_mid": 215848,
+      "heavy": 613690
+    },
+    "selected": {
+      "light": 25000,
+      "lower_mid": 25000,
+      "upper_mid": 25000,
+      "heavy": 25000
+    },
+    "cutoff": "2020-07-29"
+  },
+  "canonical_config": null,
+  "stage_runtimes_s": {
+    "ingest": 23.2,
+    "verify": 8.3,
+    "splits": 0.0,
+    "cohort": 10.6,
+    "build": 229.2,
+    "evaluate": 4.8,
+    "export": 6.2,
+    "leakage-check": 97.0,
+    "validity": 28.6,
+    "compress": 66.5,
+    "audit": 742.7,
+    "manifest": 5.6
+  }
+}

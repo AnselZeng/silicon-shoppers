@@ -1,0 +1,24 @@
+{
+  "default_section_order": [
+    "bestsellers",
+    "sale",
+    "new_in",
+    "buy_again"
+  ],
+  "store_default_sort": "bestsellers",
+  "dev_section_means": {
+    "new_in": 0.198652,
+    "sale": 0.257757,
+    "bestsellers": 0.518258,
+    "buy_again": 0.071581
+  },
+  "dev_sort_means": {
+    "price_asc": 0.388175,
+    "newest": 0.659572,
+    "bestsellers": 0.872588
+  },
+  "headline_category_metrics": [
+    "cat_ndcg",
+    "cat_hit3"
+  ]
+}

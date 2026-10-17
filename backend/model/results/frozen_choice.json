@@ -1,0 +1,13 @@
+{
+  "combo": {
+    "cat": "offset",
+    "dept": "blend",
+    "sec": "rank_dev"
+  },
+  "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+  },
+  "note": "setups chosen per decision on August (final); margins tuned on the 12 training windows out-of-fold"
+}

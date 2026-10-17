@@ -1,0 +1,102 @@
+version: 1
+copy_revision: 2   # grammatical per-feature phrases; displayed percentiles clamped to 1st..99th
+
+classes:
+  tested: "Tested"
+  consent: "Based on your settings"
+  assumed: "Assumed"
+
+feature_labels:
+  markdown_affinity: "markdown purchases"
+  novelty_affinity: "new-arrival purchases"
+  mainstream_score: "bestseller purchases"
+  rebuy_share: "repeat purchases"
+  color_concentration: "color consistency"
+  price_level: "price level"
+
+feature_phrases:                    # subject + verb, so every reason is grammatical
+  markdown_affinity: "your markdown purchases are"
+  novelty_affinity: "your new-arrival purchases are"
+  mainstream_score: "your bestseller purchases are"
+  rebuy_share: "your repeat purchases are"
+  color_concentration: "your color consistency is"
+  price_level: "your price level is"
+
+percentile_display: [1, 99]         # displayed percentile ordinals are clamped to 1st..99th
+
+sort_labels:
+  price_asc: "price, low to high"
+  newest: "newest first"
+  bestsellers: "bestsellers first"
+
+section_labels:
+  new_in: "New In"
+  sale: "Sale"
+  bestsellers: "Bestsellers"
+  buy_again: "Buy Again"
+
+decisions:
+  landing_department:
+    class: tested
+    adapts_at: [low, medium, high]
+    reason: "{label}: about {share_pct} of your purchases"
+  category_order:
+    class: tested
+    adapts_at: [low, medium, high]
+    reason: "{label} first: about {share_pct} of your purchases"
+  section_order:
+    class: tested
+    adapts_at: [medium, high]
+    sections:                       # section -> feature; listed order breaks ties
+      new_in: novelty_affinity
+      sale: markdown_affinity
+      bestsellers: mainstream_score
+      buy_again: rebuy_share
+    reason: "{label} first: {feature_phrase} in the {pct_ordinal} percentile"
+  default_sort:
+    class: tested
+    adapts_at: [medium, high]
+    candidates:                     # listed order breaks ties
+      - {feature: markdown_affinity, sort: price_asc}
+      - {feature: novelty_affinity, sort: newest}
+      - {feature: mainstream_score, sort: bestsellers}
+    reason: "Sorted {sort_label}: {feature_phrase} in the {pct_ordinal} percentile"
+    default_reason: "Store default sort"
+  color_highlight:
+    class: tested
+    adapts_at: [medium, high]
+    feature: color_concentration
+    reason: "You mostly buy {colors}"
+  price_filter_first:
+    class: assumed
+    adapts_at: [medium, high]
+    any_of:
+      - {feature: markdown_affinity, op: ">=", threshold: trigger_high}
+      - {feature: price_level, op: "<=", threshold: trigger_low}
+    reason: "Price filter first: {feature_phrase} in the {pct_ordinal} percentile"
+  filter_order:
+    class: assumed
+    default: [category, size, color, price, sale]
+    reason: "Filters reordered to match your shopping"
+  hero:
+    class: assumed
+    adapts_at: [medium, high]
+    candidates:                     # listed order breaks ties
+      - {feature: markdown_affinity, hero: discount}
+      - {feature: novelty_affinity, hero: new_drop}
+    default: editorial
+    reason: "Banner chosen from your {feature_label}"
+    category_reason: "Banner for {label}, your top category"
+  popups:
+    class: consent
+    adapts_at: [low, medium, high]
+    reason_on: "You subscribed to the newsletter"
+    reason_off: "You haven't subscribed to the newsletter"
+  grid_columns:
+    class: assumed
+    adapts_at: [medium, high]
+    default: 3
+    reason: "Grid density from how broadly you shop"
+  compare_panel: {class: assumed, value: default, reason: "Browsing data not available in this build"}
+  reviews_first: {class: assumed, value: default, reason: "Browsing data not available in this build"}
+  cart_reminder: {class: assumed, value: default, reason: "Browsing data not available in this build"}

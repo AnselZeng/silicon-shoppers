@@ -1,0 +1,623 @@
+{
+  "cutoff_name": "final",
+  "config": "Eall_D25_identity_float32",
+  "rules_label": "rules v1: hand-written baseline",
+  "disabled_decisions": [],
+  "store_defaults": {
+    "landing_department": "dept_ladieswear",
+    "category_order": [
+      "cat_garment_upper_body",
+      "cat_garment_lower_body",
+      "cat_garment_full_body",
+      "cat_swimwear",
+      "cat_underwear",
+      "cat_accessories",
+      "cat_other",
+      "cat_shoes"
+    ],
+    "section_order": [
+      "bestsellers",
+      "sale",
+      "new_in",
+      "buy_again"
+    ],
+    "default_sort": "bestsellers",
+    "hero": "editorial",
+    "grid_columns": 3,
+    "filter_order": [
+      "category",
+      "size",
+      "color",
+      "price",
+      "sale"
+    ],
+    "popups": "off",
+    "price_filter_first": false,
+    "color_highlight": []
+  },
+  "recent_popularity": {
+    "window_days": 28,
+    "category": [
+      0.33423057276745066,
+      0.21205854265218646,
+      0.1559064561263242,
+      0.10724676305327914,
+      0.08471894640993181,
+      0.05279943145223977,
+      0.019629999777911033,
+      0.03340928776067693
+    ],
+    "category_order": [
+      "cat_garment_upper_body",
+      "cat_garment_lower_body",
+      "cat_garment_full_body",
+      "cat_swimwear",
+      "cat_underwear",
+      "cat_accessories",
+      "cat_other",
+      "cat_shoes"
+    ],
+    "department": [
+      0.6657418882004131,
+      0.05513758411619695,
+      0.21393208519332846,
+      0.04953028183090146,
+      0.01565816065916006
+    ],
+    "department_order": [
+      "dept_ladieswear",
+      "dept_divided",
+      "dept_menswear",
+      "dept_sport",
+      "dept_baby_children"
+    ]
+  },
+  "eval_users": {
+    "overall": 11183,
+    "by_stratum": {
+      "light": 811,
+      "lower_mid": 1310,
+      "upper_mid": 2216,
+      "heavy": 6846
+    }
+  },
+  "sort_eval_users": 10618,
+  "excluded_sort_pairs": {
+    "outside_assortment": 6609,
+    "single_article_type": 5,
+    "pairs_total": 42115,
+    "pairs_used": 35501
+  },
+  "overall": {
+    "category_order": {
+      "metric": "cat_ndcg",
+      "users": 11183,
+      "adapted": 0.8006277312471292,
+      "baseline": 0.8206289548179343,
+      "gain": -0.020001223570805114,
+      "ci95": [
+        -0.022817654360625876,
+        -0.017347060133731163
+      ],
+      "changed_users": {
+        "users": 9639,
+        "adapted": 0.7949071341661796,
+        "baseline": 0.81811220556283,
+        "gain": -0.023205071396650442,
+        "ci95": [
+          -0.026385807661905767,
+          -0.020299783513893332
+        ],
+        "validated": false
+      },
+      "vs_recent_popularity": {
+        "users": 11183,
+        "adapted": 0.8006277312471292,
+        "baseline": 0.8206289548179343,
+        "gain": -0.020001223570805114,
+        "ci95": [
+          -0.0225799803666547,
+          -0.017417268170814886
+        ]
+      },
+      "hit1": {
+        "adapted": 0.6551909147813646,
+        "baseline": 0.7179647679513548,
+        "baseline_recent": 0.7179647679513548
+      },
+      "hit3": {
+        "adapted": 0.8977018689081642,
+        "baseline": 0.8874184029330233,
+        "baseline_recent": 0.8874184029330233
+      }
+    },
+    "landing_department": {
+      "metric": "dept_share",
+      "users": 11183,
+      "adapted": 0.6290054647621457,
+      "baseline": 0.6264088849577714,
+      "gain": 0.0025965798043742945,
+      "ci95": [
+        -0.0005415610087913748,
+        0.0056945464303285245
+      ],
+      "changed_users": {
+        "users": 566,
+        "adapted": 0.44976705232356845,
+        "baseline": 0.3984639570014523,
+        "gain": 0.051303095322116146,
+        "ci95": [
+          -0.01615944990379869,
+          0.10886956670104733
+        ],
+        "validated": false
+      },
+      "vs_recent_popularity": {
+        "users": 11183,
+        "adapted": 0.6290054647621457,
+        "baseline": 0.6264088849577714,
+        "gain": 0.0025965798043742945,
+        "ci95": [
+          -0.0005167768755074794,
+          0.00575828636899302
+        ]
+      }
+    },
+    "section_order": {
+      "metric": "section_ndcg",
+      "users": 10280,
+      "adapted": 0.780038256325009,
+      "baseline": 0.8347334769448634,
+      "gain": -0.054695220619854545,
+      "ci95": [
+        -0.05913400973269189,
+        -0.05021724517178562
+      ],
+      "changed_users": {
+        "users": 8574,
+        "adapted": 0.7662772417998032,
+        "baseline": 0.8318553696248678,
+        "gain": -0.0655781278250647,
+        "ci95": [
+          -0.07123658601791183,
+          -0.06024499264793246
+        ],
+        "validated": false
+      }
+    },
+    "default_sort": {
+      "metric": "sort_gain",
+      "users": 10618,
+      "adapted": 0.759052084220182,
+      "baseline": 0.8657825910428724,
+      "gain": -0.10673050682269038,
+      "ci95": [
+        -0.11107657491666276,
+        -0.10247841972309606
+      ],
+      "changed_users": {
+        "users": 3935,
+        "adapted": 0.5656515076970958,
+        "baseline": 0.8536475741375854,
+        "gain": -0.2879960664404896,
+        "ci95": [
+          -0.29666720942358743,
+          -0.279520956611101
+        ],
+        "validated": false
+      }
+    },
+    "color_highlight": {
+      "metric": "color_share",
+      "users": 2401,
+      "adapted": 0.5447292085047014,
+      "baseline": 0.5413656136250417,
+      "gain": 0.0033635948796598143,
+      "ci95": [
+        -0.008573144665076353,
+        0.015244577792711421
+      ],
+      "changed_users": {
+        "users": 2401,
+        "adapted": 0.5447292085047014,
+        "baseline": 0.5413656136250417,
+        "gain": 0.0033635948796598143,
+        "ci95": [
+          -0.007279518801653808,
+          0.015047488693851946
+        ],
+        "validated": false
+      },
+      "baseline_colors": [
+        "Black",
+        "Blue"
+      ]
+    }
+  },
+  "per_stratum": {
+    "light": {
+      "category_order": {
+        "users": 811,
+        "adapted": 0.7972722049454964,
+        "baseline": 0.808479317884872,
+        "gain": -0.01120711293937547,
+        "ci95": [
+          -0.019572777970447222,
+          -0.0034789908984134772
+        ],
+        "vs_recent_popularity": {
+          "users": 811,
+          "adapted": 0.7972722049454964,
+          "baseline": 0.808479317884872,
+          "gain": -0.01120711293937547,
+          "ci95": [
+            -0.019099984429815173,
+            -0.0033606571908409537
+          ]
+        }
+      },
+      "landing_department": {
+        "users": 811,
+        "adapted": 0.6122338995390848,
+        "baseline": 0.6115650657013237,
+        "gain": 0.0006688338377610879,
+        "ci95": [
+          -0.008662986212308038,
+          0.010219612898404512
+        ],
+        "vs_recent_popularity": {
+          "users": 811,
+          "adapted": 0.6122338995390848,
+          "baseline": 0.6115650657013237,
+          "gain": 0.0006688338377610879,
+          "ci95": [
+            -0.007685517318686246,
+            0.010594664275305456
+          ]
+        }
+      },
+      "section_order": {
+        "users": 732,
+        "adapted": 0.8380972315828403,
+        "baseline": 0.8450156774530777,
+        "gain": -0.00691844587023746,
+        "ci95": [
+          -0.012801484772813431,
+          -0.001811509074037919
+        ]
+      },
+      "default_sort": {
+        "users": 759,
+        "adapted": 0.8658870701335191,
+        "baseline": 0.8761393598266629,
+        "gain": -0.010252289693143955,
+        "ci95": [
+          -0.01638878330573212,
+          -0.00493647348247972
+        ]
+      },
+      "color_highlight": {
+        "users": 19,
+        "adapted": 0.620494417862839,
+        "baseline": 0.555103668261563,
+        "gain": 0.0653907496012759,
+        "ci95": [
+          -0.06220095693779905,
+          0.2360446570972887
+        ]
+      }
+    },
+    "lower_mid": {
+      "category_order": {
+        "users": 1310,
+        "adapted": 0.7933967513158615,
+        "baseline": 0.8119201376063534,
+        "gain": -0.01852338629049178,
+        "ci95": [
+          -0.026420879198178836,
+          -0.01033813546464127
+        ],
+        "vs_recent_popularity": {
+          "users": 1310,
+          "adapted": 0.7933967513158615,
+          "baseline": 0.8119201376063534,
+          "gain": -0.01852338629049178,
+          "ci95": [
+            -0.026615986957008727,
+            -0.01103431112863379
+          ]
+        }
+      },
+      "landing_department": {
+        "users": 1310,
+        "adapted": 0.6152042253097425,
+        "baseline": 0.6189019715838247,
+        "gain": -0.003697746274082152,
+        "ci95": [
+          -0.011300299890948745,
+          0.003529352962559069
+        ],
+        "vs_recent_popularity": {
+          "users": 1310,
+          "adapted": 0.6152042253097425,
+          "baseline": 0.6189019715838247,
+          "gain": -0.003697746274082152,
+          "ci95": [
+            -0.011164485641584879,
+            0.0034207333696837515
+          ]
+        }
+      },
+      "section_order": {
+        "users": 1179,
+        "adapted": 0.7989133223395648,
+        "baseline": 0.8410378810826807,
+        "gain": -0.042124558743115895,
+        "ci95": [
+          -0.05231091529855577,
+          -0.03125965733909034
+        ]
+      },
+      "default_sort": {
+        "users": 1225,
+        "adapted": 0.8212223081747143,
+        "baseline": 0.8730772685558281,
+        "gain": -0.05185496038111389,
+        "ci95": [
+          -0.06125873977370787,
+          -0.042389439396267076
+        ]
+      },
+      "color_highlight": {
+        "users": 141,
+        "adapted": 0.5119554204660588,
+        "baseline": 0.5356467409658899,
+        "gain": -0.02369132049983114,
+        "ci95": [
+          -0.08012960148598447,
+          0.028127744005403566
+        ]
+      }
+    },
+    "upper_mid": {
+      "category_order": {
+        "users": 2216,
+        "adapted": 0.7916612477168087,
+        "baseline": 0.814204260952721,
+        "gain": -0.022543013235912394,
+        "ci95": [
+          -0.028521429190833933,
+          -0.01656974822409661
+        ],
+        "vs_recent_popularity": {
+          "users": 2216,
+          "adapted": 0.7916612477168087,
+          "baseline": 0.814204260952721,
+          "gain": -0.022543013235912394,
+          "ci95": [
+            -0.029076009846144953,
+            -0.01636692072630254
+          ]
+        }
+      },
+      "landing_department": {
+        "users": 2216,
+        "adapted": 0.6114939410314568,
+        "baseline": 0.6050640216728372,
+        "gain": 0.006429919358619721,
+        "ci95": [
+          -0.0010621249238126492,
+          0.013636639571319172
+        ],
+        "vs_recent_popularity": {
+          "users": 2216,
+          "adapted": 0.6114939410314568,
+          "baseline": 0.6050640216728372,
+          "gain": 0.006429919358619721,
+          "ci95": [
+            -0.0002947278353415541,
+            0.013661888840702015
+          ]
+        }
+      },
+      "section_order": {
+        "users": 1967,
+        "adapted": 0.758811641293702,
+        "baseline": 0.8392997436768067,
+        "gain": -0.08048810238310457,
+        "ci95": [
+          -0.09245628455470939,
+          -0.06907235963187344
+        ]
+      },
+      "default_sort": {
+        "users": 2092,
+        "adapted": 0.7586529326851552,
+        "baseline": 0.8678095149335425,
+        "gain": -0.10915658224838717,
+        "ci95": [
+          -0.11851086061651576,
+          -0.0989875053298237
+        ]
+      },
+      "color_highlight": {
+        "users": 516,
+        "adapted": 0.5228029926053778,
+        "baseline": 0.5491214428636364,
+        "gain": -0.026318450258258737,
+        "ci95": [
+          -0.05244280190030873,
+          -0.0009957081032662513
+        ]
+      }
+    },
+    "heavy": {
+      "category_order": {
+        "users": 6846,
+        "adapted": 0.8053112899739441,
+        "baseline": 0.82581432258089,
+        "gain": -0.020503032606946244,
+        "ci95": [
+          -0.024001149252927265,
+          -0.01695092407705831
+        ],
+        "vs_recent_popularity": {
+          "users": 6846,
+          "adapted": 0.8053112899739441,
+          "baseline": 0.82581432258089,
+          "gain": -0.020503032606946244,
+          "ci95": [
+            -0.02393884114395931,
+            -0.016683422370973235
+          ]
+        }
+      },
+      "landing_department": {
+        "users": 6846,
+        "adapted": 0.6393015354115404,
+        "baseline": 0.636512976540632,
+        "gain": 0.002788558870908532,
+        "ci95": [
+          -0.001208354977619052,
+          0.006918872845993714
+        ],
+        "vs_recent_popularity": {
+          "users": 6846,
+          "adapted": 0.6393015354115404,
+          "baseline": 0.636512976540632,
+          "gain": 0.002788558870908532,
+          "ci95": [
+            -0.0011762165790205142,
+            0.007039739156684515
+          ]
+        }
+      },
+      "section_order": {
+        "users": 6402,
+        "adapted": 0.7764456101279903,
+        "baseline": 0.8309938159151491,
+        "gain": -0.05454820578715879,
+        "ci95": [
+          -0.060171472479958486,
+          -0.04873996082757126
+        ]
+      },
+      "default_sort": {
+        "users": 6542,
+        "adapted": 0.7351433019454573,
+        "baseline": 0.8625668936659923,
+        "gain": -0.12742359172053497,
+        "ci95": [
+          -0.13308414982621342,
+          -0.12146833645663556
+        ]
+      },
+      "color_highlight": {
+        "users": 1725,
+        "adapted": 0.5531323925856843,
+        "baseline": 0.5393617470277847,
+        "gain": 0.013770645557899516,
+        "ci95": [
+          0.0017506767042347287,
+          0.026887436856703868
+        ]
+      }
+    }
+  },
+  "population_weighted": {
+    "category_order": {
+      "adapted": 0.8030223258458786,
+      "baseline": 0.823229754448639,
+      "gain": -0.020207428602760244
+    },
+    "landing_department": {
+      "adapted": 0.6342302136297725,
+      "baseline": 0.6315801038843354,
+      "gain": 0.0026501097454370254
+    },
+    "section_order": {
+      "adapted": 0.778555672529905,
+      "baseline": 0.832847268891907,
+      "gain": -0.05429159636200186
+    },
+    "default_sort": {
+      "adapted": 0.747409612470047,
+      "baseline": 0.8641889860304722,
+      "gain": -0.11677937356042542
+    },
+    "color_highlight": {
+      "adapted": 0.5494552679794182,
+      "baseline": 0.5402198479347795,
+      "gain": 0.00923542004463868
+    }
+  },
+  "baselines": {
+    "popularity_all_time": {
+      "cat_ndcg": 0.8206289548179343,
+      "cat_hit1": 0.7179647679513548,
+      "cat_hit3": 0.8874184029330233,
+      "dept_share": 0.6264088849577714
+    },
+    "popularity_recent": {
+      "cat_ndcg": 0.8206289548179343,
+      "cat_hit1": 0.7179647679513548,
+      "cat_hit3": 0.8874184029330233,
+      "dept_share": 0.6264088849577714,
+      "window_days": 28
+    },
+    "recent_minus_all_time_cat_ndcg": {
+      "gain": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "shuffle_control": {
+    "real_mean": 0.759052084220182,
+    "shuffled_mean": 0.7321872995176397,
+    "p_value": 0.004975124378109453,
+    "permutations": 200
+  },
+  "targeting": [
+    {
+      "rule": "markdown_affinity->price_asc",
+      "feature": "markdown_affinity",
+      "fired_users": 2426,
+      "non_fired_users": 8192,
+      "delta": 0.07912745689953737,
+      "ci95": [
+        0.06829947689251718,
+        0.08998903194689312
+      ],
+      "validated": true,
+      "note": ""
+    },
+    {
+      "rule": "novelty_affinity->newest",
+      "feature": "novelty_affinity",
+      "fired_users": 2092,
+      "non_fired_users": 8526,
+      "delta": 0.07899374819109306,
+      "ci95": [
+        0.06635405505407198,
+        0.09242967747067207
+      ],
+      "validated": true,
+      "note": ""
+    },
+    {
+      "rule": "mainstream_score->bestsellers",
+      "feature": "mainstream_score",
+      "fired_users": 2642,
+      "non_fired_users": 7976,
+      "delta": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "validated": false,
+      "note": "rule sort equals store default; targeting not testable"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "frozen_at": "2026-10-15T21:35:23",
+  "sha256": {
+    "models.pkl": "2554ea6520dc972f42202d10a71a6a8b084eabb3a8cde103fa6fa5cfd38a9cb3",
+    "item_ranker.txt": "d9c748d3292f6329a7070b4ce47b2d2a5a09bae88390b0a1fde60e7e17e1b31d",
+    "choice.json": "1f22d61c76dc48a48882c865ced02b02a4987fdfd0cb90618f7bbfba03eb6877"
+  }
+}

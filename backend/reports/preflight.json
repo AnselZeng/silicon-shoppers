@@ -1,0 +1,175 @@
+{
+  "columns": {
+    "ok": true,
+    "transactions": [
+      "article_id",
+      "customer_id",
+      "price",
+      "sales_channel_id",
+      "t_dat"
+    ],
+    "customers": [
+      "Active",
+      "FN",
+      "age",
+      "club_member_status",
+      "customer_id",
+      "fashion_news_frequency",
+      "postal_code"
+    ],
+    "articles_missing": []
+  },
+  "rows": {
+    "transactions": 31788324,
+    "articles": 105542,
+    "customers": 1371980
+  },
+  "dates": {
+    "t_dat_min": "2018-09-20",
+    "t_dat_max": "2020-09-22",
+    "D_max": "2020-09-22"
+  },
+  "departments": {
+    "found": [
+      "Baby/Children",
+      "Divided",
+      "Ladieswear",
+      "Menswear",
+      "Sport"
+    ],
+    "expected": [
+      "Baby/Children",
+      "Divided",
+      "Ladieswear",
+      "Menswear",
+      "Sport"
+    ],
+    "null_department_articles": 0
+  },
+  "product_groups": {
+    "Garment Upper body": 12459310,
+    "Garment Lower body": 7006207,
+    "Garment Full body": 3537206,
+    "Swimwear": 2564205,
+    "Underwear": 2552022,
+    "Accessories": 1593676,
+    "Shoes": 742546,
+    "Socks & Tights": 679300,
+    "Nightwear": 346338,
+    "Unknown": 96291,
+    "Bags": 7310,
+    "Items": 5422,
+    "Cosmetic": 1478,
+    "Underwear/nightwear": 558,
+    "Furniture": 514,
+    "Garment and Shoe care": 279,
+    "Stationery": 229,
+    "Interior textile": 74,
+    "Fun": 5
+  },
+  "colors": {
+    "mapping": {
+      "Beige": "neutral",
+      "Black": "neutral",
+      "Blue": "cool",
+      "Bluish Green": "cool",
+      "Brown": "neutral",
+      "Green": "cool",
+      "Grey": "neutral",
+      "Khaki green": "cool",
+      "Lilac Purple": "cool",
+      "Metal": "neutral",
+      "Mole": "neutral",
+      "Orange": "warm",
+      "Pink": "warm",
+      "Red": "warm",
+      "Turquoise": "cool",
+      "Unknown": "unknown",
+      "White": "neutral",
+      "Yellow": "warm",
+      "Yellowish Green": "cool",
+      "undefined": "unknown"
+    },
+    "unmapped": [],
+    "unmapped_unit_share": 0.0
+  },
+  "solid_present": true,
+  "duplicates": {
+    "exact_duplicate_rows": 2974905,
+    "groups_over_cap": 93433
+  },
+  "prices": {
+    "nonpositive_or_null": 0,
+    "anomaly_rows_all_data": 7
+  },
+  "channels": {
+    "monthly_rows": {
+      "1": {
+        "2019-09": 335011,
+        "2019-10": 353588,
+        "2019-11": 326721,
+        "2019-12": 434698,
+        "2020-01": 317316,
+        "2020-02": 324660,
+        "2020-03": 154087,
+        "2020-05": 391746,
+        "2020-06": 590345,
+        "2020-07": 535082,
+        "2020-08": 412565,
+        "2020-09": 250404
+      },
+      "2": {
+        "2019-09": 892167,
+        "2019-10": 793184,
+        "2019-11": 871312,
+        "2019-12": 683617,
+        "2020-01": 759038,
+        "2020-02": 677199,
+        "2020-03": 893665,
+        "2020-04": 1340882,
+        "2020-05": 970069,
+        "2020-06": 1174162,
+        "2020-07": 816420,
+        "2020-08": 824627,
+        "2020-09": 547865
+      }
+    },
+    "ratios": {
+      "1": 0.0,
+      "2": 1.9800413172494349
+    },
+    "store_channel_id": 1,
+    "online_channel_id": 2,
+    "channel_status": "verified_by_2020_closure_pattern"
+  },
+  "customers_audit": {
+    "age_missing": 15861,
+    "age_outside_range": 77,
+    "postal_top_count": 120303,
+    "postal_second_count": 261,
+    "postal_top_is_placeholder": true
+  },
+  "hard_failures": [],
+  "strata": {
+    "eligible": {
+      "light": 251002,
+      "lower_mid": 238863,
+      "upper_mid": 215848,
+      "heavy": 613690
+    },
+    "selected": {
+      "light": 25000,
+      "lower_mid": 25000,
+      "upper_mid": 25000,
+      "heavy": 25000
+    },
+    "cutoff": "2020-07-29"
+  },
+  "granularity": {
+    "popularity_hit3_dev": 0.8358404757740073,
+    "headline_category_metrics": [
+      "cat_ndcg",
+      "cat_hit3"
+    ]
+  }
+}

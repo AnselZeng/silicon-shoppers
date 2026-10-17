@@ -1,0 +1,8 @@
+{
+  "cutoff": "2020-07-29",
+  "customers": 2000,
+  "vocabulary_identical": true,
+  "features_allclose": true,
+  "evidence_identical": true,
+  "passed": true
+}
