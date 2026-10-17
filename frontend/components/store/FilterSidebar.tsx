@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { COLOR_HEX, STORE_COLORS } from "@/config/ui"
 import { FILTER_LABEL, type FilterSectionId } from "@/lib/layout/types"
 import { useStorefront } from "@/lib/store/storeState"
@@ -30,12 +30,14 @@ export function FilterSidebar({
   onQuery: (next: ListingQuery, event: "filter_applied" | "filter_removed", filter: string, value?: string) => void
 }) {
   const layout = useStorefront((state) => state.layout)
-  const [expanded, setExpanded] = useState<FilterSectionId[]>(layout.expandedFilters)
   const signature = layout.expandedFilters.join("|")
-
-  useEffect(() => {
-    setExpanded(layout.expandedFilters)
-  }, [signature, layout.expandedFilters])
+  const [toggled, setToggled] = useState<{ signature: string; open: FilterSectionId[] }>({
+    signature,
+    open: layout.expandedFilters,
+  })
+  const expanded = toggled.signature === signature ? toggled.open : layout.expandedFilters
+  const setExpanded = (update: (current: FilterSectionId[]) => FilterSectionId[]) =>
+    setToggled({ signature, open: update(expanded) })
 
   function push(next: ListingQuery, applied: boolean, filter: string, value?: string) {
     onQuery(next, applied ? "filter_applied" : "filter_removed", filter, value)
@@ -51,7 +53,6 @@ export function FilterSidebar({
             <div key={section} className="border-b border-[#e4dfd6] pb-2">
               <button
                 type="button"
-                data-agent-id={`filter-section-${section}`}
                 aria-expanded={open}
                 onClick={() =>
                   setExpanded((current) =>
@@ -70,7 +71,6 @@ export function FilterSidebar({
                   {section === "sale" ? (
                     <button
                       type="button"
-                      data-agent-id="filter-sale-toggle"
                       aria-pressed={query.sale}
                       onClick={() => push({ ...query, sale: !query.sale }, !query.sale, "sale", "1")}
                       className={`px-2 py-1 text-left text-sm ${query.sale ? "bg-[#141414] text-white" : "hover:bg-white"}`}
@@ -85,7 +85,6 @@ export function FilterSidebar({
                           <button
                             key={option.id}
                             type="button"
-                            data-agent-id={option.id}
                             aria-pressed={active}
                             onClick={() =>
                               push(
@@ -109,7 +108,6 @@ export function FilterSidebar({
                           <button
                             key={size}
                             type="button"
-                            data-agent-id={`filter-size-${size}`}
                             aria-pressed={active}
                             onClick={() =>
                               push(
@@ -134,7 +132,6 @@ export function FilterSidebar({
                           <button
                             key={color}
                             type="button"
-                            data-agent-id={`filter-color-${color}`}
                             aria-label={color}
                             aria-pressed={active}
                             title={color}
@@ -160,7 +157,6 @@ export function FilterSidebar({
                           <button
                             key={category}
                             type="button"
-                            data-agent-id={`filter-category-${category}`}
                             aria-pressed={active}
                             onClick={() =>
                               push(
@@ -188,7 +184,6 @@ export function FilterSidebar({
                           <button
                             key={slug}
                             type="button"
-                            data-agent-id={`filter-collection-${slug}`}
                             aria-pressed={active}
                             onClick={() =>
                               push(

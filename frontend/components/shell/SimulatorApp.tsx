@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { UI_CONFIG } from "@/config/ui"
 import { DemoScreen } from "@/components/shell/DemoScreen"
 import { PersonaPanel } from "@/components/shell/PersonaPanel"
-import { SimulationControls } from "@/components/shell/SimulationControls"
+import { PipelineLog } from "@/components/shell/PipelineLog"
 import { runner } from "@/lib/sim/runner"
 
 export function SimulatorApp() {
@@ -21,7 +21,7 @@ export function SimulatorApp() {
           <p className="text-[10px] tracking-[0.28em] text-white/50 uppercase">Atelier Nine</p>
           <h1 className="mt-3 font-serif text-3xl">Best viewed on desktop</h1>
           <p className="mt-3 text-sm text-white/70">
-            The simulator needs at least {UI_CONFIG.minWidthPx}px. The store itself still opens on its own.
+            The demo shell needs at least {UI_CONFIG.minWidthPx}px. The store itself still opens on its own.
           </p>
           <a href="/store" className="mt-6 inline-block text-sm underline">
             Open the store
@@ -34,7 +34,7 @@ export function SimulatorApp() {
             <PersonaPanel />
           </div>
           <div className="h-[45%] min-h-0 overflow-hidden border-t border-white/10">
-            <SimulationControls />
+            <PipelineLog />
           </div>
         </div>
         <div className="h-full w-[65%] min-w-0">

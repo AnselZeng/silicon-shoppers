@@ -14,7 +14,6 @@ export function PromoStrip() {
           : "Complimentary shipping over $150"
   return (
     <div
-      data-agent-id="promo-strip"
       className="bg-[#141414] px-6 py-2 text-center text-[10px] tracking-[0.22em] text-[#f6f3ee] uppercase"
     >
       {copy}

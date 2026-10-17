@@ -16,37 +16,14 @@ export type SortOption =
   | "price_asc"
   | "price_desc"
   | "bestsellers"
-export type FirstFilter =
-  | "sale"
-  | "color"
-  | "size"
-  | "category"
-  | "collection"
-  | "none"
-export type BannerTrigger = "discount" | "new_drop" | "collection" | "any"
 
+/** Shopping traits a persona keeps. The persona builder turns these into a basket. */
 export interface PersonaTraits {
   preferredDepartment: DepartmentPref
-  defaultSortPreference: SortOption
-  firstFilterUsed: FirstFilter
   priceSensitivity: number
   maxBudget: number
-  popupTolerance: number
-  bannerClickRate: number
-  bannerTrigger: BannerTrigger
-  scrollDepth: number
-  productsViewedBeforeDecision: number
-  imageVsTextAttention: number
-  readsReviews: boolean
-  usesSearch: number
-  usesWishlist: number
-  colorPreference: StoreColor[]
-  sizePreference: string
   noveltySeeking: number
-  brandCollectionLoyalty: number
-  sessionPatience: number
-  addToCartThreshold: number
-  device: "desktop"
+  colorPreference: StoreColor[]
 }
 
 export interface Persona {

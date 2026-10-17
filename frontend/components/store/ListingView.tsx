@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { UI_CONFIG } from "@/config/ui"
 import { FilterSidebar } from "@/components/store/FilterSidebar"
@@ -8,7 +8,7 @@ import { ProductGrid } from "@/components/store/ProductGrid"
 import { SortDropdown } from "@/components/store/SortDropdown"
 import type { SortOption } from "@/lib/personas/schema"
 import { emitStoreEvent } from "@/lib/store/emit"
-import { applyFilters, baseProducts, filterKeys, listingHref, parseListingQuery } from "@/lib/store/filtering"
+import { applyFilters, baseProducts, listingHref, parseListingQuery } from "@/lib/store/filtering"
 import { sortProducts } from "@/lib/store/sorting"
 import { useStorefront } from "@/lib/store/storeState"
 import { modePath, type ListingMode, type ListingQuery } from "@/lib/store/types"
@@ -20,16 +20,9 @@ export function ListingView({ mode }: { mode: ListingMode }) {
   const query = useMemo(() => parseListingQuery(new URLSearchParams(params.toString())), [params])
   const sort = query.sort ?? layout.defaultSort
   const path = modePath(mode)
-  const [visible, setVisible] = useState<number>(UI_CONFIG.listingPageSize)
-  const paramKey = params.toString()
-
-  useEffect(() => {
-    setVisible(UI_CONFIG.listingPageSize)
-  }, [paramKey, layout.defaultSort])
-
-  useEffect(() => {
-    useStorefront.getState().setBrowse(sort, filterKeys(query).join(","))
-  }, [sort, query])
+  const pageKey = `${params.toString()}|${layout.defaultSort}`
+  const [paging, setPaging] = useState<{ key: string; count: number }>({ key: pageKey, count: UI_CONFIG.listingPageSize })
+  const visible = paging.key === pageKey ? paging.count : UI_CONFIG.listingPageSize
 
   const products = useMemo(() => {
     const filtered = applyFilters(baseProducts(mode), query, mode)
@@ -85,8 +78,7 @@ export function ListingView({ mode }: { mode: ListingMode }) {
           {visible < products.length ? (
             <button
               type="button"
-              data-agent-id="load-more"
-              onClick={() => setVisible((count) => count + UI_CONFIG.listingPageSize)}
+              onClick={() => setPaging({ key: pageKey, count: visible + UI_CONFIG.listingPageSize })}
               className="mt-10 border border-[#141414] px-6 py-3 text-[11px] tracking-[0.18em] uppercase"
             >
               Load more

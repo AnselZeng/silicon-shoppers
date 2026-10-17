@@ -77,14 +77,13 @@ export function Concierge() {
   return (
     <div className="fixed right-4 bottom-4 z-40 w-72">
       {open ? (
-        <div data-agent-id="concierge-panel" className="mb-2 border border-[#141414] bg-[#f6f3ee] p-3 shadow-lg">
+        <div className="mb-2 border border-[#141414] bg-[#f6f3ee] p-3 shadow-lg">
           <p className="text-[10px] tracking-[0.2em] uppercase">Concierge · {tone}</p>
           <div className="mt-2 flex flex-col gap-1">
-            {script.map((item, index) => (
+            {script.map((item) => (
               <button
                 key={item.q}
                 type="button"
-                data-agent-id={`concierge-ask-${index}`}
                 onClick={() => {
                   setAsked(item.q)
                   setAnswer(item.a)
@@ -102,7 +101,6 @@ export function Concierge() {
       ) : null}
       <button
         type="button"
-        data-agent-id="concierge-toggle"
         onClick={() => setOpen(!open)}
         className="bg-[#141414] px-4 py-2 text-[11px] tracking-[0.18em] text-white uppercase"
       >

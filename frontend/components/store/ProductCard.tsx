@@ -12,11 +12,9 @@ import { GarmentImage } from "@/components/store/GarmentImage"
 export function ProductCard({
   product,
   colorway,
-  agentSuffix = "",
 }: {
   product: Product
   colorway?: string
-  agentSuffix?: string
 }) {
   const layout = useStorefront((state) => state.layout)
   const openQuick = useStorefront((state) => state.setQuickViewId)
@@ -28,20 +26,11 @@ export function ProductCard({
   const preview = layout.colorMerchandising === "hover_preview"
   const color = preview && hovered ? hovered : resting
   const showSwatches = layout.colorMerchandising === "swatches" && colors.length > 1
-  const cardId = `product-card-${product.id}${agentSuffix}`
 
   return (
     <article className="group relative">
       <Link
         href={`/store/product/${product.id}`}
-        data-agent-id={cardId}
-        data-product-id={product.id}
-        data-price={price}
-        data-color={color}
-        data-is-new={product.isNew ? "1" : "0"}
-        data-on-sale={onSale ? "1" : "0"}
-        data-collection={product.collection}
-        data-name={product.name}
         className="block"
       >
         <div
@@ -109,7 +98,6 @@ export function ProductCard({
       </Link>
       <button
         type="button"
-        data-agent-id={`wishlist-btn-${product.id}${agentSuffix}`}
         aria-label={`Save ${product.name}`}
         onClick={(event) => {
           event.preventDefault()
@@ -122,7 +110,6 @@ export function ProductCard({
       </button>
       <button
         type="button"
-        data-agent-id={`quickview-btn-${product.id}${agentSuffix}`}
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()

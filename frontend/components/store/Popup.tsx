@@ -32,7 +32,6 @@ export function Popup() {
         <div className="flex gap-2">
           <button
             type="button"
-            data-agent-id="popup-cta"
             onClick={() => {
               emitStoreEvent("popup_clicked", { variant })
               dismiss()
@@ -43,7 +42,6 @@ export function Popup() {
           </button>
           <button
             type="button"
-            data-agent-id="popup-close"
             onClick={() => {
               emitStoreEvent("popup_dismissed", { variant })
               dismiss()

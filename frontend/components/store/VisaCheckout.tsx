@@ -35,7 +35,6 @@ export function VisaCheckout() {
         </div>
         <button
           type="button"
-          data-agent-id="visa-pay-btn"
           onClick={() => {
             const captured = captureCheckout()
             if (captured) router.push("/store/confirmation")

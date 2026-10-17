@@ -39,31 +39,21 @@ export function Header() {
         {isPdp ? (
           <button
             type="button"
-            data-agent-id="nav-back"
             onClick={() => router.back()}
             className="text-[11px] tracking-[0.18em] uppercase"
           >
             Back
           </button>
-        ) : (
-          <button
-            type="button"
-            data-agent-id="nav-back"
-            aria-label="Back"
-            onClick={() => router.back()}
-            className="fixed top-0 left-0 h-2 w-2 opacity-0"
-          />
-        )}
+        ) : null}
         <Link
           href="/store"
-          data-agent-id="nav-home"
           className="shrink-0 font-serif text-[13px] tracking-[0.22em] uppercase sm:text-[15px] sm:tracking-[0.28em]"
         >
           Atelier Nine
         </Link>
         <nav className="hidden items-center gap-5 text-[11px] tracking-[0.18em] uppercase sm:flex">
           {LINKS.map((link) => (
-            <Link key={link.id} href={link.href} data-agent-id={link.id} className="hover:opacity-60">
+            <Link key={link.id} href={link.href} className="hover:opacity-60">
               {link.label}
             </Link>
           ))}
@@ -76,7 +66,6 @@ export function Header() {
           }}
         >
           <input
-            data-agent-id="search-input"
             value={draft}
             placeholder="Search"
             onChange={(event) => setDraft(event.target.value)}
@@ -88,8 +77,6 @@ export function Header() {
         </form>
         <button
           type="button"
-          data-agent-id="wishlist-icon"
-          data-count={String(wishCount)}
           onClick={() => openWish(true)}
           className="shrink-0 text-[10px] tracking-[0.14em] uppercase sm:text-[11px] sm:tracking-[0.16em]"
         >
@@ -97,8 +84,6 @@ export function Header() {
         </button>
         <button
           type="button"
-          data-agent-id="bag-icon"
-          data-count={String(bagCount)}
           onClick={() => openBag(true)}
           className="shrink-0 text-[10px] tracking-[0.14em] uppercase sm:text-[11px] sm:tracking-[0.16em]"
         >
@@ -107,7 +92,7 @@ export function Header() {
       </div>
       <nav className="flex gap-4 overflow-x-auto px-4 pb-3 text-[10px] tracking-[0.16em] uppercase sm:hidden">
         {LINKS.map((link) => (
-          <Link key={`m-${link.id}`} href={link.href} data-agent-id={link.id} className="shrink-0 hover:opacity-60">
+          <Link key={`m-${link.id}`} href={link.href} className="shrink-0 hover:opacity-60">
             {link.label}
           </Link>
         ))}

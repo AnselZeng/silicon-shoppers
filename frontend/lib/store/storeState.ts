@@ -1,7 +1,6 @@
 "use client"
 
 import { create } from "zustand"
-import { PERSONA_ACCENTS } from "@/config/ui"
 import { DEFAULT_LAYOUT, cloneLayout } from "@/lib/layout/presets"
 import type { LayoutConfig } from "@/lib/layout/types"
 import type { MockCapture, MockSession } from "@/lib/visa/mock"
@@ -23,28 +22,16 @@ export interface WishlistItem {
   color: string
 }
 
-export interface CursorState {
-  x: number
-  y: number
-  visible: boolean
-  clicking: boolean
-  outlineId: string | null
-  color: string
-}
-
 export type CheckoutPhase = "idle" | "session" | "paid"
 
 interface StorefrontState {
   layout: LayoutConfig
   layoutPresetName: string | null
   layoutToast: string | null
-  cursor: CursorState
-  cursorSpeed: number
   bag: BagLine[]
   wishlist: WishlistItem[]
   popupOpen: boolean
   popupDismissed: boolean
-  showElementIds: boolean
   quickViewId: string | null
   bagOpen: boolean
   wishlistOpen: boolean
@@ -55,16 +42,11 @@ interface StorefrontState {
   conciergeAnswer: string | null
   selectedColor: Record<string, string>
   selectedSize: Record<string, string>
-  browseSort: string
-  browseFilters: string
   sessionNonce: number
   setLayout: (layout: LayoutConfig, presetName?: string | null) => void
   dismissToast: () => void
-  setCursor: (patch: Partial<CursorState>) => void
-  setCursorSpeed: (speed: number) => void
   setPopupOpen: (open: boolean) => void
   dismissPopup: () => void
-  setShowElementIds: (show: boolean) => void
   setQuickViewId: (id: string | null) => void
   setBagOpen: (open: boolean) => void
   setWishlistOpen: (open: boolean) => void
@@ -77,18 +59,8 @@ interface StorefrontState {
   setConciergeAnswer: (answer: string | null) => void
   selectColor: (productId: string, color: string) => void
   selectSize: (productId: string, size: string) => void
-  setBrowse: (sort: string, filters: string) => void
   resetStorefront: () => void
 }
-
-const initialCursor = (): CursorState => ({
-  x: 80,
-  y: 80,
-  visible: false,
-  clicking: false,
-  outlineId: null,
-  color: PERSONA_ACCENTS.price_hunter,
-})
 
 let lineSeq = 1
 
@@ -96,13 +68,10 @@ export const useStorefront = create<StorefrontState>((set) => ({
   layout: cloneLayout(DEFAULT_LAYOUT),
   layoutPresetName: null,
   layoutToast: null,
-  cursor: initialCursor(),
-  cursorSpeed: 1,
   bag: [],
   wishlist: [],
   popupOpen: false,
   popupDismissed: false,
-  showElementIds: false,
   quickViewId: null,
   bagOpen: false,
   wishlistOpen: false,
@@ -113,8 +82,6 @@ export const useStorefront = create<StorefrontState>((set) => ({
   conciergeAnswer: null,
   selectedColor: {},
   selectedSize: {},
-  browseSort: "relevance",
-  browseFilters: "",
   sessionNonce: 0,
   setLayout: (layout, presetName) =>
     set({
@@ -125,11 +92,8 @@ export const useStorefront = create<StorefrontState>((set) => ({
       popupDismissed: !layout.popupEnabled,
     }),
   dismissToast: () => set({ layoutToast: null }),
-  setCursor: (patch) => set((state) => ({ cursor: { ...state.cursor, ...patch } })),
-  setCursorSpeed: (speed) => set({ cursorSpeed: speed }),
   setPopupOpen: (open) => set({ popupOpen: open }),
   dismissPopup: () => set({ popupOpen: false, popupDismissed: true }),
-  setShowElementIds: (show) => set({ showElementIds: show }),
   setQuickViewId: (id) => set({ quickViewId: id }),
   setBagOpen: (open) => set({ bagOpen: open }),
   setWishlistOpen: (open) => set({ wishlistOpen: open }),
@@ -178,14 +142,11 @@ export const useStorefront = create<StorefrontState>((set) => ({
     set((state) => ({ selectedColor: { ...state.selectedColor, [productId]: color } })),
   selectSize: (productId, size) =>
     set((state) => ({ selectedSize: { ...state.selectedSize, [productId]: size } })),
-  setBrowse: (sort, filters) => set({ browseSort: sort, browseFilters: filters }),
   resetStorefront: () =>
     set((state) => ({
       layout: cloneLayout(DEFAULT_LAYOUT),
       layoutPresetName: null,
       layoutToast: null,
-      cursor: initialCursor(),
-      cursorSpeed: 1,
       bag: [],
       wishlist: [],
       popupOpen: false,
@@ -200,8 +161,6 @@ export const useStorefront = create<StorefrontState>((set) => ({
       conciergeAnswer: null,
       selectedColor: {},
       selectedSize: {},
-      browseSort: "relevance",
-      browseFilters: "",
       sessionNonce: state.sessionNonce + 1,
     })),
 }))

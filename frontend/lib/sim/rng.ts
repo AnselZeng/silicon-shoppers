@@ -8,17 +8,3 @@ export function mulberry32(seed: number): () => number {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
 }
-
-export function createRng(seed: number): { next: () => number; seed: number } {
-  return { next: mulberry32(seed), seed }
-}
-
-export function randomSeed(): number {
-  const buffer = new Uint32Array(1)
-  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
-    crypto.getRandomValues(buffer)
-    const value = buffer[0] ?? 1
-    return value === 0 ? 1 : value
-  }
-  return Math.floor(Math.random() * 1_000_000_000) + 1
-}

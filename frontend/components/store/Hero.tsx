@@ -58,8 +58,6 @@ export function Hero({ compact = false }: { compact?: boolean }) {
       {short ? null : <p className="mt-4 max-w-md text-sm leading-relaxed opacity-80">{hero.body}</p>}
       <Link
         href={hero.href}
-        data-agent-id="hero-banner-cta"
-        data-banner={hero.variant}
         onClick={() => emitStoreEvent("banner_clicked", { variant: hero.variant })}
         className={`mt-5 inline-block border px-4 py-2 text-[11px] tracking-[0.18em] uppercase ${
           layout.heroVariant === "editorial" ? "border-[#141414]" : "border-white/70"

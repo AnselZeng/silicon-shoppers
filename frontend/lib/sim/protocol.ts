@@ -3,14 +3,6 @@ import type { SortOption } from "@/lib/personas/schema"
 
 export const SIM_SOURCE = "atelier-nine-sim" as const
 
-export type AgentAction =
-  | { type: "navigate"; href: string }
-  | { type: "click"; agentId: string }
-  | { type: "scrollTo"; percent: number }
-  | { type: "type"; agentId: string; text: string }
-  | { type: "hover"; agentId: string }
-  | { type: "wait"; ms: number }
-
 export const STORE_EVENT_TYPES = [
   "page_view",
   "sort_changed",
@@ -30,7 +22,6 @@ export const STORE_EVENT_TYPES = [
   "payment_completed",
   "concierge_query",
   "loyalty_awarded",
-  "session_end",
 ] as const
 
 export type StoreEventType = (typeof STORE_EVENT_TYPES)[number]
@@ -44,42 +35,12 @@ export interface StoreEvent {
   properties: Record<string, EventValue>
 }
 
-export interface VisibleElement {
-  agentId: string
-  rect: { x: number; y: number; w: number; h: number }
-  productId?: string
-  price?: number
-  color?: string
-  isNew?: boolean
-  onSale?: boolean
-  collection?: string
-  name?: string
-  sort?: string
-  filters?: string
-  banner?: string
-  popup?: string
-  checkout?: string
-  count?: string
-  text?: string
-}
-
-export interface PageState {
-  route: string
-  scrollPercent: number
-  elements: VisibleElement[]
-}
-
 export type ParentPayload =
-  | { type: "agent_action"; action: AgentAction }
   | { type: "set_layout"; layout: LayoutConfig; presetName?: string }
   | { type: "reset" }
-  | { type: "cursor_config"; color: string; speed: number }
-  | { type: "set_debug"; showElementIds: boolean }
 
 export type StorePayload =
   | { type: "store_event"; event: StoreEvent }
-  | { type: "page_state"; state: PageState }
-  | { type: "action_done"; ok: boolean; error?: string }
   | { type: "store_ready" }
 
 export interface SimEnvelope<T> {
@@ -104,22 +65,11 @@ export function readEnvelope(data: unknown): { payload: ParentPayload | StorePay
 }
 
 export function isParentPayload(payload: ParentPayload | StorePayload): payload is ParentPayload {
-  return (
-    payload.type === "agent_action" ||
-    payload.type === "set_layout" ||
-    payload.type === "reset" ||
-    payload.type === "cursor_config" ||
-    payload.type === "set_debug"
-  )
+  return payload.type === "set_layout" || payload.type === "reset"
 }
 
 export function isStorePayload(payload: ParentPayload | StorePayload): payload is StorePayload {
-  return (
-    payload.type === "store_event" ||
-    payload.type === "page_state" ||
-    payload.type === "action_done" ||
-    payload.type === "store_ready"
-  )
+  return payload.type === "store_event" || payload.type === "store_ready"
 }
 
 export function postSimMessage(target: Window, payload: ParentPayload | StorePayload) {

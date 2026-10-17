@@ -12,11 +12,6 @@ export const UI_CONFIG = {
   terminalMaxLines: 1000,
   listingPageSize: 12,
   popupDelayMs: 2200,
-  stepBaseDelayMs: 650,
-  cursorBaseMs: 480,
-  classificationThreshold: 0.75,
-  minEventsToClassify: 3,
-  typewriterMaxSpeed: 1,
   loyalistCollection: "Essentials",
 } as const
 
@@ -31,9 +26,7 @@ export const PERSONA_ACCENTS = {
 
 export const LOG_COLORS = {
   sim: "#a3a3a3",
-  agent: "#67e8f9",
   tracker: "#fde047",
-  engine: "#e879f9",
   layout: "#86efac",
   sentry: "#fdba74",
   visa: "#7dd3fc",

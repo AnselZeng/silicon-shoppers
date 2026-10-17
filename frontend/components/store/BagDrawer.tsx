@@ -52,7 +52,6 @@ export function BagDrawer() {
           </p>
           <button
             type="button"
-            data-agent-id="checkout-btn"
             disabled={bag.length === 0}
             onClick={() => startCheckout()}
             className="w-full bg-[#141414] py-3 text-[11px] tracking-[0.18em] text-white uppercase disabled:opacity-40"

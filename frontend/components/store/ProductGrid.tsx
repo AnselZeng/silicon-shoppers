@@ -21,7 +21,6 @@ export function ProductGrid({ products }: { products: Product[] }) {
           key={`${card.product.id}-${card.color}`}
           product={card.product}
           colorway={card.color}
-          agentSuffix={card.agentSuffix}
         />
       ))}
     </div>

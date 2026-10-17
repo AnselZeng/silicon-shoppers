@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect } from "react"
 import { Hero } from "@/components/store/Hero"
 import { ProductGrid } from "@/components/store/ProductGrid"
 import { UI_CONFIG } from "@/config/ui"
@@ -48,10 +47,6 @@ function sectionProducts(id: HomeSectionId): Product[] {
 
 export function HomeView() {
   const layout = useStorefront((state) => state.layout)
-  useEffect(() => {
-    useStorefront.getState().setBrowse(layout.defaultSort, "")
-  }, [layout.defaultSort])
-
   return (
     <div>
       <Hero />
@@ -77,7 +72,6 @@ export function HomeView() {
                   <Link
                     key={slug}
                     href={`/store/women?collection=${slug}`}
-                    data-agent-id={`collection-tile-${slug}`}
                     className="flex min-h-36 items-end bg-[#141414] p-4 text-[#f6f3ee]"
                   >
                     <span className="text-[12px] tracking-[0.18em] uppercase">{collection}</span>
