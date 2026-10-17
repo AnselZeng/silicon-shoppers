@@ -69,7 +69,7 @@ export function ListingView({ mode }: { mode: ListingMode }) {
               : "Search"
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-[10px] tracking-[0.22em] text-neutral-500 uppercase">Atelier Nine</p>
@@ -78,7 +78,7 @@ export function ListingView({ mode }: { mode: ListingMode }) {
         </div>
         <SortDropdown sort={sort} onSort={onSort} />
       </div>
-      <div className="flex items-start gap-8">
+      <div className="flex flex-col items-start gap-6 md:flex-row md:gap-8">
         <FilterSidebar query={query} onQuery={onQuery} />
         <div className="min-w-0 flex-1">
           <ProductGrid products={products.slice(0, visible)} />

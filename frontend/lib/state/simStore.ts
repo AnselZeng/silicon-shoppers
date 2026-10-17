@@ -6,7 +6,7 @@ import { emptyScores } from "@/lib/sim/evidence"
 
 export type SimStatus = "idle" | "running" | "paused" | "finished"
 export type SimSpeed = 0.5 | 1 | 2 | 4
-export type AspectChoice = "wide" | "classic"
+export type ViewportChoice = "web" | "mobile"
 
 export interface InferenceView {
   personaId: PersonaId | null
@@ -22,7 +22,7 @@ interface SimState {
   adaptive: boolean
   route: string
   showElementIds: boolean
-  aspect: AspectChoice
+  viewport: ViewportChoice
   activePersonaId: string | null
   inference: InferenceView
   iframe: HTMLIFrameElement | null
@@ -32,7 +32,7 @@ interface SimState {
   setAdaptive: (adaptive: boolean) => void
   setRoute: (route: string) => void
   setShowElementIds: (show: boolean) => void
-  setAspect: (aspect: AspectChoice) => void
+  setViewport: (viewport: ViewportChoice) => void
   setActivePersonaId: (id: string | null) => void
   setInference: (inference: InferenceView) => void
   setIframe: (iframe: HTMLIFrameElement | null) => void
@@ -49,7 +49,7 @@ export const useSimStore = create<SimState>((set) => ({
   adaptive: true,
   route: "/store",
   showElementIds: false,
-  aspect: "wide",
+  viewport: "web",
   activePersonaId: null,
   inference: {
     personaId: null,
@@ -64,7 +64,7 @@ export const useSimStore = create<SimState>((set) => ({
   setAdaptive: (adaptive) => set({ adaptive }),
   setRoute: (route) => set({ route }),
   setShowElementIds: (show) => set({ showElementIds: show }),
-  setAspect: (aspect) => set({ aspect }),
+  setViewport: (viewport) => set({ viewport }),
   setActivePersonaId: (id) => set({ activePersonaId: id }),
   setInference: (inference) => set({ inference }),
   setIframe: (iframe) => set({ iframe }),

@@ -42,7 +42,7 @@ export function FilterSidebar({
   }
 
   return (
-    <aside className="w-52 shrink-0">
+    <aside className="w-full shrink-0 md:w-52">
       <p className="mb-4 text-[10px] tracking-[0.22em] text-neutral-500 uppercase">Filters</p>
       <div className="flex flex-col gap-2">
         {layout.filterOrder.map((section) => {

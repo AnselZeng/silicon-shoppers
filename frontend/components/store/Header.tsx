@@ -35,7 +35,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-[#e4dfd6] bg-[#f6f3ee]/95 backdrop-blur">
-      <div className="flex items-center gap-6 px-6 py-4">
+      <div className="flex items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4">
         {isPdp ? (
           <button
             type="button"
@@ -57,11 +57,11 @@ export function Header() {
         <Link
           href="/store"
           data-agent-id="nav-home"
-          className="font-serif text-[15px] tracking-[0.28em] uppercase"
+          className="shrink-0 font-serif text-[13px] tracking-[0.22em] uppercase sm:text-[15px] sm:tracking-[0.28em]"
         >
           Atelier Nine
         </Link>
-        <nav className="flex items-center gap-5 text-[11px] tracking-[0.18em] uppercase">
+        <nav className="hidden items-center gap-5 text-[11px] tracking-[0.18em] uppercase sm:flex">
           {LINKS.map((link) => (
             <Link key={link.id} href={link.href} data-agent-id={link.id} className="hover:opacity-60">
               {link.label}
@@ -69,7 +69,7 @@ export function Header() {
           ))}
         </nav>
         <form
-          className="ml-auto"
+          className="ml-auto min-w-0 flex-1 sm:flex-none"
           onSubmit={(event) => {
             event.preventDefault()
             submitSearch(draft)
@@ -81,8 +81,8 @@ export function Header() {
             placeholder="Search"
             onChange={(event) => setDraft(event.target.value)}
             className={cn(
-              "h-9 border border-[#d9d3c8] bg-white px-3 text-sm outline-none",
-              layout.searchEmphasized ? "w-64 ring-2 ring-[#141414]" : "w-36",
+              "h-9 w-full border border-[#d9d3c8] bg-white px-3 text-sm outline-none sm:w-36",
+              layout.searchEmphasized && "sm:w-64 sm:ring-2 sm:ring-[#141414]",
             )}
           />
         </form>
@@ -91,7 +91,7 @@ export function Header() {
           data-agent-id="wishlist-icon"
           data-count={String(wishCount)}
           onClick={() => openWish(true)}
-          className="text-[11px] tracking-[0.16em] uppercase"
+          className="shrink-0 text-[10px] tracking-[0.14em] uppercase sm:text-[11px] sm:tracking-[0.16em]"
         >
           Wishlist {wishCount > 0 ? `(${wishCount})` : ""}
         </button>
@@ -100,11 +100,18 @@ export function Header() {
           data-agent-id="bag-icon"
           data-count={String(bagCount)}
           onClick={() => openBag(true)}
-          className="text-[11px] tracking-[0.16em] uppercase"
+          className="shrink-0 text-[10px] tracking-[0.14em] uppercase sm:text-[11px] sm:tracking-[0.16em]"
         >
           Bag {bagCount > 0 ? `(${bagCount})` : ""}
         </button>
       </div>
+      <nav className="flex gap-4 overflow-x-auto px-4 pb-3 text-[10px] tracking-[0.16em] uppercase sm:hidden">
+        {LINKS.map((link) => (
+          <Link key={`m-${link.id}`} href={link.href} data-agent-id={link.id} className="shrink-0 hover:opacity-60">
+            {link.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   )
 }

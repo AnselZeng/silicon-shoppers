@@ -52,9 +52,9 @@ export function Hero({ compact = false }: { compact?: boolean }) {
   const hero = HERO[layout.heroVariant]
   const short = compact || layout.heroMinimized
   return (
-    <section className={`${hero.className} ${short ? "px-6 py-6" : "px-8 py-16"}`}>
+    <section className={`${hero.className} ${short ? "px-4 py-6 sm:px-6" : "px-5 py-10 sm:px-8 sm:py-16"}`}>
       <p className="text-[10px] tracking-[0.28em] uppercase opacity-70">{hero.kicker}</p>
-      <h1 className={`font-serif tracking-tight ${short ? "mt-1 text-3xl" : "mt-3 text-6xl"}`}>{hero.title}</h1>
+      <h1 className={`font-serif tracking-tight ${short ? "mt-1 text-3xl" : "mt-3 text-4xl sm:text-6xl"}`}>{hero.title}</h1>
       {short ? null : <p className="mt-4 max-w-md text-sm leading-relaxed opacity-80">{hero.body}</p>}
       <Link
         href={hero.href}

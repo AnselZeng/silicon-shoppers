@@ -37,7 +37,8 @@ export function HomeView() {
     useStorefront.getState().setBrowse(layout.defaultSort, "")
   }, [layout.defaultSort])
 
-  const cols = layout.gridDensity === 4 ? "grid-cols-4" : layout.gridDensity === 2 ? "grid-cols-2" : "grid-cols-4"
+  const cols =
+    layout.gridDensity === 2 ? "grid-cols-2" : layout.gridDensity === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2 md:grid-cols-3"
 
   return (
     <div>
@@ -53,7 +54,7 @@ export function HomeView() {
             ) : null}
           </div>
           {section === "collections" ? (
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {COLLECTIONS.map((collection) => {
                 const slug = collectionSlug(collection)
                 return (

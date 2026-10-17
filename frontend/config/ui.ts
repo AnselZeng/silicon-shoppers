@@ -4,8 +4,11 @@ export const UI_CONFIG = {
   rightColumnWidth: 0.65,
   personaPanelHeight: 0.55,
   controlsPanelHeight: 0.45,
-  demoAspectRatios: { wide: "16 / 10", classic: "4 / 3" },
-  defaultAspectRatio: "wide",
+  demoViewports: {
+    web: { width: 1280, height: 800 },
+    mobile: { width: 390, height: 780 },
+  },
+  defaultViewport: "web",
   terminalMaxLines: 1000,
   listingPageSize: 12,
   popupDelayMs: 2200,
@@ -17,7 +20,7 @@ export const UI_CONFIG = {
   loyalistCollection: "Essentials",
 } as const
 
-export type AspectRatioKey = keyof typeof UI_CONFIG.demoAspectRatios
+export type ViewportKey = keyof typeof UI_CONFIG.demoViewports
 
 export const PERSONA_ACCENTS = {
   price_hunter: "#e8a838",
