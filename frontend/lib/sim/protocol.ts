@@ -22,6 +22,7 @@ export const STORE_EVENT_TYPES = [
   "concierge_query",
   "concierge_reply",
   "concierge_error",
+  "concierge_layout",
   "loyalty_awarded",
 ] as const
 

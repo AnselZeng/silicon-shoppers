@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import type { ConciergeTone } from "@/lib/layout/types"
 import { buildChatContext } from "@/lib/store/chatContext"
+import { applyChatIntent } from "@/lib/store/chatIntent"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -76,7 +77,6 @@ export function Concierge() {
   // Always available to shoppers — tone still comes from the applied layout.
   const tone = useStorefront((state) => state.layout.concierge.tone)
   const open = useStorefront((state) => state.conciergeOpen)
-  const footer = useStorefront((state) => state.stickyFooterOpen)
   const setOpen = useStorefront((state) => state.setConciergeOpen)
   const [messages, setMessages] = useState<Msg[]>([])
   const [draft, setDraft] = useState("")
@@ -99,6 +99,13 @@ export function Concierge() {
     setBusy(true)
     setDraft("")
     emitStoreEvent("concierge_query", { tone, q: message })
+    // A stated preference the store can act on is applied right away — the shopper asked
+    // out loud, so no confidence gate. The reply below is then told what changed.
+    const applied = applyChatIntent(message, useStorefront.getState().layout)
+    if (applied) {
+      useStorefront.getState().setLayout(applied.layout, { presetName: applied.summary })
+      emitStoreEvent("concierge_layout", { tone, summary: applied.summary })
+    }
     setMessages((prev) => [...prev, { role: "user", content: message }])
     try {
       const res = await fetch("/api/chat", {
@@ -107,7 +114,10 @@ export function Concierge() {
         body: JSON.stringify({
           message,
           history: history.current.slice(-10),
-          context: buildChatContext(),
+          context: {
+            ...buildChatContext(),
+            ...(applied ? { applied: { summary: applied.summary, changes: applied.changes } } : {}),
+          },
         }),
       })
       if (!res.ok) throw new Error(`chat ${res.status}`)
@@ -147,7 +157,9 @@ export function Concierge() {
       emitStoreEvent("concierge_error", { tone, error: error instanceof Error ? error.message : "failed" })
       const fallback =
         scriptedAnswer(message) ??
-        "The concierge is offline right now — but the store is still learning from everything you click."
+        (applied
+          ? `Done — ${applied.summary}.`
+          : "The concierge is offline right now — but the store is still learning from everything you click.")
       setOffline(true)
       setMessages((prev) => {
         const last = prev[prev.length - 1]
@@ -160,9 +172,16 @@ export function Concierge() {
   }
 
   return (
-    <div className={`fixed right-4 z-40 w-72 ${footer ? "bottom-20" : "bottom-4"}`}>
+    <div className="fixed top-20 right-4 z-40 w-72">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="ml-auto block rounded-full bg-[#141414] px-3 py-1.5 text-[10px] tracking-[0.14em] text-white uppercase shadow-md"
+      >
+        {open ? "Close" : "Concierge"}
+      </button>
       {open ? (
-        <div className="mb-2 flex h-80 flex-col border border-[#141414] bg-[#f6f3ee] shadow-lg">
+        <div className="mt-2 flex h-80 flex-col border border-[#141414] bg-[#f6f3ee] shadow-lg">
           <p className="border-b border-[#141414]/15 px-3 py-2 text-[10px] tracking-[0.2em] uppercase">
             Concierge · {tone}{offline ? " · offline" : ""}
           </p>
@@ -216,13 +235,6 @@ export function Concierge() {
           </form>
         </div>
       ) : null}
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="ml-auto block rounded-full bg-[#141414] px-3 py-1.5 text-[10px] tracking-[0.14em] text-white uppercase shadow-md"
-      >
-        {open ? "Close" : "Concierge"}
-      </button>
     </div>
   )
 }

@@ -142,6 +142,8 @@ class ShellRunner {
       )
     } else if (event.type === "concierge_error") {
       logs.push("llm", `chat failed · ${String(event.properties.error ?? "unknown")} · scripted fallback`)
+    } else if (event.type === "concierge_layout") {
+      logs.push("llm", `store rearranged · ${String(event.properties.summary ?? "shopper request")}`)
     } else {
       logs.push("tracker", describeStoreEvent(event))
     }
