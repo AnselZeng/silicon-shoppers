@@ -11,25 +11,25 @@ export const DEMO_SHOPPERS: {
     id: "price_hunter",
     title: "Price Hunter",
     fixtureId: "fixture-men-sale",
-    lines: ["Buys on markdown.", "Men and Sale lead the store.", "Budget sits around $75."],
+    lines: ["Buys menswear on markdown, around $75.", "Sale leads the store."],
   },
   {
     id: "trend_seeker",
     title: "Trend Seeker",
     fixtureId: "fixture-women-new",
-    lines: ["Chases what just landed.", "New in and dresses come first.", "Looks at the pictures before the price."],
+    lines: ["Chases new dresses before the price.", "New in comes first."],
   },
   {
     id: "mission_shopper",
     title: "Mission Shopper",
     fixtureId: "fixture-low-evidence",
-    lines: ["Already knows the piece.", "Little history, so the store stays close to the default.", "Gets in and out."],
+    lines: ["Knows the piece and gets in and out.", "Little history, so the store stays near the default."],
   },
   {
     id: "brand_loyalist",
     title: "Brand Loyalist",
     fixtureId: "fixture-divided",
-    lines: ["Comes back for the same cuts.", "Lower-priced women's pieces: jeans, skirts, tees.", "Keeps a wishlist."],
+    lines: ["Comes back for the same jeans, skirts, and tees.", "Keeps a wishlist."],
   },
 ]
 
