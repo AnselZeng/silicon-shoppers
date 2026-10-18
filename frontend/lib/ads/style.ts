@@ -7,9 +7,9 @@ export const AD_KICKER: Record<AdKind, string> = {
   new_drop: "Just landed",
   collection: "Autumn / Winter",
   category: "The edit",
-  newsletter: "Atelier Nine",
-  shipping: "Atelier Nine",
-  loyalty: "Atelier points",
+  newsletter: "SoCal Atelier",
+  shipping: "SoCal Atelier",
+  loyalty: "SoCal points",
 }
 
 export const AD_TONE: Record<AdKind, { className: string; light: boolean }> = {

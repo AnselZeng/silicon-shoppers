@@ -1,6 +1,6 @@
-# Silicon Shoppers / ATELIER NINE
+# Silicon Shoppers / SOCAL ATELIER
 
-**ATELIER NINE** is a fashion store that watches who is shopping, from their purchase history, their first few clicks and a sentence about what they need, and **rewrites its own UI** before they pay: nav, hero, home rows, ads, sort, filters and cards. The layout comes from an H&M-trained model's output and an LLM that designs within a fixed schema.
+**SOCAL ATELIER** is a fashion store that watches who is shopping, from their purchase history, their first few clicks and a sentence about what they need, and **rewrites its own UI** before they pay: nav, hero, home rows, ads, sort, filters and cards. The layout comes from an H&M-trained model's output and an LLM that designs within a fixed schema.
 
 > This is not a chatbot that recommends three products. **The page is the model output.**
 
@@ -65,7 +65,7 @@ What the store changes for you:
 ## Demo in 2 minutes
 
 1. **Normal store:** everyone sees the same editorial layout.
-2. **Pick an AI shopper** (Price Hunter, seed 42, Adaptive on) and press **Run**. A ghost cursor browses ATELIER NINE while the terminal streams `[agent]`, `[tracker]`, `[engine]`, `[layout]`, `[sentry]` and `[visa]`.
+2. **Pick an AI shopper** (Price Hunter, seed 42, Adaptive on) and press **Run**. A ghost cursor browses SOCAL ATELIER while the terminal streams `[agent]`, `[tracker]`, `[engine]`, `[layout]`, `[sentry]` and `[visa]`.
 3. After a few events the engine classifies the session and the store **switches live**: discount hero, sale filters, pop-ups off, guest checkout.
 4. The cursor adds a piece, opens the **mock Visa Unified Checkout**, and lands on `/store/confirmation`.
 5. **Tell the store what you need:** type "gym clothes for my husband, spend $100 total". Men and Sport move up, Budget picks appears, and every card shows whether it fits.
@@ -89,7 +89,7 @@ What the store changes for you:
                            |
                  Layout + a reason for every change
                            |
-          ATELIER NINE re-renders (and Sentry records why)
+          SOCAL ATELIER re-renders (and Sentry records why)
 ```
 
 ### 1. The purchase model (H&M)
@@ -124,7 +124,7 @@ What the store changes for you:
 
 ### 4. The store and the simulator
 
-- **Next.js store:** ATELIER NINE (women, men, new in, sale, search, product, confirmation pages) runs in an iframe inside a simulator.
+- **Next.js store:** SOCAL ATELIER (women, men, new in, sale, search, product, confirmation pages) runs in an iframe inside a simulator.
 - **The simulator:** a persona editor (4 personas, about 21 traits each), seeded runs (mulberry32), a terminal and a local Observability tab.
 - **The ghost-cursor agent** scores candidate actions with trait-weighted heuristics. The engine scores events, converts them with softmax, and declares a persona once its top probability is at least 0.75 after at least 3 events.
 - **Layout changes** are sent into the store with a `set_layout` message.
@@ -231,7 +231,7 @@ From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `n
 
 | Where | What |
 | --- | --- |
-| `frontend/` | Next.js simulator and store: layout preview, terminal, Observability tab, ATELIER NINE |
+| `frontend/` | Next.js simulator and store: layout preview, terminal, Observability tab, SOCAL ATELIER |
 | `frontend/lib/model/` | Model runtime in the browser: session model, layout adapter, Snowflake homepage fetch |
 | `backend/` | Homepage and live-session models; the store falls back to defaults when Python is not configured |
 | branch `dataset` | dataset-v1: 100k H&M shopper profiles, leak-free time windows, scoring harness |
@@ -259,7 +259,7 @@ From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `n
 - Run the one clean test on the reserved 2019 window, then a real A/B test.
 - Per-person profiles for shared household accounts, the reason Ladieswear dominates even for menswear buyers.
 
-Routes: `/` is the demo shell (layout preview, terminal, local observability, iframe of the store). `/store` is ATELIER NINE, including women, men, new in, sale, for you, search, product, and confirmation. The terminal logs `[tracker]`, `[model]`, `[layout]`, `[sentry]`, and `[visa]`. The Observability tab shows replay crumbs, traces, and logs without a Sentry DSN.
+Routes: `/` is the demo shell (layout preview, terminal, local observability, iframe of the store). `/store` is SOCAL ATELIER, including women, men, new in, sale, for you, search, product, and confirmation. The terminal logs `[tracker]`, `[model]`, `[layout]`, `[sentry]`, and `[visa]`. The Observability tab shows replay crumbs, traces, and logs without a Sentry DSN.
 
 ---
 
@@ -267,4 +267,4 @@ Routes: `/` is the demo shell (layout preview, terminal, local observability, if
 
 - **H&M Personalized Fashion Recommendations** (Kaggle). Non-commercial academic use only; everyone with access accepted the competition rules. The data and derived files are never published, and the demo stays behind a password.
 - **OTTO Recommender System Dataset** (Kaggle), CC BY 4.0. Credit: OTTO.
-- ATELIER NINE is a fictional brand. Product names and images in the demo store are generated.
+- SOCAL ATELIER is a fictional brand. Product names and images in the demo store are generated.

@@ -1,4 +1,4 @@
-# ATELIER NINE dataset pipeline (v1)
+# SOCAL ATELIER dataset pipeline (v1)
 
 How the compact shopper-profile dataset is built from the H&M Personalized Fashion Recommendations data. The full specification is `BUILD_PROMPT.md`. Every place this build departs from it, or settles something the spec leaves open, is listed under "Decisions made during build" in `reports/DATA_LOG.md`.
 

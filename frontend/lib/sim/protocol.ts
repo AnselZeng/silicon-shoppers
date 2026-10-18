@@ -1,7 +1,7 @@
 import type { ModelContext } from "@/lib/model/homepage"
 import type { SortOption } from "@/lib/personas/schema"
 
-export const SIM_SOURCE = "atelier-nine-sim" as const
+export const SIM_SOURCE = "socal-atelier-sim" as const
 
 export const STORE_EVENT_TYPES = [
   "page_view",

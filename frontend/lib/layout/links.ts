@@ -3,18 +3,20 @@ import type { LayoutConfig } from "@/lib/layout/types"
 import type { Category, CollectionName } from "@/lib/store/types"
 import { collectionSlug } from "@/lib/utils"
 
-/** Links that follow the shopper's department (women when the layout has none). */
+/** The shopper's department, or Women when the layout has not chosen one. */
 
 export function departmentPath(layout: LayoutConfig): string {
   return `/store/${layout.nav.department ?? "women"}`
 }
 
 export function collectionHref(layout: LayoutConfig, collection: CollectionName): string {
-  return `${departmentPath(layout)}?collection=${collectionSlug(collection)}`
+  const base = layout.nav.department ? departmentPath(layout) : "/store/search"
+  return `${base}?collection=${collectionSlug(collection)}`
 }
 
 export function categoryHref(layout: LayoutConfig, category: Category): string {
-  return `${departmentPath(layout)}?category=${category}`
+  const base = layout.nav.department ? departmentPath(layout) : "/store/search"
+  return `${base}?category=${category}`
 }
 
 export const NAV_LABEL: Record<NavItemId, string> = {

@@ -65,7 +65,7 @@ export function Header() {
           href="/store"
           className="shrink-0 font-serif text-[13px] tracking-[0.22em] uppercase sm:text-[15px] sm:tracking-[0.28em]"
         >
-          Atelier Nine
+          SoCal Atelier
         </Link>
         <nav className="relative hidden items-center gap-5 text-[11px] tracking-[0.18em] uppercase sm:flex">
           <LayoutFlash name="nav" className="-inset-x-3 -inset-y-2" tag="below" />

@@ -1,4 +1,4 @@
-# ATELIER NINE design guideline
+# SOCAL ATELIER design guideline
 
 Generated from the code by `lib/layout/guideline.ts`. Do not edit by hand; run `npm run guideline`.
 

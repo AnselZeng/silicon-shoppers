@@ -1,4 +1,4 @@
-# Backend — ATELIER NINE / Refit models
+# Backend — SOCAL ATELIER / Refit models
 
 Training and serving code for the two personalization models, ported from the
 `model` branch of `AnselZeng/la-hacks` (working tree, including the 2019

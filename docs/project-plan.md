@@ -4,7 +4,7 @@ Last updated: 2026-10-17
 
 ## Goal
 
-Demo a shopping site (ATELIER NINE) that rebuilds its layout for each user from their shopping profile. A judge builds a persona, presses Run, and watches the full pipeline: model, then LLM, then a store that re-arranges itself live. They can then browse the new store.
+Demo a shopping site (SOCAL ATELIER) that rebuilds its layout for each user from their shopping profile. A judge builds a persona, presses Run, and watches the full pipeline: model, then LLM, then a store that re-arranges itself live. They can then browse the new store.
 
 Example: a shopper who mostly buys menswear sees **Men** first in the nav, a menswear hero, menswear rows on the home page, and ads aimed at them.
 

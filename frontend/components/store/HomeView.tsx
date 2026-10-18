@@ -66,9 +66,9 @@ function rowHref(source: ProductSource, layout: LayoutConfig): string | null {
     case "new_in":
       return "/store/new-in"
     case "sale":
-      return layout.nav.department ? `${departmentPath(layout)}?sale=1` : "/store/sale"
+      return "/store/sale"
     case "bestsellers":
-      return `${departmentPath(layout)}?sort=bestsellers`
+      return layout.nav.department ? `${departmentPath(layout)}?sort=bestsellers` : "/store/search?sort=bestsellers"
     case "category":
       return categoryHref(layout, source.category)
     case "collection":

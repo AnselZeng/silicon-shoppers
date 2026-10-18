@@ -2,7 +2,7 @@ You are reviewing a plan, not writing code. Do not edit any files. Your output i
 
 ## Context
 
-Repo: /Users/surf/Desktop/silicon-shoppers (branch layout-v2). It's a demo shopping site (ATELIER NINE) that rebuilds its layout per shopper: a persona's basket goes to an H&M-trained model, the model's output goes to an LLM, and the store re-renders from the resulting layout config.
+Repo: /Users/surf/Desktop/silicon-shoppers (branch layout-v2). It's a demo shopping site (SOCAL ATELIER) that rebuilds its layout per shopper: a persona's basket goes to an H&M-trained model, the model's output goes to an LLM, and the store re-renders from the resulting layout config.
 
 Read these first, in order:
 1. docs/project-plan.md - the overall goal and the 6-step work plan (steps 0-5).

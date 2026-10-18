@@ -51,6 +51,6 @@ export const CHECKOUT_COPY: Record<CheckoutVariant, { title: string; detail: str
   },
   loyalty_pay: {
     title: "Loyalty pay",
-    detail: "Visa plus Atelier Nine points.",
+    detail: "Visa plus SoCal Atelier points.",
   },
 }

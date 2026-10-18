@@ -4,9 +4,9 @@ import { postSimMessage } from "@/lib/sim/protocol"
 import { useSimStore, type ViewportChoice } from "@/lib/state/simStore"
 
 function shopUrl(route: string): string {
-  if (route === "/store" || route === "") return "atelier-nine.shop"
+  if (route === "/store" || route === "") return "socal-atelier.shop"
   const path = route.replace(/^\/store/, "")
-  return `atelier-nine.shop${path}`
+  return `socal-atelier.shop${path}`
 }
 
 function sendHistory(action: "back" | "forward" | "reload") {
@@ -54,7 +54,7 @@ export function BrowserChrome({ mode }: { mode: ViewportChoice }) {
         </div>
         <div className="ml-3 flex h-8 max-w-[220px] min-w-0 items-center gap-2 rounded-t-lg bg-white px-3 text-[12px] text-neutral-700">
           <span className="size-3 rounded-sm bg-[#141414]" />
-          <span className="truncate">ATELIER NINE</span>
+          <span className="truncate">SOCAL ATELIER</span>
         </div>
       </div>
       <div className="flex h-11 items-center gap-2 border-b border-black/5 bg-white px-3">

@@ -1,6 +1,6 @@
-# ATELIER NINE: shopper models, H&M + OTTO (`model` branch)
+# SOCAL ATELIER: shopper models, H&M + OTTO (`model` branch)
 
-This branch holds the training code, results and exports for the two models that personalize the ATELIER NINE store:
+This branch holds the training code, results and exports for the two models that personalize the SOCAL ATELIER store:
 
 | Model | Folder | Trained on | Predicts | Drives |
 | --- | --- | --- | --- | --- |
