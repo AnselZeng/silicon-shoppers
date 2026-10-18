@@ -77,6 +77,7 @@ export function Concierge() {
   // Always available to shoppers — tone still comes from the applied layout.
   const tone = useStorefront((state) => state.layout.concierge.tone)
   const open = useStorefront((state) => state.conciergeOpen)
+  const footer = useStorefront((state) => state.stickyFooterOpen)
   const setOpen = useStorefront((state) => state.setConciergeOpen)
   const [messages, setMessages] = useState<Msg[]>([])
   const [draft, setDraft] = useState("")
@@ -158,8 +159,8 @@ export function Concierge() {
       const fallback =
         scriptedAnswer(message) ??
         (applied
-          ? `Done — ${applied.summary}.`
-          : "The concierge is offline right now — but the store is still learning from everything you click.")
+          ? `Done! ${applied.summary}.`
+          : "The concierge is offline right now, but the store is still learning from everything you click.")
       setOffline(true)
       setMessages((prev) => {
         const last = prev[prev.length - 1]
@@ -172,16 +173,9 @@ export function Concierge() {
   }
 
   return (
-    <div className="fixed top-20 right-4 z-40 w-72">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="ml-auto block rounded-full bg-[#141414] px-3 py-1.5 text-[10px] tracking-[0.14em] text-white uppercase shadow-md"
-      >
-        {open ? "Close" : "Concierge"}
-      </button>
+    <div className={`fixed right-4 z-40 w-72 ${footer ? "bottom-20" : "bottom-4"}`}>
       {open ? (
-        <div className="mt-2 flex h-80 flex-col border border-[#141414] bg-[#f6f3ee] shadow-lg">
+        <div className="mb-2 flex h-80 flex-col border border-[#141414] bg-[#f6f3ee] shadow-lg">
           <p className="border-b border-[#141414]/15 px-3 py-2 text-[10px] tracking-[0.2em] uppercase">
             Concierge · {tone}{offline ? " · offline" : ""}
           </p>
@@ -235,6 +229,13 @@ export function Concierge() {
           </form>
         </div>
       ) : null}
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="ml-auto block rounded-full bg-[#141414] px-3 py-1.5 text-[10px] tracking-[0.14em] text-white uppercase shadow-md"
+      >
+        {open ? "Close" : "Concierge"}
+      </button>
     </div>
   )
 }
