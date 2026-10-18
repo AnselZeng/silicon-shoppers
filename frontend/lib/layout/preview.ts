@@ -23,7 +23,13 @@ export interface Preview {
   basket: string[]
   report: ValidationReport
   note?: string
+  /** On a Run: whether the LLM built the layout, or the model's rules after the LLM failed. */
+  builtBy?: BuiltBy
 }
+
+export type BuiltBy =
+  | { kind: "llm"; model: string; cached: boolean; ms: number }
+  | { kind: "rules"; error: string }
 
 export function previewId(fixtureId: string, stage: Exclude<PipelineStage, "default">): string {
   return `${fixtureId}:${stage}`

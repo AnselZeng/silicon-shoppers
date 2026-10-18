@@ -1,5 +1,6 @@
 "use client"
 
+import type { Preview } from "@/lib/layout/preview"
 import type { HomepageDoc } from "@/lib/model/homepage"
 import type { StoreLayoutDoc } from "@/lib/model/storeLayout"
 
@@ -58,20 +59,52 @@ function StoredOutput({ doc }: { doc: StoreLayoutDoc }) {
   )
 }
 
+/** Who built the last Run's layout: the LLM, or the model's rules after the LLM failed. */
+function BuiltBy({ preview }: { preview: Preview }) {
+  const built = preview.builtBy
+  if (!built) return null
+  const llmReasons = preview.layout.reasons.filter((reason) => reason.source === "llm")
+  return (
+    <div className="mt-3 text-[11px]">
+      <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">
+        {built.kind === "llm"
+          ? `Built by ${built.model} · ${built.cached ? "cached" : `${(built.ms / 1000).toFixed(1)}s`}`
+          : "Built by the model's rules"}
+        {preview.report.changes.length ? ` · ${preview.report.changes.length} fixes` : ""}
+      </p>
+      {built.kind === "rules" ? (
+        <p className="mt-1 leading-snug text-[#fca5a5]">LLM failed: {built.error}</p>
+      ) : (
+        <ul className="mt-1 flex flex-col gap-1">
+          {llmReasons.map((reason) => (
+            <li key={reason.field} className="leading-snug text-white/80">
+              {reason.text}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 /** The model's output. `stored` is the Snowflake document; otherwise `doc` is a hand-written fixture. */
 export function ModelOutput({
   doc,
   stored,
   exampleName,
+  built,
 }: {
   doc: HomepageDoc
   basket: string[]
   stored?: StoreLayoutDoc | null
   exampleName?: string
+  /** The last Run's preview for this shopper, if any. */
+  built?: Preview | null
 }) {
   if (stored) return <StoredOutput doc={stored} />
   return (
     <div className="mt-3 text-[11px]">
+      {built ? <BuiltBy preview={built} /> : null}
       <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">
         What Run applies{exampleName ? ` · ${exampleName}` : ""}
       </p>
