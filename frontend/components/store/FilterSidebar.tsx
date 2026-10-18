@@ -1,13 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { COLOR_HEX, STORE_COLORS } from "@/config/ui"
 import { FILTER_LABEL, type FilterSectionId } from "@/lib/layout/types"
 import { useStorefront } from "@/lib/store/storeState"
 import { toggleValue } from "@/lib/store/filtering"
 import {
   APPAREL_SIZES,
-  CATEGORIES,
   CATEGORY_LABEL,
   COLLECTIONS,
   type Category,
@@ -30,12 +29,16 @@ export function FilterSidebar({
   onQuery: (next: ListingQuery, event: "filter_applied" | "filter_removed", filter: string, value?: string) => void
 }) {
   const layout = useStorefront((state) => state.layout)
-  const [expanded, setExpanded] = useState<FilterSectionId[]>(layout.expandedFilters)
-  const signature = layout.expandedFilters.join("|")
-
-  useEffect(() => {
-    setExpanded(layout.expandedFilters)
-  }, [signature, layout.expandedFilters])
+  const signature = layout.listing.expandedFilters.join("|")
+  const highlight = layout.listing.colorHighlight
+  const colorOrder = [...highlight, ...STORE_COLORS.filter((c) => !highlight.includes(c))]
+  const [toggled, setToggled] = useState<{ signature: string; open: FilterSectionId[] }>({
+    signature,
+    open: layout.listing.expandedFilters,
+  })
+  const expanded = toggled.signature === signature ? toggled.open : layout.listing.expandedFilters
+  const setExpanded = (update: (current: FilterSectionId[]) => FilterSectionId[]) =>
+    setToggled({ signature, open: update(expanded) })
 
   function push(next: ListingQuery, applied: boolean, filter: string, value?: string) {
     onQuery(next, applied ? "filter_applied" : "filter_removed", filter, value)
@@ -45,13 +48,12 @@ export function FilterSidebar({
     <aside className="w-full shrink-0 md:w-52">
       <p className="mb-4 text-[10px] tracking-[0.22em] text-neutral-500 uppercase">Filters</p>
       <div className="flex flex-col gap-2">
-        {layout.filterOrder.map((section) => {
+        {layout.listing.filterOrder.map((section) => {
           const open = expanded.includes(section)
           return (
             <div key={section} className="border-b border-[#e4dfd6] pb-2">
               <button
                 type="button"
-                data-agent-id={`filter-section-${section}`}
                 aria-expanded={open}
                 onClick={() =>
                   setExpanded((current) =>
@@ -70,7 +72,6 @@ export function FilterSidebar({
                   {section === "sale" ? (
                     <button
                       type="button"
-                      data-agent-id="filter-sale-toggle"
                       aria-pressed={query.sale}
                       onClick={() => push({ ...query, sale: !query.sale }, !query.sale, "sale", "1")}
                       className={`px-2 py-1 text-left text-sm ${query.sale ? "bg-[#141414] text-white" : "hover:bg-white"}`}
@@ -85,7 +86,6 @@ export function FilterSidebar({
                           <button
                             key={option.id}
                             type="button"
-                            data-agent-id={option.id}
                             aria-pressed={active}
                             onClick={() =>
                               push(
@@ -109,7 +109,6 @@ export function FilterSidebar({
                           <button
                             key={size}
                             type="button"
-                            data-agent-id={`filter-size-${size}`}
                             aria-pressed={active}
                             onClick={() =>
                               push(
@@ -128,13 +127,12 @@ export function FilterSidebar({
                     : null}
                   {section === "color" ? (
                     <div className="flex flex-wrap gap-2 px-1 py-1">
-                      {STORE_COLORS.map((color) => {
+                      {colorOrder.map((color) => {
                         const active = query.colors.includes(color)
                         return (
                           <button
                             key={color}
                             type="button"
-                            data-agent-id={`filter-color-${color}`}
                             aria-label={color}
                             aria-pressed={active}
                             title={color}
@@ -154,13 +152,12 @@ export function FilterSidebar({
                     </div>
                   ) : null}
                   {section === "category"
-                    ? CATEGORIES.map((category) => {
+                    ? layout.listing.categoryOrder.map((category) => {
                         const active = query.categories.includes(category)
                         return (
                           <button
                             key={category}
                             type="button"
-                            data-agent-id={`filter-category-${category}`}
                             aria-pressed={active}
                             onClick={() =>
                               push(
@@ -188,7 +185,6 @@ export function FilterSidebar({
                           <button
                             key={slug}
                             type="button"
-                            data-agent-id={`filter-collection-${slug}`}
                             aria-pressed={active}
                             onClick={() =>
                               push(

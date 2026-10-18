@@ -30,14 +30,6 @@ export function QuickView() {
       <SheetContent side="right" showCloseButton={false} className="w-[380px] bg-[#f6f3ee] text-[#141414] sm:max-w-md">
         {product ? (
           <div
-            data-agent-id="quickview-root"
-            data-product-id={product.id}
-            data-price={effectivePrice(product)}
-            data-color={product.colors[0] ?? "black"}
-            data-is-new={product.isNew ? "1" : "0"}
-            data-on-sale={product.salePrice !== undefined ? "1" : "0"}
-            data-collection={product.collection}
-            data-name={product.name}
           >
             <SheetHeader>
               <SheetTitle className="font-serif text-2xl">{product.name}</SheetTitle>
@@ -48,7 +40,6 @@ export function QuickView() {
             <div className="mt-4 flex gap-2">
               <button
                 type="button"
-                data-agent-id="add-to-bag"
                 onClick={() => addProductToBag(product)}
                 className="bg-[#141414] px-4 py-2 text-[11px] tracking-[0.16em] text-white uppercase"
               >
@@ -56,7 +47,6 @@ export function QuickView() {
               </button>
               <button
                 type="button"
-                data-agent-id="add-to-wishlist"
                 onClick={() => addProductToWishlist(product)}
                 className="border border-[#141414] px-4 py-2 text-[11px] tracking-[0.16em] uppercase"
               >
@@ -64,7 +54,6 @@ export function QuickView() {
               </button>
               <button
                 type="button"
-                data-agent-id="quickview-close"
                 onClick={() => close(null)}
                 className="px-3 text-[11px] tracking-[0.16em] uppercase"
               >

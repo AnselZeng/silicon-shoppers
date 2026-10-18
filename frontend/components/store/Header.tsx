@@ -3,17 +3,18 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
+import { NAV_LABEL, navHref } from "@/lib/layout/links"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
 import { cn } from "@/lib/utils"
 
-const LINKS = [
-  { id: "nav-women", href: "/store/women", label: "Women" },
-  { id: "nav-men", href: "/store/men", label: "Men" },
-  { id: "nav-new-in", href: "/store/new-in", label: "New in" },
-  { id: "nav-sale", href: "/store/sale", label: "Sale" },
-  { id: "nav-collections", href: "/store/women", label: "Collections" },
-] as const
+function navClass(highlight: boolean, sale: boolean): string {
+  if (!highlight) return "hover:opacity-60"
+  return cn(
+    "font-semibold underline decoration-2 underline-offset-[6px] hover:opacity-60",
+    sale && "text-[#9f2d2d]",
+  )
+}
 
 export function Header() {
   const pathname = usePathname()
@@ -25,6 +26,12 @@ export function Header() {
   const openWish = useStorefront((state) => state.setWishlistOpen)
   const [draft, setDraft] = useState("")
   const isPdp = pathname.startsWith("/store/product/")
+  const links = layout.nav.order.map((id) => ({
+    id,
+    href: navHref(layout, id),
+    label: NAV_LABEL[id],
+    className: navClass(layout.nav.highlight === id, id === "sale"),
+  }))
 
   function submitSearch(value: string) {
     const q = value.trim()
@@ -39,31 +46,21 @@ export function Header() {
         {isPdp ? (
           <button
             type="button"
-            data-agent-id="nav-back"
             onClick={() => router.back()}
             className="text-[11px] tracking-[0.18em] uppercase"
           >
             Back
           </button>
-        ) : (
-          <button
-            type="button"
-            data-agent-id="nav-back"
-            aria-label="Back"
-            onClick={() => router.back()}
-            className="fixed top-0 left-0 h-2 w-2 opacity-0"
-          />
-        )}
+        ) : null}
         <Link
           href="/store"
-          data-agent-id="nav-home"
           className="shrink-0 font-serif text-[13px] tracking-[0.22em] uppercase sm:text-[15px] sm:tracking-[0.28em]"
         >
           Atelier Nine
         </Link>
         <nav className="hidden items-center gap-5 text-[11px] tracking-[0.18em] uppercase sm:flex">
-          {LINKS.map((link) => (
-            <Link key={link.id} href={link.href} data-agent-id={link.id} className="hover:opacity-60">
+          {links.map((link) => (
+            <Link key={link.id} href={link.href} className={link.className}>
               {link.label}
             </Link>
           ))}
@@ -76,20 +73,17 @@ export function Header() {
           }}
         >
           <input
-            data-agent-id="search-input"
             value={draft}
             placeholder="Search"
             onChange={(event) => setDraft(event.target.value)}
             className={cn(
               "h-9 w-full border border-[#d9d3c8] bg-white px-3 text-sm outline-none sm:w-36",
-              layout.searchEmphasized && "sm:w-64 sm:ring-2 sm:ring-[#141414]",
+              layout.nav.searchEmphasized && "sm:w-64 sm:ring-2 sm:ring-[#141414]",
             )}
           />
         </form>
         <button
           type="button"
-          data-agent-id="wishlist-icon"
-          data-count={String(wishCount)}
           onClick={() => openWish(true)}
           className="shrink-0 text-[10px] tracking-[0.14em] uppercase sm:text-[11px] sm:tracking-[0.16em]"
         >
@@ -97,8 +91,6 @@ export function Header() {
         </button>
         <button
           type="button"
-          data-agent-id="bag-icon"
-          data-count={String(bagCount)}
           onClick={() => openBag(true)}
           className="shrink-0 text-[10px] tracking-[0.14em] uppercase sm:text-[11px] sm:tracking-[0.16em]"
         >
@@ -106,8 +98,8 @@ export function Header() {
         </button>
       </div>
       <nav className="flex gap-4 overflow-x-auto px-4 pb-3 text-[10px] tracking-[0.16em] uppercase sm:hidden">
-        {LINKS.map((link) => (
-          <Link key={`m-${link.id}`} href={link.href} data-agent-id={link.id} className="shrink-0 hover:opacity-60">
+        {links.map((link) => (
+          <Link key={`m-${link.id}`} href={link.href} className={cn("shrink-0", link.className)}>
             {link.label}
           </Link>
         ))}

@@ -129,20 +129,3 @@
     @apply font-sans;
   }
 }
-
-.show-agent-ids [data-agent-id] {
-  outline: 1px dashed rgba(232, 168, 56, 0.9);
-  outline-offset: 1px;
-}
-
-.show-agent-ids [data-agent-id]::after {
-  content: attr(data-agent-id);
-  position: absolute;
-  z-index: 70;
-  padding: 0 4px;
-  background: #141414;
-  color: #f6f3ee;
-  font-size: 9px;
-  letter-spacing: 0.04em;
-  pointer-events: none;
-}

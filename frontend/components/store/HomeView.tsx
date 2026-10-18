@@ -1,16 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect } from "react"
-import { Hero } from "@/components/store/Hero"
+import { AdBanner } from "@/components/store/ads/AdBanner"
+import { GarmentImage } from "@/components/store/GarmentImage"
+import { AdSlot } from "@/components/store/ads/AdSlot"
 import { ProductGrid } from "@/components/store/ProductGrid"
-import { UI_CONFIG } from "@/config/ui"
-import { FILTER_LABEL, type ColorMerchandising, type HomeSectionId } from "@/lib/layout/types"
+import { adContent } from "@/lib/ads/placement"
+import { resolveHome } from "@/lib/layout/home"
+import { categoryHref, collectionHref, departmentPath } from "@/lib/layout/links"
+import { FILTER_LABEL, type ColorMerchandising, type LayoutConfig, type ProductSource } from "@/lib/layout/types"
 import { PRODUCTS } from "@/lib/store/catalog"
-import { sortProducts } from "@/lib/store/sorting"
 import { useStorefront } from "@/lib/store/storeState"
-import { COLLECTIONS, type Product } from "@/lib/store/types"
-import { collectionSlug } from "@/lib/utils"
+import { CATEGORY_LABEL, type CollectionName } from "@/lib/store/types"
 
 const SORT_LINE = {
   relevance: "Sorted by relevance",
@@ -27,70 +28,154 @@ const MERCH_LINE: Record<ColorMerchandising, string> = {
   color_locked: "One colorway per piece",
 }
 
-const SECTION_TITLE: Record<HomeSectionId, string> = {
-  new_in: "New in",
-  bestsellers: "Bestsellers",
-  sale_picks: "Sale picks",
-  collections: "Collections",
+const TILE_COLS: Record<number, string> = {
+  3: "lg:grid-cols-3",
+  4: "lg:grid-cols-4",
+  5: "lg:grid-cols-5",
+  6: "lg:grid-cols-6",
 }
 
-function sectionProducts(id: HomeSectionId): Product[] {
-  if (id === "new_in") return sortProducts(PRODUCTS.filter((product) => product.isNew), "newest").slice(0, 8)
-  if (id === "bestsellers") return sortProducts(PRODUCTS, "bestsellers").slice(0, 8)
-  if (id === "sale_picks") {
-    return sortProducts(
-      PRODUCTS.filter((product) => product.salePrice !== undefined),
-      "price_asc",
-    ).slice(0, 8)
+function rowTitle(source: ProductSource): string {
+  switch (source.kind) {
+    case "for_you":
+      return "Picked for you"
+    case "new_in":
+      return "New in"
+    case "bestsellers":
+      return "Bestsellers"
+    case "sale":
+      return "Sale picks"
+    case "buy_again":
+      return "Buy again"
+    case "under_price":
+      return `Under $${source.max}`
+    case "category":
+      return CATEGORY_LABEL[source.category]
+    case "collection":
+      return source.collection
   }
-  return []
+}
+
+function rowHref(source: ProductSource, layout: LayoutConfig): string | null {
+  switch (source.kind) {
+    case "for_you":
+      return "/store/for-you"
+    case "new_in":
+      return "/store/new-in"
+    case "sale":
+      return layout.nav.department ? `${departmentPath(layout)}?sale=1` : "/store/sale"
+    case "bestsellers":
+      return `${departmentPath(layout)}?sort=bestsellers`
+    case "category":
+      return categoryHref(layout, source.category)
+    case "collection":
+      return collectionHref(layout, source.collection)
+    case "under_price":
+    case "buy_again":
+      return null
+  }
+}
+
+function CollectionSpotlight({ layout, collection }: { layout: LayoutConfig; collection: CollectionName }) {
+  const department = layout.nav.department
+  const pieces = PRODUCTS.filter((p) => p.collection === collection && (!department || p.department === department))
+  const lead = [...pieces].sort((a, b) => b.popularity - a.popularity)[0]
+  return (
+    <section className="mx-6 my-10 grid items-center gap-8 bg-[#efeae2] p-8 md:grid-cols-[1fr_auto]">
+      <div>
+        <p className="text-[10px] tracking-[0.28em] text-neutral-500 uppercase">Collection</p>
+        <h2 className="mt-2 font-serif text-4xl tracking-tight">{collection}</h2>
+        <p className="mt-3 text-sm text-neutral-600">{pieces.length} pieces</p>
+        <Link
+          href={collectionHref(layout, collection)}
+          className="mt-5 inline-block border border-[#141414] px-4 py-2 text-[11px] tracking-[0.18em] uppercase"
+        >
+          Shop {collection}
+        </Link>
+      </div>
+      {lead ? <GarmentImage type={lead.garmentType} color={lead.colors[0] ?? "black"} className="h-56 w-44" /> : null}
+    </section>
+  )
 }
 
 export function HomeView() {
   const layout = useStorefront((state) => state.layout)
-  useEffect(() => {
-    useStorefront.getState().setBrowse(layout.defaultSort, "")
-  }, [layout.defaultSort])
+  const blocks = resolveHome(layout)
 
   return (
     <div>
-      <Hero />
-      <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
-        {SORT_LINE[layout.defaultSort]} · Filters lead with {FILTER_LABEL[layout.filterOrder[0] ?? "category"]} ·{" "}
-        {MERCH_LINE[layout.colorMerchandising]}
-      </p>
-      {layout.homeSectionOrder.map((section) => (
-        <section key={section} className="px-6 py-10">
-          <div className="mb-6 flex items-baseline justify-between">
-            <h2 className="text-[11px] tracking-[0.22em] uppercase">{SECTION_TITLE[section]}</h2>
-            {section !== "collections" ? (
-              <Link href={section === "sale_picks" ? "/store/sale" : section === "new_in" ? "/store/new-in" : "/store/women"} className="text-[10px] tracking-[0.18em] uppercase">
-                View all
-              </Link>
-            ) : null}
-          </div>
-          {section === "collections" ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {COLLECTIONS.map((collection) => {
-                const slug = collectionSlug(collection)
-                return (
+      {blocks.map((entry, index) => {
+        const block = entry.block
+        const key = `${index}-${block.type}`
+        if (block.type === "hero") {
+          return (
+            <div key={key}>
+              <AdSlot slot="hero" />
+              <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
+                {SORT_LINE[layout.listing.defaultSort]} · Filters lead with{" "}
+                {FILTER_LABEL[layout.listing.filterOrder[0] ?? "category"]} · {MERCH_LINE[layout.listing.colorMerchandising]}
+              </p>
+            </div>
+          )
+        }
+        if ("products" in entry) {
+          if (entry.products.length === 0) return null
+          const href = rowHref(entry.block.source, layout)
+          return (
+            <section key={key} className="px-6 py-10">
+              <div className="mb-6 flex items-baseline justify-between">
+                <h2 className="text-[11px] tracking-[0.22em] uppercase">{entry.block.title ?? rowTitle(entry.block.source)}</h2>
+                {href ? (
+                  <Link href={href} className="text-[10px] tracking-[0.18em] uppercase">
+                    View all
+                  </Link>
+                ) : null}
+              </div>
+              <ProductGrid products={entry.products} columns={4} />
+            </section>
+          )
+        }
+        if (block.type === "category_tiles") {
+          return (
+            <section key={key} className="px-6 py-10">
+              <h2 className="mb-6 text-[11px] tracking-[0.22em] uppercase">Shop by category</h2>
+              <div className={`grid grid-cols-2 gap-4 md:grid-cols-3 ${TILE_COLS[block.categories.length] ?? "lg:grid-cols-6"}`}>
+                {block.categories.map((category) => (
                   <Link
-                    key={slug}
-                    href={`/store/women?collection=${slug}`}
-                    data-agent-id={`collection-tile-${slug}`}
+                    key={category}
+                    href={categoryHref(layout, category)}
                     className="flex min-h-36 items-end bg-[#141414] p-4 text-[#f6f3ee]"
                   >
-                    <span className="text-[12px] tracking-[0.18em] uppercase">{collection}</span>
+                    <span className="text-[12px] tracking-[0.18em] uppercase">{CATEGORY_LABEL[category]}</span>
                   </Link>
-                )
-              })}
-            </div>
-          ) : (
-            <ProductGrid products={sectionProducts(section)} />
-          )}
-        </section>
-      ))}
-      <p className="sr-only">{UI_CONFIG.loyalistCollection}</p>
+                ))}
+              </div>
+            </section>
+          )
+        }
+        if (block.type === "collection_spotlight") {
+          return <CollectionSpotlight key={key} layout={layout} collection={block.collection} />
+        }
+        if (block.type === "editorial_text") {
+          const text = layout.copy[block.copyKey]
+          if (!text) return null
+          return (
+            <section key={key} className="px-6 py-12">
+              <p
+                className={`mx-auto max-w-2xl text-center font-serif tracking-tight ${
+                  block.copyKey === "intro" ? "text-2xl" : "text-lg leading-relaxed text-neutral-700"
+                }`}
+              >
+                {text}
+              </p>
+            </section>
+          )
+        }
+        if (block.type === "ad_banner") {
+          return <AdBanner key={key} ad={adContent(layout, block.adId)} slot="home_block" className="mx-6 my-6" />
+        }
+        return null
+      })}
     </div>
   )
 }

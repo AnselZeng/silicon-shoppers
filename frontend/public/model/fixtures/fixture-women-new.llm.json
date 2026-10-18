@@ -1,0 +1,53 @@
+{
+  "version": 2,
+  "nav": {
+    "order": ["women", "new_in", "for_you", "collections", "sale", "men"],
+    "highlight": "new_in",
+    "department": "women",
+    "searchEmphasized": false
+  },
+  "home": {
+    "blocks": [
+      { "type": "hero" },
+      { "type": "editorial_text", "copyKey": "intro" },
+      { "type": "product_row", "source": { "kind": "new_in" }, "title": "Just landed", "limit": 8 },
+      { "type": "product_row", "source": { "kind": "category", "category": "dresses" }, "limit": 4 },
+      { "type": "collection_spotlight", "collection": "Winter Edit" },
+      { "type": "product_row", "source": { "kind": "for_you" }, "limit": 8 },
+      { "type": "category_tiles", "categories": ["dresses", "shirts", "knitwear", "coats", "skirts"] },
+      { "type": "product_row", "source": { "kind": "bestsellers" }, "limit": 4 }
+    ],
+    "heroSize": "full"
+  },
+  "listing": {
+    "defaultSort": "newest",
+    "filterOrder": ["color", "category", "collection", "size", "price", "sale"],
+    "expandedFilters": ["color", "category"],
+    "gridDensity": 3,
+    "colorMerchandising": "hover_preview",
+    "colorHighlight": ["black", "burgundy"],
+    "card": { "priceStyle": "plain", "showRating": true, "badges": ["new", "bestseller"], "quickView": "emphasized" }
+  },
+  "ads": {
+    "placements": [
+      { "slot": "top_strip", "adIds": ["new_women", "shipping"] },
+      { "slot": "hero", "adIds": ["new_women", "cat_full_women", "collection_women"] },
+      { "slot": "listing_banner", "adIds": ["cat_full_women"] },
+      { "slot": "grid_tile", "adIds": ["new_women"], "gridPosition": 4 },
+      { "slot": "interstitial", "adIds": ["new_women"], "trigger": "page_count", "triggerValue": 2 }
+    ]
+  },
+  "copy": {
+    "intro": "New pieces land every week. Slip dresses, the Winter Puffer and soft knits, in black and burgundy first."
+  },
+  "checkout": { "variant": "click_to_pay", "expressCheckout": false, "showTrustBadges": false, "loyaltyPrompt": false },
+  "concierge": { "enabled": true, "tone": "drops" },
+  "reasons": [
+    { "field": "nav.department", "source": "model", "modelDecision": "landing_department", "text": "" },
+    { "field": "nav.highlight", "source": "llm", "text": "New in highlighted: New In is about 52% of next picks" },
+    { "field": "home.blocks", "source": "model", "modelDecision": "section_order", "text": "" },
+    { "field": "ads.placements", "source": "llm", "text": "New-drop hero and one interstitial for a shopper whose top section is New In" },
+    { "field": "listing.colorHighlight", "source": "model", "modelDecision": "color_highlight", "text": "" },
+    { "field": "listing.card", "source": "llm", "text": "Quick view emphasized and New badges for a new-arrival buyer" }
+  ]
+}

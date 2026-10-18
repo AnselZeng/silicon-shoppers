@@ -1,14 +1,15 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { UI_CONFIG } from "@/config/ui"
+import { AdSlot } from "@/components/store/ads/AdSlot"
 import { FilterSidebar } from "@/components/store/FilterSidebar"
 import { ProductGrid } from "@/components/store/ProductGrid"
 import { SortDropdown } from "@/components/store/SortDropdown"
 import type { SortOption } from "@/lib/personas/schema"
 import { emitStoreEvent } from "@/lib/store/emit"
-import { applyFilters, baseProducts, filterKeys, listingHref, parseListingQuery } from "@/lib/store/filtering"
+import { applyFilters, baseProducts, listingHref, parseListingQuery } from "@/lib/store/filtering"
 import { sortProducts } from "@/lib/store/sorting"
 import { useStorefront } from "@/lib/store/storeState"
 import { modePath, type ListingMode, type ListingQuery } from "@/lib/store/types"
@@ -18,23 +19,18 @@ export function ListingView({ mode }: { mode: ListingMode }) {
   const router = useRouter()
   const layout = useStorefront((state) => state.layout)
   const query = useMemo(() => parseListingQuery(new URLSearchParams(params.toString())), [params])
-  const sort = query.sort ?? layout.defaultSort
+  const sort = query.sort ?? layout.listing.defaultSort
+  /** For You keeps the model's ranking until the shopper picks a sort. */
+  const keepRank = mode === "for-you" && !query.sort
   const path = modePath(mode)
-  const [visible, setVisible] = useState<number>(UI_CONFIG.listingPageSize)
-  const paramKey = params.toString()
-
-  useEffect(() => {
-    setVisible(UI_CONFIG.listingPageSize)
-  }, [paramKey, layout.defaultSort])
-
-  useEffect(() => {
-    useStorefront.getState().setBrowse(sort, filterKeys(query).join(","))
-  }, [sort, query])
+  const pageKey = `${params.toString()}|${layout.listing.defaultSort}`
+  const [paging, setPaging] = useState<{ key: string; count: number }>({ key: pageKey, count: UI_CONFIG.listingPageSize })
+  const visible = paging.key === pageKey ? paging.count : UI_CONFIG.listingPageSize
 
   const products = useMemo(() => {
-    const filtered = applyFilters(baseProducts(mode), query, mode)
-    return sortProducts(filtered, sort, query.q)
-  }, [mode, query, sort])
+    const filtered = applyFilters(baseProducts(mode, layout.home.forYouIds), query, mode)
+    return keepRank ? filtered : sortProducts(filtered, sort, query.q)
+  }, [mode, query, sort, keepRank, layout.home.forYouIds])
 
   function write(next: ListingQuery) {
     router.push(listingHref(path, next), { scroll: false })
@@ -64,6 +60,8 @@ export function ListingView({ mode }: { mode: ListingMode }) {
           ? "New in"
           : mode === "sale"
             ? "Sale"
+            : mode === "for-you"
+              ? "For you"
             : query.q
               ? `Search “${query.q}”`
               : "Search"
@@ -81,12 +79,12 @@ export function ListingView({ mode }: { mode: ListingMode }) {
       <div className="flex flex-col items-start gap-6 md:flex-row md:gap-8">
         <FilterSidebar query={query} onQuery={onQuery} />
         <div className="min-w-0 flex-1">
-          <ProductGrid products={products.slice(0, visible)} />
+          <AdSlot slot="listing_banner" />
+          <ProductGrid products={products.slice(0, visible)} withAds />
           {visible < products.length ? (
             <button
               type="button"
-              data-agent-id="load-more"
-              onClick={() => setVisible((count) => count + UI_CONFIG.listingPageSize)}
+              onClick={() => setPaging({ key: pageKey, count: visible + UI_CONFIG.listingPageSize })}
               className="mt-10 border border-[#141414] px-6 py-3 text-[11px] tracking-[0.18em] uppercase"
             >
               Load more

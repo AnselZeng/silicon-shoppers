@@ -78,5 +78,5 @@ function apply(live?: SessionDecisions): void {
   const { layout, log } = modelLayout(home, live);
   lastSignature = live ? signature(live) : "";
   lastLog = log;
-  useStorefront.getState().setLayout(layout, live ? "Live session" : "H&M model");
+  useStorefront.getState().setLayout(layout, { presetName: live ? "Live session" : "H&M model" });
 }

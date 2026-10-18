@@ -11,19 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
 import { useLogStore } from "@/lib/state/logStore"
 import { usePersonaStore } from "@/lib/state/personaStore"
-import {
-  SORT_LABEL,
-  SORT_OPTIONS,
-  type BannerTrigger,
-  type DepartmentPref,
-  type FirstFilter,
-  type Persona,
-  type PersonaTraits,
-  type SortOption,
-} from "@/lib/personas/schema"
+import type { DepartmentPref, Persona, PersonaTraits } from "@/lib/personas/schema"
 
 function SliderRow({
   label,
@@ -122,58 +112,9 @@ export function TraitEditor({ persona }: { persona: Persona }) {
           onChange={(value) => patch({ preferredDepartment: value as DepartmentPref })}
         />
       </Field>
-      <Field label="Sort">
-        <EnumSelect
-          value={traits.defaultSortPreference}
-          options={SORT_OPTIONS}
-          labelFor={(value) => SORT_LABEL[value as SortOption]}
-          onChange={(value) => patch({ defaultSortPreference: value as SortOption })}
-        />
-      </Field>
-      <Field label="First filter">
-        <EnumSelect
-          value={traits.firstFilterUsed}
-          options={["sale", "color", "size", "category", "collection", "none"]}
-          onChange={(value) => patch({ firstFilterUsed: value as FirstFilter })}
-        />
-      </Field>
-      <Field label="Banner">
-        <EnumSelect
-          value={traits.bannerTrigger}
-          options={["discount", "new_drop", "collection", "any"]}
-          onChange={(value) => patch({ bannerTrigger: value as BannerTrigger })}
-        />
-      </Field>
-      <Field label="Size">
-        <EnumSelect
-          value={traits.sizePreference}
-          options={["XS", "S", "M", "L", "XL"]}
-          onChange={(value) => patch({ sizePreference: value })}
-        />
-      </Field>
       <SliderRow label="Price sensitivity" value={traits.priceSensitivity} onChange={(value) => patch({ priceSensitivity: value })} />
       <SliderRow label="Max budget" value={traits.maxBudget} min={20} max={400} onChange={(value) => patch({ maxBudget: value })} />
-      <SliderRow label="Popup tolerance" value={traits.popupTolerance} onChange={(value) => patch({ popupTolerance: value })} />
-      <SliderRow label="Banner click" value={traits.bannerClickRate} onChange={(value) => patch({ bannerClickRate: value })} />
-      <SliderRow label="Scroll depth" value={traits.scrollDepth} onChange={(value) => patch({ scrollDepth: value })} />
-      <SliderRow
-        label="PDPs before bag"
-        value={traits.productsViewedBeforeDecision}
-        min={1}
-        max={12}
-        onChange={(value) => patch({ productsViewedBeforeDecision: value })}
-      />
-      <SliderRow label="Image vs text" value={traits.imageVsTextAttention} onChange={(value) => patch({ imageVsTextAttention: value })} />
-      <SliderRow label="Search" value={traits.usesSearch} onChange={(value) => patch({ usesSearch: value })} />
-      <SliderRow label="Wishlist" value={traits.usesWishlist} onChange={(value) => patch({ usesWishlist: value })} />
       <SliderRow label="Novelty" value={traits.noveltySeeking} onChange={(value) => patch({ noveltySeeking: value })} />
-      <SliderRow label="Collection loyalty" value={traits.brandCollectionLoyalty} onChange={(value) => patch({ brandCollectionLoyalty: value })} />
-      <SliderRow label="Patience" value={traits.sessionPatience} onChange={(value) => patch({ sessionPatience: value })} />
-      <SliderRow label="Add-to-bag threshold" value={traits.addToCartThreshold} onChange={(value) => patch({ addToCartThreshold: value })} />
-      <label className="flex items-center justify-between text-[11px]">
-        Reads reviews
-        <Switch checked={traits.readsReviews} onCheckedChange={(checked) => patch({ readsReviews: Boolean(checked) })} />
-      </label>
       <div>
         <p className="mb-1 text-[11px] text-white/70">Colors</p>
         <div className="flex flex-wrap gap-1">

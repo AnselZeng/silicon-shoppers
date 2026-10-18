@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react"
 import { UI_CONFIG } from "@/config/ui"
 import { BrowserChrome } from "@/components/shell/BrowserChrome"
-import { postSimMessage } from "@/lib/sim/protocol"
 import { useSimStore, type ViewportChoice } from "@/lib/state/simStore"
 
 const VIEWS: { id: ViewportChoice; label: string }[] = [
@@ -14,8 +13,6 @@ const VIEWS: { id: ViewportChoice; label: string }[] = [
 export function DemoScreen() {
   const viewport = useSimStore((state) => state.viewport)
   const setViewport = useSimStore((state) => state.setViewport)
-  const showElementIds = useSimStore((state) => state.showElementIds)
-  const setShow = useSimStore((state) => state.setShowElementIds)
   const setIframe = useSimStore((state) => state.setIframe)
   const frameRef = useRef<HTMLIFrameElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -43,13 +40,6 @@ export function DemoScreen() {
     return () => observer.disconnect()
   }, [web.width, web.height])
 
-  function toggleIds() {
-    const next = !showElementIds
-    setShow(next)
-    const frame = frameRef.current?.contentWindow
-    if (frame) postSimMessage(frame, { type: "set_debug", showElementIds: next })
-  }
-
   return (
     <div className="flex h-full flex-col bg-[#141416]">
       <div className="flex items-center gap-2 px-4 py-2 text-[11px] text-white/70">
@@ -64,9 +54,6 @@ export function DemoScreen() {
             {view.label}
           </button>
         ))}
-        <button type="button" onClick={toggleIds} className="ml-auto border border-white/20 px-2 py-1">
-          {showElementIds ? "Hide IDs" : "Show IDs"}
-        </button>
       </div>
       <div ref={stageRef} className="flex min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-hidden px-6 py-5">
         {viewport === "web" ? (
