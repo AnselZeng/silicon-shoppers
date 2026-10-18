@@ -5,6 +5,7 @@
 
 import type { LayoutConfig } from "@/lib/layout/types"
 import type { NavItemId } from "@/lib/layout/enums"
+import type { AdId } from "@/lib/ads/catalog"
 import { STORE_COLORS, type StoreColor } from "@/config/ui"
 import { intentOverrides, keywordIntent } from "@/lib/model/intent"
 
@@ -96,6 +97,42 @@ export function applyChatIntent(message: string, current: LayoutConfig): ChatApp
     layout.listing.colorHighlight = colors
     layout.listing.expandedFilters = [...new Set<typeof layout.listing.expandedFilters[number]>(["color", ...layout.listing.expandedFilters])]
     changes.push(`${colors.join(" + ")} colors forward`)
+  }
+
+  // Stated colors → color merchandising: those colors first on cards and in the color filter.
+  if (colors.length) {
+    layout.listing.colorHighlight = colors
+    layout.listing.expandedFilters = [...new Set<typeof layout.listing.expandedFilters[number]>(["color", ...layout.listing.expandedFilters])]
+    changes.push(`${colors.join(" + ")} colors forward`)
+  }
+
+  // The hero is part of the rearrange too — swap the banner to match what they asked
+  // for, so the headline/visual changes with the store instead of staying constant.
+  const heroAd: AdId | null =
+    o.sectionFirst === "sale" || o.budget || o.priceMode
+      ? landing === "men"
+        ? "sale_men"
+        : landing === "women"
+          ? "sale_women"
+          : "offer_all"
+      : o.sectionFirst === "new_in"
+        ? landing === "women"
+          ? "new_women"
+          : "new_men"
+        : landing === "men"
+          ? "collection_men"
+          : landing === "women"
+            ? "collection_women"
+            : null
+  if (heroAd) {
+    const hero = layout.ads.placements.find((p) => p.slot === "hero")
+    if (!hero) {
+      layout.ads.placements.unshift({ slot: "hero", adIds: [heroAd] })
+      changes.push("hero banner swapped")
+    } else if (hero.adIds[0] !== heroAd) {
+      hero.adIds = [heroAd]
+      changes.push("hero banner swapped")
+    }
   }
 
   if (!changes.length) return null

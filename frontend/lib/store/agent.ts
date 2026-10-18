@@ -38,6 +38,12 @@ export function shopperConfirmed(message: string): boolean {
   return SHORT_YES_RE.test(message) || CHECKOUT_WORDS_RE.test(message)
 }
 
+// Recovery of a claimed add only runs when the SHOPPER actually asked to buy —
+// otherwise a browsing ask ("show me men's sale") can't be turned into a bagged
+// item by a model that got over-eager with its prose.
+export const BUY_INTENT_RE =
+  /\b(buy|buying|add|adding|purchase|purchasing|get (me|this|that|it|one|those|these)|grab|order(ing)?|i'?ll (take|get|grab|have|buy)|give me|put (it|that|this|them|one|those|these|a) in|bag (it|this|that)|i want|i'?m (taking|getting|buying)|pick (it|that|this|one|me|them|out|up)|send me|need (the|that|this|a|an|it|one))\b/i
+
 // "next order" / "another one" — start a fresh bag. Whole-message only, so
 // "next loafers medium navy" (a product request) never trips it.
 export const NEW_ORDER_RE =

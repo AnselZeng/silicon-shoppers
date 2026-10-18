@@ -3,6 +3,7 @@ import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { captureCheckout } from "@/lib/store/actions"
 import {
+  BUY_INTENT_RE,
   confirmReply,
   NEW_ORDER_RE,
   recoverClaimedAdd,
@@ -78,6 +79,15 @@ describe("confirmReply / shopperConfirmed", () => {
     }
     expect(NEW_ORDER_RE.test("next loafers medium navy blue")).toBe(false)
     expect(NEW_ORDER_RE.test("next")).toBe(false)
+  })
+
+  test("buy intent separates 'buy me the X' from browsing asks", () => {
+    for (const m of ["buy a black pant medium size", "add the navy tee", "i'll take the coat", "get me the loafers", "can you order that for me"]) {
+      expect(BUY_INTENT_RE.test(m)).toBe(true)
+    }
+    for (const m of ["i need more men sale products", "show me navy shoes", "what do you have under $50", "why am i seeing this"]) {
+      expect(BUY_INTENT_RE.test(m)).toBe(false)
+    }
   })
 
   test("shopping requests never count as a checkout confirmation", () => {

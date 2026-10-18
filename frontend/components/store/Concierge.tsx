@@ -6,6 +6,7 @@ import type { ConciergeTone } from "@/lib/layout/types"
 import { buildChatContext } from "@/lib/store/chatContext"
 import { applyChatIntent } from "@/lib/store/chatIntent"
 import {
+  BUY_INTENT_RE,
   confirmReply,
   NEW_ORDER_RE,
   recoverClaimedAdd,
@@ -252,8 +253,10 @@ export function Concierge() {
       )
       const result = runChatActions(safe, (path: string) => router.push(path))
       // The model claimed an add but no action landed — recover the product it named
-      // from its own prose and do the add for real. The claim becomes true.
-      if (CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
+      // from its own prose and do the add for real. The claim becomes true. Gated on
+      // the shopper's own buy intent: a browsing ask ("show me sale stuff") can never
+      // be turned into a bagged item by over-eager model prose.
+      if (BUY_INTENT_RE.test(message) && CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
         const recovered = recoverClaimedAdd(text, (path: string) => router.push(path))
         if (recovered) {
           result.added.push(...recovered.added)
@@ -286,7 +289,7 @@ export function Concierge() {
         const hint = suggestSimilar(text)
         notes.push(
           hint
-            ? `Hmm, could not find that exact piece — but we do have the ${hint}, want me to grab it?`
+            ? `Nothing was bagged just yet — want me to add the ${hint}?`
             : "Hmm, that did not make it into your bag. Tell me the item again and I will grab it!",
         )
       }
