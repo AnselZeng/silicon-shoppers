@@ -9,6 +9,7 @@ import { DEMO_SHOPPERS, shopperFromSentence } from "@/lib/layout/demoShoppers"
 import { isStoreLayoutDoc } from "@/lib/model/adapter"
 import { loadFixture } from "@/lib/model/fixtures"
 import type { HomepageDoc } from "@/lib/model/homepage"
+import { fetchCohort, type CohortSnapshot } from "@/lib/model/cohort"
 import { draftFromLive, fetchLiveLayout, sameMix, type LiveFetch } from "@/lib/model/liveDoc"
 import { applyMix } from "@/lib/model/mix"
 import { runner } from "@/lib/sim/runner"
@@ -26,6 +27,7 @@ export function PersonaPanel() {
   const liveRevision = useSimStore((state) => state.liveRevision)
   const [sentence, setSentence] = useState("")
   const [live, setLive] = useState<LiveFetch | null>(null)
+  const [cohort, setCohort] = useState<CohortSnapshot | null>(null)
   const [followLive, setFollowLive] = useState(true)
   const [busy, setBusy] = useState(false)
   const runToken = useRef(0)
@@ -58,6 +60,16 @@ export function PersonaPanel() {
       window.clearInterval(timer)
     }
   }, [liveRevision])
+
+  useEffect(() => {
+    let cancel = false
+    void fetchCohort().then((next) => {
+      if (!cancel) setCohort(next)
+    })
+    return () => {
+      cancel = true
+    }
+  }, [])
 
   useEffect(() => {
     const entry = fixtures.find((item) => item.id === active.fixtureId)
@@ -123,18 +135,14 @@ export function PersonaPanel() {
         <h1 className="mt-1 text-sm font-medium">Refit the store for one shopper</h1>
         <p className="mt-2 text-[11px] leading-snug text-white/55">
           {showingLive
-            ? `This JSON is the document stored for ${live?.shopperId}. The laptop rewrites it on the next refresh.`
+            ? `${stored?.shopper.persona?.name ?? "This shopper"} · ${stored?.shopper.confidence ?? "low"} confidence. ${stored?.shopper.persona_reason ?? "Run applies the stored layout."}`
             : stored
-              ? "Showing a fixture preview, not this browser's stored document."
-              : live?.state === "waiting"
-                ? `No document stored for ${live.shopperId} yet. The JSON below is a stand-in until the laptop refreshes.`
-                : live?.state === "error"
-                  ? "Could not read the stored document. The JSON below is a stand-in."
-                  : `Snowflake is off. The JSON below is a hand-written stand-in${live?.shopperId ? ` for ${live.shopperId}` : ""}.`}
+              ? "Showing an example. This browser also has a stored layout."
+              : "Every shopper is assigned to one of these four. Pick one and Run to rebuild the store."}
         </p>
         {stored && !followLive ? (
           <button type="button" className="mt-1 text-[11px] text-white underline" onClick={() => setFollowLive(true)}>
-            Show the stored document
+            Show this browser&apos;s stored layout
           </button>
         ) : null}
       </div>
@@ -153,11 +161,12 @@ export function PersonaPanel() {
         </button>
       </div>
       <ScrollArea className="mt-3 min-h-0 flex-1 px-4">
-        <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">Who’s shopping</p>
+        <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">Four types</p>
         <div className="mt-2 grid grid-cols-2 gap-2">
           {DEMO_SHOPPERS.map((shopper) => {
             const accent = PERSONA_ACCENTS[shopper.id]
             const picked = shopper.id === selected.id && !fromSentence
+            const members = cohort?.personas.find((persona) => persona.id === shopper.id)?.members
             return (
               <button
                 key={shopper.id}
@@ -176,6 +185,11 @@ export function PersonaPanel() {
                 <span className="block text-[10px] tracking-[0.14em] uppercase" style={{ color: accent }}>
                   {shopper.title}
                 </span>
+                {members ? (
+                  <span className="mt-0.5 block text-[10px] text-white/45 normal-case tracking-normal">
+                    {members.toLocaleString("en-US")} shoppers
+                  </span>
+                ) : null}
               </button>
             )
           })}
@@ -187,7 +201,7 @@ export function PersonaPanel() {
         </ul>
         {draft ? (
           <div className="mt-3">
-            <p className="mb-2 text-[10px] tracking-[0.14em] text-white/40 uppercase">Predicted mix</p>
+            <p className="mb-2 text-[10px] tracking-[0.14em] text-white/40 uppercase">Shopping mix</p>
             <PredictedMix doc={draft} onChange={setDraft} />
           </div>
         ) : null}
@@ -224,7 +238,14 @@ export function PersonaPanel() {
             Stop
           </Button>
         </div>
-        {draft ? <ModelOutput doc={draft} basket={basket} stored={showingLive ? stored : null} /> : null}
+        {draft ? (
+          <ModelOutput
+            doc={draft}
+            basket={basket}
+            stored={showingLive ? stored : null}
+            exampleName={active.title}
+          />
+        ) : null}
         <div className="h-4" />
       </ScrollArea>
     </div>

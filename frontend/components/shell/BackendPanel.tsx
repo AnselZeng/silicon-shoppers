@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { isStoreLayoutDoc } from "@/lib/model/adapter"
+import { fetchCohort, type CohortSnapshot } from "@/lib/model/cohort"
 import type { HomepageDoc } from "@/lib/model/homepage"
 import { fetchLiveLayout, type LiveFetch } from "@/lib/model/liveDoc"
 import type { StoreLayoutDoc } from "@/lib/model/storeLayout"
@@ -15,7 +16,7 @@ function show(value: unknown): string {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <li className="grid grid-cols-[6.5rem_1fr] gap-2">
+    <li className="grid grid-cols-[5.5rem_1fr] gap-2">
       <span className="text-white/40">{label}</span>
       <span className="break-all text-white/85">{value}</span>
     </li>
@@ -23,12 +24,12 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 function statusCopy(live: LiveFetch | null): { tone: string; title: string; detail: string } {
-  if (!live) return { tone: "text-white/50", title: "Checking", detail: "Asking /api/layout for this browser." }
+  if (!live) return { tone: "text-white/50", title: "Checking", detail: "Asking for this browser's layout." }
   if (live.state === "disabled") {
     return {
       tone: "text-[#fdba74]",
       title: "Not connected",
-      detail: "Snowflake is off, so nothing is pulled. The store is on the fixture.",
+      detail: "Snowflake is off. The store is running the examples.",
     }
   }
   if (live.state === "error") {
@@ -37,14 +38,14 @@ function statusCopy(live: LiveFetch | null): { tone: string; title: string; deta
   if (live.state === "waiting") {
     return {
       tone: "text-[#fde68a]",
-      title: "Connected, no document yet",
-      detail: "Clicks are uploading. A document shows up after the laptop's next refresh.",
+      title: "Connected, no layout yet",
+      detail: "Clicks are uploading. A layout appears after the laptop's next refresh.",
     }
   }
   return {
     tone: "text-[#86efac]",
     title: "Pulled",
-    detail: "This list is the document stored for this browser.",
+    detail: "This is the layout stored for this browser.",
   }
 }
 
@@ -70,9 +71,14 @@ function storedRows(doc: StoreLayoutDoc): { label: string; value: string }[] {
   ]
 }
 
+function count(n: number): string {
+  return n.toLocaleString("en-US")
+}
+
 export function BackendPanel() {
   const liveRevision = useSimStore((state) => state.liveRevision)
   const [live, setLive] = useState<LiveFetch | null>(null)
+  const [cohort, setCohort] = useState<CohortSnapshot | null>(null)
   const [checkedAt, setCheckedAt] = useState<string>("")
 
   useEffect(() => {
@@ -92,6 +98,21 @@ export function BackendPanel() {
     }
   }, [liveRevision])
 
+  useEffect(() => {
+    let cancel = false
+    const load = () => {
+      void fetchCohort().then((next) => {
+        if (!cancel) setCohort(next)
+      })
+    }
+    load()
+    const timer = window.setInterval(load, 30000)
+    return () => {
+      cancel = true
+      window.clearInterval(timer)
+    }
+  }, [])
+
   const status = statusCopy(live)
   const rows =
     live?.state === "live" && live.doc && isStoreLayoutDoc(live.doc)
@@ -99,32 +120,68 @@ export function BackendPanel() {
       : live?.state === "live" && live.doc
         ? [{ label: "Document", value: "Older homepage shape, not a v1 layout." }]
         : []
+  const members = cohort?.personas.reduce((sum, persona) => sum + persona.members, 0) ?? 0
 
   return (
-    <div className="flex h-full flex-col gap-2 overflow-auto pr-1 text-[11px]">
+    <div className="flex h-full flex-col gap-3 overflow-auto pr-1 text-[11px]">
       <p className={status.tone}>
         <span className="tracking-[0.14em] uppercase">{status.title}</span>
         <span className="mt-0.5 block text-white/70">{status.detail}</span>
       </p>
-      <ul className="flex flex-col gap-1">
-        <Row label="Shopper" value={live?.shopperId ?? "…"} />
-        <Row label="Checked" value={checkedAt || "…"} />
-        <Row label="Updated" value={live?.updatedAt || "no document"} />
-        {rows.map((row) => (
-          <Row key={row.label} label={row.label} value={row.value} />
-        ))}
-        <Row
-          label="Trending"
-          value={
-            live?.trending.length
-              ? live.trending
-                  .slice(0, 6)
-                  .map((item) => item.productId)
-                  .join(", ")
-              : "none"
-          }
-        />
-      </ul>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <section>
+          <p className="mb-1 text-[10px] tracking-[0.14em] text-white/40 uppercase">This browser</p>
+          <ul className="flex flex-col gap-1">
+            <Row label="Shopper" value={live?.shopperId ?? "…"} />
+            <Row label="Checked" value={checkedAt || "…"} />
+            <Row label="Updated" value={live?.updatedAt || "no layout"} />
+            {rows.map((row) => (
+              <Row key={row.label} label={row.label} value={row.value} />
+            ))}
+          </ul>
+        </section>
+        <section>
+          <p className="mb-1 text-[10px] tracking-[0.14em] text-white/40 uppercase">
+            Four types{members > 0 ? ` · ${count(members)} shoppers` : ""}
+          </p>
+          {cohort?.state === "ready" ? (
+            <ul className="flex flex-col gap-1">
+              {cohort.personas.map((persona) => (
+                <li key={persona.id} className="flex items-baseline justify-between gap-3">
+                  <span className="text-white/85">{persona.name}</span>
+                  <span className="shrink-0 text-right text-white/55">
+                    {count(persona.members)} · {Math.round(persona.highConfidence * 100)}% high
+                  </span>
+                </li>
+              ))}
+              <Row label="Events" value={count(cohort.events)} />
+              <Row label="Layouts" value={count(cohort.layouts)} />
+              <Row label="Catalog" value={count(cohort.catalog)} />
+              <Row
+                label="Trending"
+                value={
+                  live?.trending.length
+                    ? live.trending
+                        .slice(0, 6)
+                        .map((item) => `${item.productId} ${item.score}`)
+                        .join(", ")
+                    : cohort.trending > 0
+                      ? count(cohort.trending)
+                      : "none right now"
+                }
+              />
+            </ul>
+          ) : (
+            <p className="text-white/55">
+              {cohort?.state === "error"
+                ? "The cohort read failed."
+                : cohort?.state === "disabled"
+                  ? "Snowflake is off, so the cohort counts are hidden."
+                  : "Reading the four types…"}
+            </p>
+          )}
+        </section>
+      </div>
     </div>
   )
 }
