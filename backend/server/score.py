@@ -19,13 +19,15 @@ import pandas as pd
 
 from . import catalog as K
 from . import hm_features as H
+from . import layout_v1 as V1
+from . import personas as PERSONA
 from .config import REPO, SESSION_LAST_EVENTS
 
 SECTION_LABELS = {"new_in": "New In", "sale": "Sale", "bestsellers": "Bestsellers", "buy_again": "Buy Again"}
 SORT_LABELS = {"price_asc": "price, low to high", "price_desc": "price, high to low", "newest": "newest first",
                "bestsellers": "bestsellers first", "relevance": "relevance"}
 CLICKS = ("product_viewed", "quickview_opened")
-CARTS = ("add_to_bag", "purchase", "checkout")
+CARTS = ("add_to_bag", "purchase", "checkout")    # payment_completed carries no product ids
 ORDERS = ("purchase", "checkout")
 STORE_FILTERS = ("category", "size", "color", "price", "sale", "collection")
 
@@ -153,8 +155,11 @@ def session_part(model: dict | None, events: list[tuple]) -> dict | None:
 def preferences(ev: pd.DataFrame) -> dict:
     """Sorts and filters the shopper keeps choosing (counted over all their visits)."""
     props = ev["properties"].apply(lambda p: p if isinstance(p, dict) else (json.loads(p) if isinstance(p, str) and p else {}))
-    sorts = [p.get("value") for t, p in zip(ev["type"], props) if t == "sort_changed" and p.get("value")]
-    filt = [(p.get("type"), p.get("value")) for t, p in zip(ev["type"], props) if t == "filter_applied" and p.get("type")]
+    # store versions differ: sort in "value" or "sort"; filter name in "type", "filter" or "section"
+    sorts = [p.get("value") or p.get("sort") for t, p in zip(ev["type"], props)
+             if t == "sort_changed" and (p.get("value") or p.get("sort"))]
+    filt = [(p.get("type") or p.get("filter") or p.get("section"), p.get("value")) for t, p in zip(ev["type"], props)
+            if t == "filter_applied" and (p.get("type") or p.get("filter") or p.get("section"))]
     searches = [p.get("q") for t, p in zip(ev["type"], props) if t == "search_performed" and p.get("q")]
     out = {"sort_counts": pd.Series(sorts, dtype=object).value_counts().to_dict() if sorts else {},
            "filter_counts": pd.Series([f for f, _ in filt], dtype=object).value_counts().to_dict() if filt else {},
@@ -248,6 +253,7 @@ def build_docs(B: dict, session_model: dict | None, events: pd.DataFrame, attrs:
         doc = {
             "user_id": u, "stratum": "light", "cutoff": cutoff.isoformat(), "updated_at": now.isoformat(timespec="seconds") + "Z",
             "run_id": run_id,
+            "shopper": PERSONA.shopper_block(u, PERSONA.assign_live(PERSONA.live_stats(ev, attrs))),
             "model": {"name": f"atelier-shopper-model v2 (frozen {B['frozen_manifest'].get('frozen_at', '?')})",
                       "inputs": f"{len(B['cols'])} purchase features from your add-to-bags, mapped to H&M groups and colors"},
             "evidence": {"events": int(len(ev)), "add_to_bags": n_carts,
@@ -262,7 +268,12 @@ def build_docs(B: dict, session_model: dict | None, events: pd.DataFrame, attrs:
             "store_products": rank_store(attrs, mix, colors, ev, trending),
             "session": ses, "preferences": pref,
         }
-        out.append({"user_id": u, "n_events": int(len(ev)), "n_carts": n_carts, "homepage": doc})
+        # store the v1 document: the UI reads format/source/shopper/layout/products directly and
+        # ignores model_meta (predicted_mix, session, preferences, evidence, store_products)
+        dept_order = sorted(mix["department"], key=mix["department"].get, reverse=True)
+        v1 = V1.to_v1(doc, source="merged",
+                      products=V1.products_by_department(doc["store_products"], attrs, dept_order))
+        out.append({"user_id": u, "n_events": int(len(ev)), "n_carts": n_carts, "homepage": v1})
     return pd.DataFrame(out)
 
 

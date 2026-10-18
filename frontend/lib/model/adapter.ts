@@ -7,9 +7,10 @@ import type { StoreColor } from "@/config/ui"
 import { FOR_YOU_MAX, type NavItemId } from "@/lib/layout/enums"
 import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import type { FilterSectionId, HomeBlock, LayoutConfig } from "@/lib/layout/types"
-import type { HMCategory, HMFilter, HMSection, HomepageDoc } from "@/lib/model/homepage"
-import { APP_TO_HM_CATEGORY, HM_TO_APP_CATEGORIES, HM_TO_APP_COLOR } from "@/lib/model/mapping"
-import { modelCategoryOrder, modelDepartment, modelHeroAd } from "@/lib/model/policy"
+import type { HMCategory, HMDepartment, HMFilter, HMHero, HMSection, HomepageDoc } from "@/lib/model/homepage"
+import { APP_TO_HM_CATEGORY, HM_TO_APP_CATEGORIES, HM_TO_APP_COLOR, HM_TO_APP_DEPARTMENT } from "@/lib/model/mapping"
+import { heroAdFor, modelCategoryOrder, modelDepartment, modelHeroAd } from "@/lib/model/policy"
+import type { StoreLayoutDoc } from "@/lib/model/storeLayout"
 import type { SessionDecisions, SessionEvent } from "@/lib/model/sessionStyle"
 import type { StoreEvent } from "@/lib/sim/protocol"
 import { PRODUCTS } from "@/lib/store/catalog"
@@ -249,6 +250,187 @@ export function modelLayout(home: HomepageDoc, liveSession?: SessionDecisions): 
   return {
     layout,
     categoryOrder: layout.listing.categoryOrder,
+    landingDepartment: landing,
+    highlightColors,
+    comparePanel,
+    recentlyViewedProminent: recentlyViewed,
+    cartReminder,
+    productPage,
+    log,
+  }
+}
+
+const V1_HERO: Record<string, HMHero> = {
+  editorial: "editorial",
+  discount_banner: "discount",
+  new_drop_banner: "new_drop",
+  collection_banner: "category",
+}
+
+/** Stored Snowflake documents are atelier.store_layout.v1. Older rows were HomepageDoc. */
+export function isStoreLayoutDoc(home: unknown): home is StoreLayoutDoc {
+  return (home as { format?: string } | null | undefined)?.format === "atelier.store_layout.v1"
+}
+
+function asStoreColor(value: string): StoreColor | null {
+  const mapped = HM_TO_APP_COLOR[value]
+  if (mapped) return mapped
+  const known = new Set<string>(Object.values(HM_TO_APP_COLOR))
+  return known.has(value) ? (value as StoreColor) : null
+}
+
+function v1ForYouIds(home: StoreLayoutDoc): string[] {
+  const meta = home.model_meta as { store_products?: { product_id: string }[] } | undefined
+  const known = new Set(PRODUCTS.map((product) => product.id))
+  const ranked = (meta?.store_products ?? []).map((pick) => pick.product_id).filter((id) => known.has(id))
+  if (ranked.length > 0) return uniq(ranked).slice(0, FOR_YOU_MAX)
+  const fromDepartments = home.products?.by_department.flatMap((group) => group.items) ?? []
+  return uniq(fromDepartments.filter((id) => known.has(id))).slice(0, FOR_YOU_MAX)
+}
+
+/**
+ * v2 layout from an atelier.store_layout.v1 document. The backend stores this shape;
+ * the store only applies layout v2.
+ */
+export function modelLayoutV1(home: StoreLayoutDoc, liveSession?: SessionDecisions): ModelLayout {
+  const decisions = home.layout
+  const meta = (home.model_meta ?? {}) as { session?: { decisions?: Partial<SessionDecisions> | null } }
+  const session = mergeSessionDecisions(liveSession, meta.session?.decisions)
+  const log: DecisionLogEntry[] = []
+  const note = (key: string, value: unknown, reason: string, source: string) =>
+    log.push({ key, value: String(value), reason, source, evidence: "stored decision" })
+  const live = (key: string, value: unknown, reason: string) =>
+    log.push({ key, value: String(value), reason, source: "Live session", evidence: "Estimated from your clicks" })
+
+  for (const key of Object.keys(decisions) as (keyof typeof decisions)[]) {
+    const decision = decisions[key]
+    if (decision.changed) note(key, JSON.stringify(decision.value), decision.reason, decision.source)
+  }
+
+  const department = HM_TO_APP_DEPARTMENT[decisions.landing_department.value as HMDepartment] ?? null
+  const landing = department ?? "women"
+  const navOrder: NavItemId[] = department
+    ? [department, ...DEFAULT_LAYOUT.nav.order.filter((id) => id !== department)]
+    : [...DEFAULT_LAYOUT.nav.order]
+  const filterOrder = uniq<FilterSectionId>([
+    ...decisions.filter_order.value.filter((id): id is FilterSectionId => FILTER_IDS.has(id)),
+    ...DEFAULT_LAYOUT.listing.filterOrder,
+  ])
+  const expandedFilters = uniq(
+    decisions.filter_order.expanded.filter((id): id is FilterSectionId => FILTER_IDS.has(id)),
+  )
+  const categoryOrder = uniq<Category>([
+    ...decisions.category_order.value.flatMap((category) => HM_TO_APP_CATEGORIES[category as HMCategory] ?? []),
+    ...CATEGORIES,
+  ])
+  const highlightColors = uniq(
+    decisions.color_highlight.value.map(asStoreColor).filter((color): color is StoreColor => color !== null),
+  ).slice(0, 3)
+
+  const blocks: HomeBlock[] = [{ type: "hero" }]
+  for (const section of decisions.homepage_sections.value) {
+    if (section === "new_in" || section === "bestsellers") {
+      blocks.push({ type: "product_row", source: { kind: section }, limit: 8 })
+    } else if (section === "sale_picks") {
+      blocks.push({ type: "product_row", source: { kind: "sale" }, limit: 8 })
+    } else if (section === "collections") {
+      blocks.push({ type: "category_tiles", categories: categoryOrder.slice(0, 4) })
+    }
+  }
+  if (blocks.length < 3) blocks.push({ type: "category_tiles", categories: categoryOrder.slice(0, 4) })
+
+  let gridDensity: 2 | 3 | 4 = decisions.grid_columns.value
+  let quickView = decisions.quick_view.value === "emphasized" || decisions.quick_add.value === "on"
+  let heroSize: "full" | "compact" = decisions.hero.minimized ? "compact" : "full"
+  let comparePanel = decisions.compare_panel.value === "on"
+  let recentlyViewed = decisions.recently_viewed.value === "prominent"
+  let cartReminder = decisions.cart_reminder.value === "on"
+  let productPage: ModelLayout["productPage"] = decisions.product_page.value
+
+  if (session) {
+    if (session.grid_columns.active) {
+      gridDensity = session.grid_columns.value
+      live("gridDensity", gridDensity, session.grid_columns.reason)
+    }
+    if (session.quick_add.active) {
+      quickView = true
+      live("quickView", true, session.quick_add.reason)
+    }
+    if (session.compare_panel.active) {
+      comparePanel = true
+      live("comparePanel", "on", session.compare_panel.reason)
+    }
+    if (session.recently_viewed.active) {
+      recentlyViewed = true
+      live("recentlyViewed", "prominent", session.recently_viewed.reason)
+    }
+    if (session.cart_reminder.active) {
+      cartReminder = true
+      live("cartReminder", "on", session.cart_reminder.reason)
+    }
+    if (session.product_page.active) {
+      productPage = session.product_page.value
+      heroSize = productPage === "compact" ? "compact" : "full"
+      live("productPage", productPage, session.product_page.reason)
+    }
+  }
+
+  const topGroup = decisions.category_order.value[0] as HMCategory | undefined
+  const heroAd = heroAdFor(V1_HERO[decisions.hero.value] ?? "editorial", department, topGroup)
+  const saleLead =
+    decisions.homepage_sections.value[0] === "sale_picks" ||
+    decisions.sale_badges.value === "prominent" ||
+    decisions.price_mode.value
+  const checkoutVariant =
+    decisions.checkout.value === "guest_express"
+      ? "guest_fast"
+      : decisions.checkout.value === "loyalty_pay"
+        ? "loyalty_pay"
+        : "click_to_pay"
+
+  const layout = cloneLayout(DEFAULT_LAYOUT)
+  layout.nav = {
+    order: navOrder,
+    highlight: department,
+    department,
+    searchEmphasized: decisions.search.value === "emphasized",
+  }
+  layout.home = {
+    ...layout.home,
+    blocks: blocks.slice(0, 8),
+    heroSize,
+    forYouIds: v1ForYouIds(home),
+    basketIds: [],
+  }
+  layout.listing = {
+    ...layout.listing,
+    defaultSort: decisions.default_sort.value,
+    filterOrder,
+    expandedFilters: expandedFilters.length > 0 ? expandedFilters : [...DEFAULT_LAYOUT.listing.expandedFilters],
+    gridDensity,
+    colorHighlight: highlightColors,
+    categoryOrder,
+    card: {
+      ...layout.listing.card,
+      priceStyle: saleLead ? "sale_emphasis" : "plain",
+      quickView: quickView ? "emphasized" : "button",
+    },
+  }
+  layout.ads = {
+    placements: layout.ads.placements
+      .filter((placement) => decisions.popups.value !== "off" || placement.slot !== "popup")
+      .map((placement) => (placement.slot === "hero" ? { ...placement, adIds: [heroAd] } : placement)),
+  }
+  layout.checkout = {
+    variant: checkoutVariant,
+    expressCheckout: checkoutVariant === "guest_fast",
+    showTrustBadges: checkoutVariant === "guest_fast",
+    loyaltyPrompt: checkoutVariant === "loyalty_pay",
+  }
+
+  return {
+    layout,
+    categoryOrder,
     landingDepartment: landing,
     highlightColors,
     comparePanel,

@@ -58,8 +58,9 @@ Paste the printed `ALTER USER ... SET RSA_PUBLIC_KEY=...` into a Snowsight SQL w
 ```
 python -m server check       :: prints your account, user, role
 python -m server setup       :: warehouse ATELIER_WH (XSMALL, auto-suspend 60 s), database ATELIER, schema LIVE, tables
-python -m server catalog     :: the 80 store products from ..\la-hacks-app\lib\store\catalog.ts
+python -m server catalog     :: store products from the app's lib\store\catalog.ts (see --catalog-ts)
 python -m server app-user    :: SQL + key for the store's own service user (give the key to the UI team privately)
+python -m server personas    :: fill PERSONAS: the 4 UI personas, member counts over the H&M cohort
 ```
 
 ## Hackathon-day retrain
@@ -110,6 +111,7 @@ python -m server simulate --clear       :: remove synthetic shoppers before the 
 | `TRENDING` | laptop | store | top products in the last 60 minutes (views + 3 × add-to-bags) |
 | `MODEL_RUNS` | laptop | anyone | every retrain and refresh: when, which models, what came out |
 | `HM_HOMEPAGES`, `HM_ARTICLES` | laptop | team | the 100k H&M model outputs (private: H&M data terms) |
+| `PERSONAS` | laptop (`personas`) | store | the 4 UI personas: traits, member counts, description |
 | `JOB_STATE` | laptop | laptop | refresh bookkeeping |
 
 Example queries for the demo:
@@ -122,7 +124,14 @@ SELECT UPDATED_AT, HOMEPAGE:layout:category_order:value, HOMEPAGE:layout:default
 
 ## What's in a shopper's document
 
-It's the same `HomepageDoc` as the H&M documents (`lib/model/homepage.ts`), so `modelLayout()` works unchanged. Store shoppers' documents also have:
+Stored documents are `atelier.store_layout.v1` (the `frontend/lib/model/storeLayout.ts` contract): the UI reads
+`format`, `source`, `shopper`, `layout` (22 decisions, each `{value, changed, reason, source}`) and `products`
+directly — `doc.layout.department_order.value`, `doc.shopper.persona.name`. Internals ride along in
+`model_meta` (`predicted_mix`, `session`, `preferences`, `evidence`, `store_products`, `hm_products`), which the
+spec says renderers ignore. The frontend adapter accepts both shapes; `modelLayoutV1()` handles v1 and
+`modelLayout()` keeps working for old HomepageDoc rows.
+
+Inside `model_meta` (store shoppers' documents also have these):
 
 - **`store_products`:** store product ids ranked for them, with a `why`. `rankCatalog()` uses it when present.
 - **`session`:** the live session model's style and decisions from their earlier visits. `modelLayout()` uses them until this visit's live decisions switch on.
@@ -131,6 +140,14 @@ It's the same `HomepageDoc` as the H&M documents (`lib/model/homepage.ts`), so `
   - Filters used twice move to the top.
   - Color filters join the highlighted colors.
 - **`evidence`:** how many events and add-to-bags the document is based on, and what "Tested" means here.
+
+And at the top level:
+
+- **`shopper`:** the v1 shopper block — `id`, `label`, `persona {name, description}`, `confidence`, `persona_reason`.
+  - One of the 4 UI personas (Price Hunter, Trend Seeker, Mission Shopper, Brand Loyalist), assigned from the shopper's own events: what they add, how it's priced, sorts/filters they use, searches, repeat views.
+  - `persona` is `null` under 5 events; `confidence` rises with evidence and the margin between personas.
+  - `persona_reason` is a template filled with their own numbers ("9 bag adds; 100% on sale; sorted by price 2x") — that's the Terminal line.
+  - H&M documents get the same block from their purchase profiles (`publish-hm`), so `doc.shopper` reads identically for both kinds of shopper.
 
 ## Cost
 

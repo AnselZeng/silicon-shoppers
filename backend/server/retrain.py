@@ -176,6 +176,7 @@ def publish_run(summary_path=None):
 def publish_hm(db=None):
     """The 100k H&M homepage documents and their tile articles (model/work/export) -> HM_HOMEPAGES / HM_ARTICLES."""
     import pandas as pd
+    from . import personas as P
     from .sf import DB
     own = db is None
     db = db or DB()
@@ -183,6 +184,21 @@ def publish_hm(db=None):
     pages = pd.read_parquet(ex / "homepages_final_compact.parquet")
     arts = pd.read_parquet(ex / "homepage_articles_final.parquet")
     pages = pages.assign(homepage=pages["homepage"].map(json.loads))
+    # every document gets the same v1 `shopper` block the live docs carry: 4 personas, assigned from
+    # the shopper's own profile values, with the deterministic reason the Terminal shows
+    fused = pd.read_parquet(REPO / "data" / "processed" / "fused_final.parquet")
+    ref = P.Ref(fused)
+    am = P.hm_assignments(fused, ref).set_index(pd.Index(fused["customer_key"]))
+    def block(ck):
+        if ck not in am.index:
+            return P.shopper_block(str(ck), None)
+        r = am.loc[ck]
+        return P.shopper_block(str(ck), {"persona_id": r["persona_id"], "name": r["persona_name"],
+                                         "description": P.PERSONAS[r["persona_id"]]["description"],
+                                         "confidence": r["persona_confidence"], "reason": r["reason"]})
+    from . import layout_v1 as V1
+    pages["homepage"] = [V1.to_v1(dict(h, shopper=block(ck)), source="hm_shopper")
+                         for h, ck in zip(pages["homepage"], pages["customer_key"])]
     t0 = time.time()
     db.replace("HM_ARTICLES", arts[["article_id", "name", "category", "department", "color", "price_scaled"]])
     db.replace("HM_HOMEPAGES", pages[["customer_key", "stratum", "homepage"]], variant=("homepage",))
