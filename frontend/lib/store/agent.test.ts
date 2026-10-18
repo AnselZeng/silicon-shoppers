@@ -97,7 +97,45 @@ describe("runChatActions", () => {
   test("checkout on an empty bag is skipped, not paid", () => {
     const result = runChatActions([{ action: "checkout" }], vi.fn())
     expect(useStorefront.getState().checkoutPhase).toBe("idle")
+    expect(result.checkedOut).toBe(false)
+    expect(result.checkoutSkipped).toBe(true)
     expect(result.done).toEqual([])
+  })
+
+  test("successful add and checkout report through added/checkedOut", () => {
+    vi.useFakeTimers()
+    try {
+      const result = runChatActions([{ action: "add_to_bag", productId: tee.id }], vi.fn())
+      expect(result.added).toHaveLength(1)
+      expect(result.added[0]).toContain(tee.name)
+      const out = runChatActions([{ action: "checkout" }], vi.fn())
+      expect(out.checkedOut).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test("post-purchase: same conversation can add and check out again", () => {
+    vi.useFakeTimers()
+    try {
+      runChatActions([{ action: "add_to_bag", productId: tee.id }, { action: "checkout" }], vi.fn())
+      vi.advanceTimersByTime(2000)
+      const first = useStorefront.getState().order
+      expect(useStorefront.getState().bag).toEqual([])
+      // Second round in the same chat.
+      const other = PRODUCTS.find((p) => p.id !== tee.id)!
+      const result = runChatActions(
+        [{ action: "add_to_bag", productId: other.id }, { action: "checkout" }],
+        vi.fn(),
+      )
+      expect(result.checkedOut).toBe(true)
+      vi.advanceTimersByTime(2000)
+      const second = useStorefront.getState().order
+      expect(second).not.toBeNull()
+      expect(second!.orderId).not.toBe(first!.orderId)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   test("add then checkout in one batch sees the fresh bag", () => {

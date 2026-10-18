@@ -75,6 +75,18 @@ interface Msg {
   content: string
 }
 
+// A message that IS the checkout confirmation — short affirmatives only. Anything
+// longer ("purchase a navy tee", "buy it and also...") is a shopping request and
+// must still route through the Yes/No buttons.
+const CONFIRM_RE =
+  /^\s*(yes|yeah|yep|yup|sure|ok(ay)?|done|i'?m done|that'?s (all|it)|all set|check ?out( me)?|let'?s (check ?out|pay|wrap( it)? up|go)|pay( now| it| me out)?|wrap( it)? up|finish(ed)?( up)?|nothing else|no( |,)that'?s (all|it))\s*[.!]?\s*$/i
+// Checkout intent embedded in a longer message.
+const CHECKOUT_WORDS_RE =
+  /\b(check me out|check ?out (now|please|for me)|proceed to (check ?out|payment)|go (ahead and|to) (pay|check ?out)|take me to (check ?out|payment)|ready to (pay|check ?out))\b/i
+// The model's prose claims an add or a payment — verified against what really ran.
+const CLAIM_ADD_RE = /\b(added|adding|in your (bag|cart)|to your (bag|cart)|into your (bag|cart)|bagged)\b/i
+const CLAIM_PAY_RE = /\b(checking you out|taking you to (check ?out|payment)|paying (for you|now)|order (is |has been |)(placed|confirmed)|you'?re all set)\b/i
+
 export function Concierge() {
   const router = useRouter()
   // Always available to shoppers — tone still comes from the applied layout.
@@ -99,6 +111,17 @@ export function Concierge() {
   const script = SCRIPTS[tone]
 
   const scriptedAnswer = (q: string) => script.find((item) => item.q === q)?.a ?? null
+
+  // Auto-pay lands ~900ms after checkout starts; append the order id to the chat
+  // when it actually does, so the shopper sees the receipt in the conversation.
+  function appendOrderLine(order: { orderId: string; amount: number }) {
+    const line = ` Order ${order.orderId} · $${order.amount}, done!`
+    setMessages((prev) => {
+      const last = prev[prev.length - 1]
+      if (last?.role === "assistant") return [...prev.slice(0, -1), { ...last, content: last.content + line }]
+      return [...prev, { role: "assistant" as const, content: line.trim() }]
+    })
+  }
 
   async function send(raw: string) {
     const message = raw.trim()
@@ -163,29 +186,48 @@ export function Concierge() {
       }
       const { text, actions } = splitActions(reply)
       if (!text) throw new Error("empty reply")
-      // Guard: the model may only pay when the shopper's own words confirm checkout.
-      // A premature {"action":"checkout"} becomes the Yes/No prompt instead.
-      const wantsCheckout =
-        /\b(yes|yeah|yep|sure|ok|okay|checkout|check out|pay|paying|done|finish|finished|all set|that's all|thats all|wrap|complete|purchase)\b/i.test(
-          message,
-        )
+      // The shopper's own words gate real payment. A pure confirmation ("yeah im done",
+      // "check me out") allows a model checkout; anything else downgrades it to the
+      // Yes/No prompt so a "purchase X" request can never skip the ask.
+      const shopperConfirmed = CONFIRM_RE.test(message) || CHECKOUT_WORDS_RE.test(message)
       const safe = actions.map((a): ChatAction =>
-        a.action === "checkout" && !wantsCheckout ? { action: "ask_checkout" } : a,
+        a.action === "checkout" && !shopperConfirmed ? { action: "ask_checkout" } : a,
       )
-      if (safe.length) {
-        const result = runChatActions(safe, (path: string) => router.push(path))
-        // Buttons are the "are you done?" ask — show them whenever the agent bagged
-        // something, whether or not the model remembered to emit ask_checkout.
-        setPendingCheckout(result.asksCheckout || safe.some((a) => a.action === "add_to_bag"))
-        // The model may have claimed an add that didn't resolve — never let the chat lie.
-        if (result.failed.length) {
-          setMessages((prev) => {
-            const last = prev[prev.length - 1]
-            const note = ` (Couldn't find ${result.failed.join(", ")} in the catalog, want me to pick something similar?)`
-            if (last?.role === "assistant") return [...prev.slice(0, -1), { ...last, content: last.content + note }]
-            return [...prev, { role: "assistant" as const, content: note.trim() }]
-          })
-        }
+      const result = runChatActions(safe, (path: string) => router.push(path), appendOrderLine)
+      // The model sometimes says "checking you out" but forgets the action. When the
+      // shopper clearly confirmed and the bag has items, the agent owes them a checkout.
+      if (CONFIRM_RE.test(message) && !result.checkedOut && useStorefront.getState().bag.length > 0) {
+        const retry = runChatActions([{ action: "checkout" }], (path: string) => router.push(path), appendOrderLine)
+        result.checkedOut = retry.checkedOut
+        result.checkoutSkipped = retry.checkoutSkipped
+      }
+      // Buttons are the "are you done?" ask — show them whenever the agent bagged
+      // something, whether or not the model remembered to emit ask_checkout.
+      if (!result.checkedOut) {
+        setPendingCheckout(result.asksCheckout || result.added.length > 0)
+      }
+      // The model's prose must never claim an action that didn't happen. If it said
+      // "added" but nothing landed, or "paying" but no session started, say so.
+      const notes: string[] = []
+      if (result.failed.length) {
+        notes.push(`Couldn't find ${result.failed.join(", ")} in the catalog, want me to pick something similar?`)
+      } else if (CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
+        notes.push("Hmm, that did not make it into your bag. Tell me the item again and I will grab it!")
+      }
+      if (CLAIM_PAY_RE.test(text) && !result.checkedOut) {
+        notes.push(
+          useStorefront.getState().bag.length === 0
+            ? "Your bag is actually empty right now, tell me what to add first!"
+            : "Checkout did not kick off, say check me out and I will run it!",
+        )
+      }
+      if (notes.length) {
+        setMessages((prev) => {
+          const last = prev[prev.length - 1]
+          const note = ` (${notes.join(" ")})`
+          if (last?.role === "assistant") return [...prev.slice(0, -1), { ...last, content: last.content + note }]
+          return [...prev, { role: "assistant" as const, content: note.trim() }]
+        })
       }
       history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: text }].slice(-12)
     } catch (error) {
@@ -210,7 +252,14 @@ export function Concierge() {
     setPendingCheckout(false)
     emitStoreEvent("concierge_action", { action: "checkout_confirm", detail: yes ? "yes" : "no" })
     if (yes) {
-      runChatActions([{ action: "checkout" }], (path: string) => router.push(path))
+      if (useStorefront.getState().bag.length === 0) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant" as const, content: "Your bag is actually empty right now! Tell me what to grab and we will get you checked out." },
+        ])
+        return
+      }
+      runChatActions([{ action: "checkout" }], (path: string) => router.push(path), appendOrderLine)
       setMessages((prev) => [
         ...prev,
         { role: "assistant" as const, content: autoPay ? "On it! Paying now, you're all set." : "Taking you to payment, one click left!" },
