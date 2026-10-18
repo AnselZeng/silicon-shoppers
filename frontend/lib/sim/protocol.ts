@@ -46,6 +46,8 @@ export type ParentPayload =
       automatic?: boolean
     }
   | { type: "reset" }
+  /** Back, forward, and reload for the fake browser chrome. The store owns the history stack. */
+  | { type: "history"; action: "back" | "forward" | "reload" }
 
 export type StorePayload =
   | { type: "store_event"; event: StoreEvent }
@@ -63,6 +65,8 @@ export type StorePayload =
       reason?: string
       updatedAt?: string | null
     }
+  /** Whether the fake browser can go back or forward, and the address it should show. */
+  | { type: "history_state"; canBack: boolean; canForward: boolean; path: string }
 
 export interface SimEnvelope<T> {
   source: typeof SIM_SOURCE
@@ -86,7 +90,7 @@ export function readEnvelope(data: unknown): { payload: ParentPayload | StorePay
 }
 
 export function isParentPayload(payload: ParentPayload | StorePayload): payload is ParentPayload {
-  return payload.type === "set_layout" || payload.type === "reset"
+  return payload.type === "set_layout" || payload.type === "reset" || payload.type === "history"
 }
 
 export function isStorePayload(payload: ParentPayload | StorePayload): payload is StorePayload {
@@ -95,7 +99,8 @@ export function isStorePayload(payload: ParentPayload | StorePayload): payload i
     payload.type === "store_ready" ||
     payload.type === "layout_step" ||
     payload.type === "layout_settled" ||
-    payload.type === "model_status"
+    payload.type === "model_status" ||
+    payload.type === "history_state"
   )
 }
 

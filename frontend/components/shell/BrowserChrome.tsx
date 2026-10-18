@@ -1,5 +1,6 @@
 "use client"
 
+import { postSimMessage } from "@/lib/sim/protocol"
 import { useSimStore, type ViewportChoice } from "@/lib/state/simStore"
 
 function shopUrl(route: string): string {
@@ -8,8 +9,16 @@ function shopUrl(route: string): string {
   return `atelier-nine.shop${path}`
 }
 
+function sendHistory(action: "back" | "forward" | "reload") {
+  const frame = useSimStore.getState().iframe
+  if (!frame?.contentWindow) return
+  postSimMessage(frame.contentWindow, { type: "history", action })
+}
+
 export function BrowserChrome({ mode }: { mode: ViewportChoice }) {
   const route = useSimStore((state) => state.route)
+  const canBack = useSimStore((state) => state.canBack)
+  const canForward = useSimStore((state) => state.canForward)
   const url = shopUrl(route)
 
   if (mode === "mobile" || mode === "tablet") {
@@ -49,10 +58,16 @@ export function BrowserChrome({ mode }: { mode: ViewportChoice }) {
         </div>
       </div>
       <div className="flex h-11 items-center gap-2 border-b border-black/5 bg-white px-3">
-        <div className="flex items-center gap-2 px-1 text-[13px] text-neutral-400" aria-hidden>
-          <span>←</span>
-          <span>→</span>
-          <span>↻</span>
+        <div className="flex items-center gap-1 px-1 text-[15px] leading-none">
+          <ChromeButton label="Back" disabled={!canBack} onClick={() => sendHistory("back")}>
+            ←
+          </ChromeButton>
+          <ChromeButton label="Forward" disabled={!canForward} onClick={() => sendHistory("forward")}>
+            →
+          </ChromeButton>
+          <ChromeButton label="Reload" onClick={() => sendHistory("reload")}>
+            ↻
+          </ChromeButton>
         </div>
         <div className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-full bg-[#f1f3f4] px-3 text-[12px] text-neutral-800">
           <LockIcon />
@@ -60,6 +75,30 @@ export function BrowserChrome({ mode }: { mode: ViewportChoice }) {
         </div>
       </div>
     </div>
+  )
+}
+
+function ChromeButton({
+  label,
+  disabled = false,
+  onClick,
+  children,
+}: {
+  label: string
+  disabled?: boolean
+  onClick: () => void
+  children: string
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className={`grid size-7 place-items-center rounded-full ${disabled ? "text-neutral-300" : "text-neutral-800 hover:bg-neutral-100"}`}
+    >
+      {children}
+    </button>
   )
 }
 

@@ -58,6 +58,11 @@ class ShellRunner {
       this.settle()
       return
     }
+    if (payload.type === "history_state") {
+      useSimStore.getState().setHistory(payload.canBack, payload.canForward)
+      useSimStore.getState().setRoute(payload.path)
+      return
+    }
     this.onStoreEvent(payload.event)
   }
 
