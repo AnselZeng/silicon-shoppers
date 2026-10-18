@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { BackendPanel } from "@/components/shell/BackendPanel"
-import { ObservabilityPanel } from "@/components/shell/ObservabilityPanel"
 import { Terminal } from "@/components/shell/Terminal"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -22,7 +21,6 @@ export function PipelineLog({ compact = false, onExpand }: { compact?: boolean; 
           <TabsList variant="line" className="bg-transparent">
             <TabsTrigger value="terminal" onClick={() => onExpand?.()}>Terminal</TabsTrigger>
             <TabsTrigger value="backend" onClick={() => onExpand?.()}>Backend</TabsTrigger>
-            <TabsTrigger value="obs" onClick={() => onExpand?.()}>Observability</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -48,16 +46,12 @@ export function PipelineLog({ compact = false, onExpand }: { compact?: boolean; 
         <TabsList variant="line" className="bg-transparent">
           <TabsTrigger value="terminal">Terminal</TabsTrigger>
           <TabsTrigger value="backend">Backend</TabsTrigger>
-          <TabsTrigger value="obs">Observability</TabsTrigger>
         </TabsList>
         <TabsContent value="terminal" className="min-h-0">
           <Terminal />
         </TabsContent>
         <TabsContent value="backend" className="min-h-0 overflow-auto">
           <BackendPanel />
-        </TabsContent>
-        <TabsContent value="obs" className="min-h-0 overflow-auto">
-          <ObservabilityPanel />
         </TabsContent>
       </Tabs>
     </div>

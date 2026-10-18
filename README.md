@@ -4,7 +4,7 @@
 
 > This is not a chatbot that recommends three products. **The page is the model output.**
 
-Built at the LA Hacks AI Hackathon (UCLA, Oct 17 to 18, 2026) for the Visa challenge *"The Future of Shopping: Powered by AI, Secured by Visa"* and the Sentry track.
+Built at the LA Hacks AI Hackathon (UCLA, Oct 17 to 18, 2026) for the Visa challenge *"The Future of Shopping: Powered by AI, Secured by Visa"*.
 
 ---
 
@@ -65,7 +65,7 @@ What the store changes for you:
 ## Demo in 2 minutes
 
 1. **Normal store:** everyone sees the same editorial layout.
-2. **Pick an AI shopper** (Price Hunter, seed 42, Adaptive on) and press **Run**. A ghost cursor browses SOCAL ATELIER while the terminal streams `[agent]`, `[tracker]`, `[engine]`, `[layout]`, `[sentry]` and `[visa]`.
+2. **Pick an AI shopper** (Price Hunter, seed 42, Adaptive on) and press **Run**. A ghost cursor browses SOCAL ATELIER while the terminal streams `[agent]`, `[tracker]`, `[engine]`, `[layout]` and `[visa]`.
 3. After a few events the engine classifies the session and the store **switches live**: discount hero, sale filters, pop-ups off, guest checkout.
 4. The cursor adds a piece, opens the **mock Visa Unified Checkout**, and lands on `/store/confirmation`.
 5. **Tell the store what you need:** type "gym clothes for my husband, spend $100 total". Men and Sport move up, Budget picks appears, and every card shows whether it fits.
@@ -89,7 +89,7 @@ What the store changes for you:
                            |
                  Layout + a reason for every change
                            |
-          SOCAL ATELIER re-renders (and Sentry records why)
+          SOCAL ATELIER re-renders
 ```
 
 ### 1. The purchase model (H&M)
@@ -117,7 +117,7 @@ What the store changes for you:
 
 - **Run** sends the model's output (layout decisions, predicted mix, evidence, with no product tiles or shopper ids) and the optional "Or describe them" sentence to a Next.js server route, `app/api/llm-layout`, which calls Gemini (`gemini-3.5-flash`, override with `GEMINI_MODEL`). The system prompt is the generated design guideline and the response is constrained to the layout JSON Schema (`LlmLayoutSchema`).
 - **The LLM designs inside a box.** Code copies product ids in afterwards, and the validator enforces the model's validated decisions (section and category order), ad rules and copy limits, and drops any reason that cites a number not in the model's output. The sentence steers the design like an unvalidated decision and never overrides a validated one.
-- **If Gemini fails** (no key, API error, invalid or unusable JSON), Run falls back to the model's rules (`modelLayout`) and the error goes to the terminal (`[llm]`), the browser console and the Observability tab.
+- **If Gemini fails** (no key, API error, invalid or unusable JSON), Run falls back to the model's rules (`modelLayout`) and the error goes to the terminal (`[llm]`) and the browser console.
 - **Live every time:** temperature 0, and every Run streams a fresh answer (the side panel shows it as it's written). Set `LLM_CACHE=on` to reuse the answer for the same input instead. There is no timeout; Run waits for the LLM.
 - **A keyword parser returns the same format** if there's no key, the API is slow, or the Wi-Fi drops, so the demo never breaks.
 - **What leaves the app:** the model's aggregate output and the sentence, with no shopper ids. The API key stays on the server.
@@ -125,7 +125,7 @@ What the store changes for you:
 ### 4. The store and the simulator
 
 - **Next.js store:** SOCAL ATELIER (women, men, new in, sale, search, product, confirmation pages) runs in an iframe inside a simulator.
-- **The simulator:** a persona editor (4 personas, about 21 traits each), seeded runs (mulberry32), a terminal and a local Observability tab.
+- **The simulator:** a persona editor (4 personas, about 21 traits each), seeded runs (mulberry32) and a terminal.
 - **The ghost-cursor agent** scores candidate actions with trait-weighted heuristics. The engine scores events, converts them with softmax, and declares a persona once its top probability is at least 0.75 after at least 3 events.
 - **Layout changes** are sent into the store with a `set_layout` message.
 
@@ -196,9 +196,8 @@ npm run dev
 ```
 
 - Open http://localhost:3000 at 1280px or wider. The store also works on its own at `/store`.
-- No keys are required: Visa and Sentry are local stubs, and without a Gemini key Run builds the layout from the model's rules (the terminal says so).
+- No keys are required: Visa checkout is a local mock, and without a Gemini key Run builds the layout from the model's rules (the terminal says so).
 - **Gemini:** add `GEMINI_API_KEY=...` to `frontend/.env.local` (free key from aistudio.google.com/apikey), then restart `npm run dev`. Optional `GEMINI_MODEL` overrides `gemini-3.5-flash`. Never put either in a `NEXT_PUBLIC_` variable.
-- **Optional Sentry:** fill `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` and `SENTRY_AUTH_TOKEN` in `.env.local` to turn on Session Replay on `/store`, tracing and logs (custom spans: `simulation.run`, `agent.step`, `persona.infer`, `layout.adapt`).
 
 **Rebuilding the models** (Python 3.12, needs the dataset via Git LFS; see the `h&m-model` and `model` branches): `python -m model.run_all` (H&M layout models), `python -m model all` (fused homepage model) and `python -m session_model all` (OTTO session model). Every branch README lists the inputs, outputs and expected numbers.
 
@@ -231,7 +230,7 @@ From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `n
 
 | Where | What |
 | --- | --- |
-| `frontend/` | Next.js simulator and store: layout preview, terminal, Observability tab, SOCAL ATELIER |
+| `frontend/` | Next.js simulator and store: layout preview, terminal, SOCAL ATELIER |
 | `frontend/lib/model/` | Model runtime in the browser: session model, layout adapter, Snowflake homepage fetch |
 | `backend/` | Homepage and live-session models; the store falls back to defaults when Python is not configured |
 | branch `dataset` | dataset-v1: 100k H&M shopper profiles, leak-free time windows, scoring harness |
@@ -247,7 +246,7 @@ From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `n
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind, shadcn/ui, Zustand.
 - **AI / ML:** PyTorch (GRU), LightGBM, scikit-learn, Gemini API, tree models exported to JSON and evaluated in TypeScript.
 - **Data:** DuckDB, Parquet, Snowflake, Supabase (Postgres with row-level security), Git LFS.
-- **Observability and payments:** `@sentry/nextjs` (with a local stub), mock Visa Unified Checkout.
+- **Payments:** mock Visa Unified Checkout.
 
 ---
 
@@ -259,7 +258,7 @@ From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `n
 - Run the one clean test on the reserved 2019 window, then a real A/B test.
 - Per-person profiles for shared household accounts, the reason Ladieswear dominates even for menswear buyers.
 
-Routes: `/` is the demo shell (layout preview, terminal, local observability, iframe of the store). `/store` is SOCAL ATELIER, including women, men, new in, sale, for you, search, product, and confirmation. The terminal logs `[tracker]`, `[model]`, `[layout]`, `[sentry]`, and `[visa]`. The Observability tab shows replay crumbs, traces, and logs without a Sentry DSN.
+Routes: `/` is the demo shell (layout preview, terminal, iframe of the store). `/store` is SOCAL ATELIER, including women, men, new in, sale, for you, search, product, and confirmation. The terminal logs `[tracker]`, `[model]`, `[layout]`, and `[visa]`.
 
 ---
 
