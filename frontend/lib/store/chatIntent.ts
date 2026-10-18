@@ -45,11 +45,26 @@ export interface ChatApplied {
  * If the message states a preference the store can act on, returns a patched copy of `current`.
  * Returns null when the message has nothing actionable (a plain question, small talk).
  */
+// "expensive" is a direction of its own — the opposite end of "sale/cheap".
+// "not too expensive" still means cheap, so negation is checked first.
+const NOT_EXPENSIVE_RE = /\b(not|nothing|isn'?t|never)\s+(too\s+|that\s+|very\s+|so\s+|really\s+)?(expensive|pricey)\b/i
+const EXPENSIVE_RE =
+  /\b(expensive|priciest|pricey|premium|luxur\w*|luxe|high[-\s]?end|top[-\s]?end|splurge|designer|upscale|fancy|posh|fanciest|nicest)\b/i
+// "not sale", "no sale", "full price" — pull sale emphasis off.
+const NOT_SALE_RE =
+  /\b(not|no|none|without|skip|hate|tired of|over)\b[\w\s']{0,20}\bsale\b|\bfull[-\s]?price\b|\bnon[-\s]?sale\b|\bno sale\b/i
+
 export function applyChatIntent(message: string, current: LayoutConfig): ChatApplied | null {
   const intent = keywordIntent(message)
   const o = intentOverrides(intent)
   const colors = colorsIn(message)
-  if (!o.landingDepartment && !o.departmentsFirst.length && !o.sectionFirst && !o.budget && !colors.length && !o.priceMode) {
+  const expensive = EXPENSIVE_RE.test(message) && !NOT_EXPENSIVE_RE.test(message)
+  const notSale = NOT_SALE_RE.test(message)
+  const wantsSale = !notSale && !expensive && (o.sectionFirst === "sale" || o.priceMode || !!o.budget)
+  if (
+    !o.landingDepartment && !o.departmentsFirst.length && !o.sectionFirst && !o.budget && !colors.length &&
+    !o.priceMode && !expensive && !notSale
+  ) {
     return null
   }
 
@@ -74,22 +89,45 @@ export function applyChatIntent(message: string, current: LayoutConfig): ChatApp
     layout.nav.highlight = landing
   }
 
-  // Stated priority → nav + homepage rail order + listing sort.
-  if (o.sectionFirst) {
+  // Stated priority → nav + homepage rail order + listing sort. A "sale" read is
+  // suppressed when the shopper actually said NOT sale or asked for expensive.
+  const sectionFirst = o.sectionFirst === "sale" && !wantsSale ? undefined : o.sectionFirst
+  if (sectionFirst) {
     const navMap: Record<string, NavItemId> = { new_in: "new_in", sale: "sale", bestsellers: "for_you" }
-    layout.nav.order = navFirst(layout.nav.order, navMap[o.sectionFirst])
-    const idx = layout.home.blocks.findIndex((b) => b.type === "product_row" && b.source.kind === o.sectionFirst)
+    layout.nav.order = navFirst(layout.nav.order, navMap[sectionFirst])
+    const idx = layout.home.blocks.findIndex((b) => b.type === "product_row" && b.source.kind === sectionFirst)
     if (idx > 1) {
       const [block] = layout.home.blocks.splice(idx, 1)
       layout.home.blocks.splice(1, 0, block)
-      changes.push(`moved ${o.sectionFirst.replaceAll("_", " ")} to the top`)
+      changes.push(`moved ${sectionFirst.replaceAll("_", " ")} to the top`)
     }
   }
-  if (o.priceMode || o.budget) {
+  if ((o.priceMode || o.budget) && wantsSale) {
     layout.listing.defaultSort = "price_asc"
     layout.listing.card.priceStyle = "sale_emphasis"
     layout.listing.expandedFilters = [...new Set<typeof layout.listing.expandedFilters[number]>(["sale", "price", ...layout.listing.expandedFilters])]
     changes.push("sorted by price, sale badges on")
+  }
+
+  // The other end of the range: "expensive / premium" sorts high-to-low, drops
+  // sale emphasis and brings collections forward.
+  if (expensive) {
+    layout.listing.defaultSort = "price_desc"
+    if (layout.listing.card.priceStyle === "sale_emphasis") layout.listing.card.priceStyle = "plain"
+    layout.listing.expandedFilters = [...new Set<typeof layout.listing.expandedFilters[number]>(["price", ...layout.listing.expandedFilters])]
+    layout.nav.order = navFirst(layout.nav.order, "collections")
+    const idx = layout.home.blocks.findIndex((b) => b.type === "category_tiles" || b.type === "collection_spotlight")
+    if (idx > 1) {
+      const [block] = layout.home.blocks.splice(idx, 1)
+      layout.home.blocks.splice(1, 0, block)
+    }
+    changes.push("most expensive first, collections up top")
+  }
+  // "not sale" on its own: pull sale badges/filters back off.
+  if (notSale) {
+    if (layout.listing.card.priceStyle === "sale_emphasis") layout.listing.card.priceStyle = "plain"
+    layout.listing.expandedFilters = layout.listing.expandedFilters.filter((f) => f !== "sale")
+    changes.push("sale de-emphasized")
   }
 
   // Stated colors → color merchandising: those colors first on cards and in the color filter.
@@ -108,15 +146,21 @@ export function applyChatIntent(message: string, current: LayoutConfig): ChatApp
 
   // The hero is part of the rearrange too — swap the banner to match what they asked
   // for, so the headline/visual changes with the store instead of staying constant.
-  const heroAd: AdId | null =
-    o.sectionFirst === "sale" || o.budget || o.priceMode
-      ? landing === "men"
+  const deptForHero = landing ?? layout.nav.department
+  const heroAd: AdId | null = expensive
+    ? deptForHero === "women"
+      ? "collection_women"
+      : deptForHero === "men"
+        ? "collection_men"
+        : null
+    : wantsSale
+      ? deptForHero === "men"
         ? "sale_men"
-        : landing === "women"
+        : deptForHero === "women"
           ? "sale_women"
           : "offer_all"
-      : o.sectionFirst === "new_in"
-        ? landing === "women"
+      : sectionFirst === "new_in"
+        ? deptForHero === "women"
           ? "new_women"
           : "new_men"
         : landing === "men"

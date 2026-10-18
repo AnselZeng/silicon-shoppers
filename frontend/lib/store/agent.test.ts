@@ -114,6 +114,38 @@ describe("applyChatIntent", () => {
     expect(applied!.layout.listing.card.priceStyle).toBe("sale_emphasis")
   })
 
+  test("'expensive' sorts high-to-low, drops sale emphasis, collections forward", () => {
+    const layout = cloneLayout(DEFAULT_LAYOUT)
+    layout.listing.card.priceStyle = "sale_emphasis"
+    layout.listing.expandedFilters = ["sale", "price"]
+    const applied = applyChatIntent("ok how about women which are really expensive", layout)
+    expect(applied).not.toBeNull()
+    expect(applied!.layout.listing.defaultSort).toBe("price_desc")
+    expect(applied!.layout.listing.card.priceStyle).toBe("plain")
+    expect(applied!.layout.nav.order[0]).toBe("collections")
+    expect(applied!.layout.nav.department).toBe("women")
+    expect(applied!.layout.ads.placements.find((p) => p.slot === "hero")?.adIds[0]).toBe("collection_women")
+  })
+
+  test("'not sale' suppresses the sale intent that 'sale' would normally trigger", () => {
+    const layout = cloneLayout(DEFAULT_LAYOUT)
+    layout.listing.card.priceStyle = "sale_emphasis"
+    layout.listing.expandedFilters = ["sale", "price"]
+    layout.listing.defaultSort = "price_asc"
+    const applied = applyChatIntent("nono not sale but expensive", layout)
+    expect(applied).not.toBeNull()
+    expect(applied!.layout.listing.defaultSort).toBe("price_desc")
+    expect(applied!.layout.listing.card.priceStyle).toBe("plain")
+    expect(applied!.layout.listing.expandedFilters).not.toContain("sale")
+    expect(applied!.layout.ads.placements.find((p) => p.slot === "hero")?.adIds[0]).not.toMatch(/^sale_/)
+  })
+
+  test("'not too expensive' still means budget, not premium", () => {
+    const applied = applyChatIntent("nothing too expensive please", cloneLayout(DEFAULT_LAYOUT))
+    expect(applied).not.toBeNull()
+    expect(applied!.layout.listing.defaultSort).not.toBe("price_desc")
+  })
+
   test("a plain question changes nothing", () => {
     expect(applyChatIntent("why am i seeing this shirt?", cloneLayout(DEFAULT_LAYOUT))).toBeNull()
   })
