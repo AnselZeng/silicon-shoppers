@@ -1,7 +1,8 @@
 import { llmStage, type PipelineStage } from "@/lib/layout/pipeline"
 import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import type { LayoutConfig } from "@/lib/layout/types"
-import type { ValidationReport } from "@/lib/layout/validate"
+import { validateLayout, type ValidationReport } from "@/lib/layout/validate"
+import { modelLayout } from "@/lib/model/adapter"
 import { loadFixture, type FixtureEntry } from "@/lib/model/fixtures"
 import type { HomepageDoc, ModelContext } from "@/lib/model/homepage"
 
@@ -46,6 +47,7 @@ const DEFAULT_PREVIEW = (): Preview => ({
 })
 
 export async function buildPreview(id: string, fixtures: FixtureEntry[]): Promise<Preview> {
+  if (id.startsWith("shopper:")) return buildShopperPreview(id.slice("shopper:".length), fixtures)
   const { fixtureId, stage } = parsePreviewId(id)
   const entry = fixtures.find((item) => item.id === fixtureId)
   if (!entry) return DEFAULT_PREVIEW()
@@ -64,5 +66,25 @@ export async function buildPreview(id: string, fixtures: FixtureEntry[]): Promis
     doc: fixture.doc,
     basket: entry.basket,
     note: stage === "llm" ? "no LLM output for this fixture, showing the model output" : undefined,
+  }
+}
+
+/** One Run: the model's document, then a layout the store can show. */
+async function buildShopperPreview(fixtureId: string, fixtures: FixtureEntry[]): Promise<Preview> {
+  const entry = fixtures.find((item) => item.id === fixtureId)
+  if (!entry) return DEFAULT_PREVIEW()
+  const fixture = await loadFixture(entry)
+  if (!fixture) return { ...DEFAULT_PREVIEW(), note: `could not load ${entry.doc}` }
+  const model: ModelContext = { doc: fixture.doc, basketIds: entry.basket }
+  const result =
+    fixture.llm !== null ? llmStage(fixture.llm, model) : validateLayout(modelLayout(fixture.doc).layout, { model })
+  return {
+    id: `shopper:${entry.id}`,
+    stage: "llm",
+    label: entry.label,
+    model,
+    doc: fixture.doc,
+    basket: entry.basket,
+    ...result,
   }
 }

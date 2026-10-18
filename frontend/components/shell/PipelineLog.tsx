@@ -14,8 +14,15 @@ export function PipelineLog() {
     <div className="flex h-full flex-col gap-2 p-3">
       <div className="flex items-center gap-2">
         <span className="text-[10px] tracking-[0.16em] text-white/50 uppercase">Pipeline log</span>
-        <Button type="button" size="sm" variant="outline" className="ml-auto text-foreground" onClick={() => runner.reset()}>
-          Reset store
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="ml-auto text-foreground"
+          title="Empties the bag and wishlist, closes checkout, and clears this log."
+          onClick={() => runner.reset()}
+        >
+          Clear session
         </Button>
       </div>
       <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1">

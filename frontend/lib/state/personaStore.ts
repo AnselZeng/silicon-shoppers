@@ -35,15 +35,35 @@ function numberOr(value: unknown, fallback: number): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback
 }
 
+function shareOr(value: unknown, fallback: number): number {
+  const raw = numberOr(value, fallback)
+  return Math.min(100, Math.max(0, Math.round(raw)))
+}
+
+function basketOr(value: unknown, fallback: number): number {
+  const raw = numberOr(value, fallback)
+  return Math.min(20, Math.max(3, Math.round(raw)))
+}
+
+function menShareFromLegacy(traits: Record<string, unknown>, fallback: number): number {
+  if (traits.preferredDepartment === "men") return 90
+  if (traits.preferredDepartment === "women") return 10
+  if (traits.preferredDepartment === "both") return 50
+  return fallback
+}
+
+function priceLevelFromBudget(budget: unknown, fallback: number): number {
+  if (typeof budget !== "number" || !Number.isFinite(budget)) return fallback
+  const t = (budget - 20) / 380
+  return Math.min(100, Math.max(0, Math.round(10 + t * 85)))
+}
+
 function asPersona(value: unknown): Persona | null {
   if (typeof value !== "object" || value === null) return null
   const record = value as Record<string, unknown>
   if (typeof record.id !== "string" || typeof record.name !== "string") return null
   if (typeof record.traits !== "object" || record.traits === null) return null
   const traits = record.traits as Record<string, unknown>
-  const colors = Array.isArray(traits.colorPreference)
-    ? traits.colorPreference.filter(isStoreColor)
-    : []
   const baseId =
     typeof record.baseId === "string" && isPersonaId(record.baseId)
       ? record.baseId
@@ -52,20 +72,21 @@ function asPersona(value: unknown): Persona | null {
         : "price_hunter"
   const template = defaultPersonaById(baseId)
   if (!template) return null
+  const colors = Array.isArray(traits.colorPreference)
+    ? traits.colorPreference.filter(isStoreColor)
+    : template.traits.colorPreference
   return {
     id: record.id,
     name: record.name,
     baseId,
     isCustom: record.isCustom === true || !isPersonaId(record.id),
     traits: {
-      preferredDepartment:
-        traits.preferredDepartment === "women" || traits.preferredDepartment === "men" || traits.preferredDepartment === "both"
-          ? traits.preferredDepartment
-          : template.traits.preferredDepartment,
-      priceSensitivity: numberOr(traits.priceSensitivity, template.traits.priceSensitivity),
-      maxBudget: numberOr(traits.maxBudget, template.traits.maxBudget),
-      noveltySeeking: numberOr(traits.noveltySeeking, template.traits.noveltySeeking),
-      colorPreference: colors.length > 0 ? colors : template.traits.colorPreference,
+      menShare: shareOr(traits.menShare, menShareFromLegacy(traits, template.traits.menShare)),
+      saleShare: shareOr(traits.saleShare, numberOr(traits.priceSensitivity, template.traits.saleShare)),
+      newShare: shareOr(traits.newShare, numberOr(traits.noveltySeeking, template.traits.newShare)),
+      priceLevel: shareOr(traits.priceLevel, priceLevelFromBudget(traits.maxBudget, template.traits.priceLevel)),
+      colorPreference: colors,
+      basketSize: basketOr(traits.basketSize, template.traits.basketSize),
     },
   }
 }
@@ -83,9 +104,10 @@ export const usePersonaStore = create<PersonaState>((set, get) => ({
               traits: {
                 ...persona.traits,
                 ...patch,
-                colorPreference: patch.colorPreference
-                  ? [...patch.colorPreference]
-                  : persona.traits.colorPreference,
+                colorPreference:
+                  patch.colorPreference !== undefined
+                    ? [...patch.colorPreference]
+                    : persona.traits.colorPreference,
               },
             }
           : persona,

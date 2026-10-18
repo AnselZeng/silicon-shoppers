@@ -1,35 +1,39 @@
 import { PERSONA_LABEL, type Persona, type PersonaTraits } from "@/lib/personas/schema"
 
 const priceHunter: PersonaTraits = {
-  preferredDepartment: "women",
-  priceSensitivity: 88,
-  maxBudget: 75,
+  menShare: 90,
+  saleShare: 70,
+  newShare: 10,
+  priceLevel: 25,
   colorPreference: ["black", "navy", "grey"],
-  noveltySeeking: 20,
+  basketSize: 12,
 }
 
 const trendSeeker: PersonaTraits = {
-  preferredDepartment: "women",
-  priceSensitivity: 30,
-  maxBudget: 160,
+  menShare: 5,
+  saleShare: 10,
+  newShare: 75,
+  priceLevel: 70,
   colorPreference: ["black", "burgundy", "camel"],
-  noveltySeeking: 90,
+  basketSize: 14,
 }
 
 const missionShopper: PersonaTraits = {
-  preferredDepartment: "men",
-  priceSensitivity: 45,
-  maxBudget: 140,
-  colorPreference: ["black", "navy"],
-  noveltySeeking: 15,
+  menShare: 50,
+  saleShare: 20,
+  newShare: 30,
+  priceLevel: 50,
+  colorPreference: [],
+  basketSize: 3,
 }
 
 const brandLoyalist: PersonaTraits = {
-  preferredDepartment: "both",
-  priceSensitivity: 28,
-  maxBudget: 220,
-  colorPreference: ["black", "cream", "navy"],
-  noveltySeeking: 18,
+  menShare: 0,
+  saleShare: 55,
+  newShare: 30,
+  priceLevel: 15,
+  colorPreference: ["black", "white", "navy"],
+  basketSize: 11,
 }
 
 export const DEFAULT_PERSONAS: Persona[] = [

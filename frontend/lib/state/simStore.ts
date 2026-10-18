@@ -4,7 +4,7 @@ import { create } from "zustand"
 import type { Preview } from "@/lib/layout/preview"
 import type { FixtureEntry } from "@/lib/model/fixtures"
 
-export type ViewportChoice = "web" | "mobile"
+export type ViewportChoice = "web" | "tablet" | "mobile"
 
 interface SimState {
   route: string

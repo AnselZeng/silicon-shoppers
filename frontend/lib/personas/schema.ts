@@ -9,15 +9,14 @@ export const PERSONA_IDS = [
 
 export type PersonaId = (typeof PERSONA_IDS)[number]
 
-export type DepartmentPref = "women" | "men" | "both"
-
-/** Shopping traits a persona keeps. The persona builder turns these into a basket. */
+/** Shopping profile the model can read. Shares and price level are 0–100. */
 export interface PersonaTraits {
-  preferredDepartment: DepartmentPref
-  priceSensitivity: number
-  maxBudget: number
-  noveltySeeking: number
+  menShare: number
+  saleShare: number
+  newShare: number
+  priceLevel: number
   colorPreference: StoreColor[]
+  basketSize: number
 }
 
 export interface Persona {

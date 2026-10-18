@@ -56,7 +56,7 @@ export function ModelOutput({ doc, basket }: { doc: HomepageDoc; basket: string[
         <span className="text-white/80">{top(doc.predicted_mix.category)}</span> ·{" "}
         <span className="text-white/80">{top(doc.predicted_mix.section, 4)}</span>
       </p>
-      <details className="mt-2">
+      <details className="mt-2" open>
         <summary className="cursor-pointer text-white/45">Raw JSON</summary>
         <pre className="mt-1 max-h-64 overflow-auto bg-black/40 p-2 text-[10px] leading-snug text-white/80">
           {JSON.stringify(doc, null, 2)}
