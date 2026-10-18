@@ -158,7 +158,9 @@ export function runChatActions(
       if (!useStorefront.getState().agentAutoPay) continue
       setTimeout(() => {
         try {
-          // The shopper may have clicked Pay themselves in the meantime — never double-charge.
+          // Re-read live: the shopper may have flipped auto-pay OFF mid-countdown,
+          // or clicked Pay themselves — never override either.
+          if (!useStorefront.getState().agentAutoPay) return
           if (useStorefront.getState().checkoutPhase !== "session") return
           const captured = captureCheckout()
           if (captured) {

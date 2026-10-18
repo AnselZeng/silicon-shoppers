@@ -16,6 +16,7 @@ import {
   type ChatAction,
 } from "@/lib/store/agent"
 import { emitStoreEvent } from "@/lib/store/emit"
+import { captureCheckout } from "@/lib/store/actions"
 import { useStorefront } from "@/lib/store/storeState"
 
 // Suggested starters per concierge tone — also the offline fallback answers when no LLM
@@ -99,6 +100,8 @@ export function Concierge() {
   const setOpen = useStorefront((state) => state.setConciergeOpen)
   const autoPay = useStorefront((state) => state.agentAutoPay)
   const setAutoPay = useStorefront((state) => state.setAgentAutoPay)
+  const checkoutPhase = useStorefront((state) => state.checkoutPhase)
+  const order = useStorefront((state) => state.order)
   const [messages, setMessages] = useState<Msg[]>([])
   const [pendingCheckout, setPendingCheckout] = useState(false)
   const [draft, setDraft] = useState("")
@@ -107,9 +110,37 @@ export function Concierge() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const history = useRef<Msg[]>([])
 
+  const lastOrderRef = useRef<string | null>(useStorefront.getState().order?.orderId ?? null)
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
   }, [messages, open])
+
+  // Every successful capture — agent auto-pay OR a manual Visa click — prints its
+  // receipt line in the chat exactly once.
+  useEffect(() => {
+    if (order && order.orderId !== lastOrderRef.current) {
+      lastOrderRef.current = order.orderId
+      appendOrderLine({ orderId: order.orderId, amount: order.amount })
+    }
+  }, [order])
+
+  // Auto-pay is a live intent, not a one-time decision: turning it ON while the
+  // Visa sheet is open means "you finish it", so the agent pays after a beat.
+  // Turning it OFF mid-countdown is honored by the re-check inside the timer.
+  useEffect(() => {
+    if (!autoPay || checkoutPhase !== "session") return
+    const timer = setTimeout(() => {
+      if (!useStorefront.getState().agentAutoPay) return
+      if (useStorefront.getState().checkoutPhase !== "session") return
+      const captured = captureCheckout()
+      if (captured) {
+        emitStoreEvent("concierge_action", { action: "paid", detail: `order ${captured.orderId} · $${captured.amount}` })
+        router.push("/store/confirmation")
+      }
+    }, 700)
+    return () => clearTimeout(timer)
+  }, [autoPay, checkoutPhase, router])
 
   const script = SCRIPTS[tone]
 
@@ -219,11 +250,11 @@ export function Concierge() {
       const safe = actions.map((a): ChatAction =>
         a.action === "checkout" && !confirmed ? { action: "ask_checkout" } : a,
       )
-      const result = runChatActions(safe, (path: string) => router.push(path), appendOrderLine)
+      const result = runChatActions(safe, (path: string) => router.push(path))
       // The model claimed an add but no action landed — recover the product it named
       // from its own prose and do the add for real. The claim becomes true.
       if (CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
-        const recovered = recoverClaimedAdd(text, (path: string) => router.push(path), appendOrderLine)
+        const recovered = recoverClaimedAdd(text, (path: string) => router.push(path))
         if (recovered) {
           result.added.push(...recovered.added)
           result.failed.push(...recovered.failed)
@@ -232,7 +263,7 @@ export function Concierge() {
       // The model sometimes says "checking you out" but forgets the action. When the
       // shopper clearly confirmed and the bag has items, the agent owes them a checkout.
       if (confirmed && !result.checkedOut && useStorefront.getState().bag.length > 0) {
-        const retry = runChatActions([{ action: "checkout" }], (path: string) => router.push(path), appendOrderLine)
+        const retry = runChatActions([{ action: "checkout" }], (path: string) => router.push(path))
         result.checkedOut = retry.checkedOut
         result.checkoutSkipped = retry.checkoutSkipped
       }
@@ -304,7 +335,7 @@ export function Concierge() {
         ])
         return
       }
-      runChatActions([{ action: "checkout" }], (path: string) => router.push(path), appendOrderLine)
+      runChatActions([{ action: "checkout" }], (path: string) => router.push(path))
       setMessages((prev) => [
         ...prev,
         { role: "assistant" as const, content: autoPay ? "On it! Paying now, you're all set." : "Taking you to payment, one click left!" },
