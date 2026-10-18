@@ -1,4 +1,5 @@
 import { postSimMessage, type EventValue, type StoreEventType } from "@/lib/sim/protocol"
+import { onStoreEvent } from "@/lib/model/personalize"
 
 const recent = new Map<string, number>()
 const scrollMarks = new Set<number>()
@@ -29,6 +30,7 @@ export function emitStoreEvent(
   const now = event.timestamp
   if (now - (recent.get(key) ?? 0) < 350) return
   recent.set(key, now)
+  onStoreEvent(event)
   if (window.parent !== window) {
     postSimMessage(window.parent, { type: "store_event", event })
   }

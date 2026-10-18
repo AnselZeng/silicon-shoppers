@@ -17,6 +17,7 @@ import { VisaCheckout } from "@/components/store/VisaCheckout"
 import { WishlistDrawer } from "@/components/store/WishlistDrawer"
 import { isParentPayload, postSimMessage, readEnvelope, type AgentAction } from "@/lib/sim/protocol"
 import { findAgentElement, readPageState, setNativeValue, sleep } from "@/lib/store/dom"
+import { initPersonalization } from "@/lib/model/personalize"
 import { emitStoreEvent, resetEmitDedupe, takeScrollMark } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -127,7 +128,9 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const routerRef = useRef(router)
-  routerRef.current = router
+  useEffect(() => {
+    routerRef.current = router
+  }, [router])
   const layout = useStorefront((state) => state.layout)
   const showElementIds = useStorefront((state) => state.showElementIds)
   const browseSort = useStorefront((state) => state.browseSort)
@@ -136,6 +139,10 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
   const popupDismissed = useStorefront((state) => state.popupDismissed)
   const sessionNonce = useStorefront((state) => state.sessionNonce)
   const checkoutPhase = useStorefront((state) => state.checkoutPhase)
+
+  useEffect(() => {
+    initPersonalization()
+  }, [])
 
   useEffect(() => {
     emitStoreEvent("page_view", { path: pathname })
