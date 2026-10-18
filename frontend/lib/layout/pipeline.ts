@@ -1,4 +1,4 @@
-import { forYouIds, modelLayout } from "@/lib/model/adapter"
+import { forYouIds } from "@/lib/model/adapter"
 import type { ModelContext } from "@/lib/model/homepage"
 import { modelCategoryOrder } from "@/lib/model/policy"
 import { validateLayout, type ValidationResult } from "@/lib/layout/validate"
@@ -21,14 +21,10 @@ export function withModelData(raw: unknown, model: ModelContext): unknown {
   return config
 }
 
+/** default: the house store. model: the model's JSON only (the store doesn't change). llm: the LLM's layout. */
 export type PipelineStage = "default" | "model" | "llm"
 
-/** The model layout, validated like any other source. */
-export function modelStage(model: ModelContext): ValidationResult {
-  return validateLayout(modelLayout(model.doc, model.basketIds), { model })
-}
-
-/** LLM output -> copied data -> validator. A broken config falls back to the model layout. */
+/** LLM output -> copied data -> validator. A broken config falls back to the house default. */
 export function llmStage(raw: unknown, model: ModelContext): ValidationResult {
   return validateLayout(withModelData(raw, model), { model })
 }

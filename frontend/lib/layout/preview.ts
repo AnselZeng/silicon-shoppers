@@ -1,17 +1,25 @@
-import { llmStage, modelStage, type PipelineStage } from "@/lib/layout/pipeline"
+import { llmStage, type PipelineStage } from "@/lib/layout/pipeline"
 import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import type { LayoutConfig } from "@/lib/layout/types"
 import type { ValidationReport } from "@/lib/layout/validate"
 import { loadFixture, type FixtureEntry } from "@/lib/model/fixtures"
-import type { ModelContext } from "@/lib/model/homepage"
+import type { HomepageDoc, ModelContext } from "@/lib/model/homepage"
 
-/** A layout the shell can show: "default", or "<fixture id>:model" / "<fixture id>:llm". */
+/**
+ * What the shell shows: "default", "<fixture id>:model" or "<fixture id>:llm".
+ * The model stage is the model's JSON only; the store stays on the house default.
+ */
 export interface Preview {
   id: string
   stage: PipelineStage
   label: string
+  /** Layout sent to the store. */
   layout: LayoutConfig
+  /** Model context the store's validator applies; null when the store shows the house default. */
   model: ModelContext | null
+  /** The model's output and basket, for the panel. */
+  doc: HomepageDoc | null
+  basket: string[]
   report: ValidationReport
   note?: string
 }
@@ -32,6 +40,8 @@ const DEFAULT_PREVIEW = (): Preview => ({
   label: "House default",
   layout: cloneLayout(DEFAULT_LAYOUT),
   model: null,
+  doc: null,
+  basket: [],
   report: { changes: [], fellBack: false },
 })
 
@@ -44,15 +54,15 @@ export async function buildPreview(id: string, fixtures: FixtureEntry[]): Promis
   const model: ModelContext = { doc: fixture.doc, basketIds: entry.basket }
   if (stage === "llm" && fixture.llm !== null) {
     const result = llmStage(fixture.llm, model)
-    return { id, stage, label: `${entry.label} · LLM layout`, model, ...result }
+    return { id, stage, label: `${entry.label} · LLM layout`, model, doc: fixture.doc, basket: entry.basket, ...result }
   }
-  const result = modelStage(model)
   return {
+    ...DEFAULT_PREVIEW(),
     id: previewId(entry.id, "model"),
     stage: "model",
-    label: `${entry.label} · model layout`,
-    model,
-    ...result,
-    note: stage === "llm" ? "no LLM output for this fixture, showing the model layout" : undefined,
+    label: `${entry.label} · model output`,
+    doc: fixture.doc,
+    basket: entry.basket,
+    note: stage === "llm" ? "no LLM output for this fixture, showing the model output" : undefined,
   }
 }

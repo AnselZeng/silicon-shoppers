@@ -41,7 +41,6 @@ import {
   type LayoutConfig,
 } from "@/lib/layout/schema"
 import { looksLikeV1, migrateV1 } from "@/lib/layout/v1"
-import { modelLayout } from "@/lib/model/adapter"
 import type { ModelContext } from "@/lib/model/homepage"
 import {
   groundedNumbers,
@@ -58,7 +57,7 @@ import { CATEGORIES, type Category, type Department } from "@/lib/store/types"
 /**
  * One validator for every layout source (default, model layout, LLM, cached files).
  * Parses, fixes small problems in place and reports each fix. If the config can't be
- * parsed it falls back to the model layout, or to the house default with no model output.
+ * parsed it falls back to the house default.
  */
 
 export interface ValidateContext {
@@ -497,9 +496,9 @@ export function fixLayout(cfg: LayoutConfig, ctx: ValidateContext = {}, changes:
   return cfg
 }
 
-export function fallbackLayout(ctx: ValidateContext = {}): LayoutConfig {
-  const base = ctx.model ? modelLayout(ctx.model.doc, ctx.model.basketIds) : cloneLayout(DEFAULT_LAYOUT)
-  return fixLayout(base, ctx)
+/** A broken config falls back to the house default, as is: the model never changes the store on its own. */
+export function fallbackLayout(): LayoutConfig {
+  return cloneLayout(DEFAULT_LAYOUT)
 }
 
 export function validateLayout(raw: unknown, ctx: ValidateContext = {}): ValidationResult {
@@ -508,7 +507,7 @@ export function validateLayout(raw: unknown, ctx: ValidateContext = {}): Validat
   if (!parsed.success) {
     const issue = parsed.error.issues[0]
     const error = issue ? `${issue.path.join(".") || "config"}: ${issue.message}` : "invalid config"
-    return { layout: fallbackLayout(ctx), report: { changes: [], fellBack: true, error } }
+    return { layout: fallbackLayout(), report: { changes: [], fellBack: true, error } }
   }
   const layout = fixLayout(parsed.data, ctx, changes)
   return { layout, report: { changes, fellBack: false } }

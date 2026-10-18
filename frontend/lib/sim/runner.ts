@@ -40,18 +40,22 @@ class ShellRunner {
     useSimStore.getState().setPreview(preview)
     const logs = useLogStore.getState()
     if (preview.note) logs.push("layout", preview.note)
-    if (preview.model) {
-      const doc = preview.model.doc
+    if (preview.doc) {
+      const doc = preview.doc
       logs.push(
         "model",
         `${doc.demo_id ?? doc.user_id ?? "shopper"} · ${doc.evidence?.add_to_bags ?? 0} add-to-bags · ${doc.store_products?.length ?? 0} ranked products`,
       )
     }
-    logs.push("layout", `${preview.label} · nav ${preview.layout.nav.order.join(" ")} · ${preview.layout.home.blocks.length} blocks`)
+    if (preview.stage === "model") {
+      logs.push("model", "model output is input for the LLM; the store stays on the house default")
+    } else {
+      logs.push("layout", `${preview.label} · nav ${preview.layout.nav.order.join(" ")} · ${preview.layout.home.blocks.length} blocks`)
+    }
     if (preview.report.fellBack) logs.push("layout", `validator fell back: ${preview.report.error ?? "invalid"}`)
     for (const change of preview.report.changes) logs.push("layout", `fixed · ${change}`)
     withSpan("layout.apply", () => preview.id)
-    this.send({ type: "set_layout", layout: preview.layout, model: preview.model, presetName: preview.stage === "default" ? undefined : preview.label })
+    this.send({ type: "set_layout", layout: preview.layout, model: preview.model, presetName: preview.stage === "llm" ? preview.label : undefined })
   }
 
   private send(payload: ParentPayload) {
