@@ -48,7 +48,7 @@ Three AI signals feed one store:
 | --- | --- | --- | --- |
 | **Purchase history** | What you buy: departments, categories, colors, price level, sale and newness habits | Models trained on **100,000 real H&M shoppers** (GRU sequence model, LightGBM, learned blend, product ranker) | Before the first click |
 | **Live clicks** | How you browse: pace, exploring vs deciding, comparing, cart habits | Session model trained on **200,000 real OTTO shoppers**, running in the browser | After every click |
-| **What you say** | "Back-to-school stuff for my 6-year-old, under $25 each" | **Gemini** turns the sentence into a fixed, validated intent (departments, priority, budget) | When you type |
+| **What you say** | "Back-to-school stuff for my 6-year-old, under $25 each" | **Gemini** reads the model's output plus your sentence and designs the layout inside a fixed, validated schema | When you press Run |
 
 What the store changes for you:
 
@@ -115,10 +115,12 @@ What the store changes for you:
 
 ### 3. The conversational layer (Gemini)
 
-- A text box sends one sentence to a Next.js server route that calls Gemini (`gemini-3.5-flash-lite`, free tier) with a **fixed JSON response schema**: up to 3 departments, a priority (price, new, classics, popular) and an optional budget (amount, per item or total).
-- **The LLM never edits the layout.** It only fills that schema, and the store applies it with the same rules and reasons as everything else.
+- **Run** sends the model's output (layout decisions, predicted mix, evidence, with no product tiles or shopper ids) and the optional "Or describe them" sentence to a Next.js server route, `app/api/llm-layout`, which calls Gemini (`gemini-3.5-flash`, override with `GEMINI_MODEL`). The system prompt is the generated design guideline and the response is constrained to the layout JSON Schema (`LlmLayoutSchema`).
+- **The LLM designs inside a box.** Code copies product ids in afterwards, and the validator enforces the model's validated decisions (section and category order), ad rules and copy limits, and drops any reason that cites a number not in the model's output. The sentence steers the design like an unvalidated decision and never overrides a validated one.
+- **If Gemini fails** (no key, API error, invalid or unusable JSON), Run falls back to the model's rules (`modelLayout`) and the error goes to the terminal (`[llm]`), the browser console and the Observability tab.
+- **Same input, same layout:** temperature 0 and a server-side cache, so rerunning a shopper is instant and saves quota. There is no timeout; Run waits for Gemini.
 - **A keyword parser returns the same format** if there's no key, the API is slow, or the Wi-Fi drops, so the demo never breaks.
-- **Only the sentence is sent.** No shopper data leaves the app, and the API key stays on the server.
+- **What leaves the app:** the model's aggregate output and the sentence, with no shopper ids. The API key stays on the server.
 
 ### 4. The store and the simulator
 
@@ -150,13 +152,13 @@ All results are **offline replays**: each layout is scored against what real sho
 
 - **Explains itself:** every block, tile, rail and badge carries a "Why am I seeing this?" reason.
 - **Only changes when confident:** a decision only changes for a group of shoppers if it beat the default for that group on held-out data. Everyone else keeps the normal store.
-- **The LLM is boxed in:** Gemini fills a fixed schema and can't invent layout changes or touch prices.
+- **The LLM is boxed in:** Gemini fills a fixed schema, the validator enforces the model's validated decisions, and it can't write product ids or touch prices.
 - **You stay in control of money:** stated budgets drive the meter and badges. Checkout is a clearly labeled mock Visa Unified Checkout, and no real payment is taken.
 - **Privacy:**
   - No age, location or customer IDs are used as model inputs.
   - The demo uses random shopper IDs.
   - Live learning stays in the browser.
-  - Only your typed sentence goes to the LLM.
+  - Only the model's aggregate output and your typed sentence go to the LLM, never shopper ids.
 - **Honest about limits:** offline replay is not an A/B test, so we make no causal claims. The profiles are not anonymous (99% are unique), so we keep the data private.
 
 ---
@@ -172,7 +174,7 @@ All results are **offline replays**: each layout is scored against what real sho
 - **Running ML in a browser.** A simple linear copy of the product ranker kept only 35% of its top picks, so we exported the actual LightGBM trees to JSON with an exact TypeScript evaluator (matches LightGBM to about 1e-16).
 - **Two vocabularies.** H&M has 5 departments and 18 colors, and our demo store has fewer, so an adapter maps between them and leaves unmapped values at their defaults.
 - **Hackathon-grade infrastructure.** Laptops ran out of disk installing PyTorch, and background training jobs got killed, so we made training resumable with time budgets.
-- **Putting an LLM in a store without letting it break the store.** We gave it a fixed schema, server-side keys, a 5-second timeout and an offline fallback that returns the same format.
+- **Putting an LLM in a store without letting it break the store.** We gave it a fixed schema, server-side keys, a validator between it and the store, and a fallback to the model's own rules.
 
 ---
 
@@ -194,8 +196,8 @@ npm run dev
 ```
 
 - Open http://localhost:3000 at 1280px or wider. The store also works on its own at `/store`.
-- No keys are required: Visa and Sentry are local stubs, and the "Tell us" box falls back to keyword parsing.
-- **Optional Gemini:** add `GEMINI_API_KEY=...` to `frontend/.env.local` (free key from aistudio.google.com/apikey), then restart `npm run dev`. Never put it in a `NEXT_PUBLIC_` variable.
+- No keys are required: Visa and Sentry are local stubs, and without a Gemini key Run builds the layout from the model's rules (the terminal says so).
+- **Gemini:** add `GEMINI_API_KEY=...` to `frontend/.env.local` (free key from aistudio.google.com/apikey), then restart `npm run dev`. Optional `GEMINI_MODEL` overrides `gemini-3.5-flash`. Never put either in a `NEXT_PUBLIC_` variable.
 - **Optional Sentry:** fill `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` and `SENTRY_AUTH_TOKEN` in `.env.local` to turn on Session Replay on `/store`, tracing and logs (custom spans: `simulation.run`, `agent.step`, `persona.infer`, `layout.adapt`).
 
 **Rebuilding the models** (Python 3.12, needs the dataset via Git LFS; see the `h&m-model` and `model` branches): `python -m model.run_all` (H&M layout models), `python -m model all` (fused homepage model) and `python -m session_model all` (OTTO session model). Every branch README lists the inputs, outputs and expected numbers.
@@ -214,6 +216,7 @@ With Snowflake configured, the store also loads that shopper's homepage document
 
 - `lib/layout/schema.ts`: the layout config (v2) as a zod schema. The LLM fills `LlmLayoutSchema`; it never writes product ids or URLs.
 - `lib/model/`: the model's `HomepageDoc` type, the H&M → store mapping, the model policy the validator applies, the For You list, and `modelLayout()` for the live Snowflake path.
+- `lib/layout/llm.ts`: the trimmed input the LLM reads, its prompt, and the layout schema converted for Gemini. `lib/server/gemini.ts` makes the call; `app/api/llm-layout` is the route Run uses.
 - `lib/layout/pipeline.ts`: code copies the ranked products and basket into LLM output, then validates.
 - `lib/layout/validate.ts`: one validator for every source, run inside the store's `setLayout`. It fixes small problems and reports them, and falls back to the house default when a config is broken.
 - `lib/ads/catalog.ts`: the house ad catalog. `docs/design-guideline.md` is the LLM's guideline, generated by `npm run guideline`.

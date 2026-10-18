@@ -33,6 +33,8 @@ export function PersonaPanel() {
   const runToken = useRef(0)
   const previousPreview = useRef("default")
   const progress = useSimStore((state) => state.layoutProgress)
+  const llmPending = useSimStore((state) => state.llmPending)
+  const preview = useSimStore((state) => state.preview)
   const [modelDoc, setModelDoc] = useState<HomepageDoc | null>(null)
   const [draft, setDraft] = useState<HomepageDoc | null>(null)
   const [basket, setBasket] = useState<string[]>([])
@@ -120,7 +122,7 @@ export function PersonaPanel() {
     } else if (doc) {
       const label = edited ? "Custom" : active.title
       useLogStore.getState().push("sim", `running ${label}`)
-      await runner.previewDocument(doc, basket, label)
+      await runner.previewDocument(doc, basket, label, sentence)
     }
     if (runToken.current === token) setBusy(false)
   }
@@ -267,7 +269,13 @@ export function PersonaPanel() {
             aria-busy={busy}
             onClick={() => void run()}
           >
-            {busy ? (progress ? `Rebuilding ${progress.index}/${progress.total}…` : "Running…") : "Run"}
+            {busy
+              ? progress
+                ? `Rebuilding ${progress.index}/${progress.total}…`
+                : llmPending
+                  ? "Asking the LLM…"
+                  : "Running…"
+              : "Run"}
           </Button>
           <Button
             type="button"
@@ -285,6 +293,7 @@ export function PersonaPanel() {
             basket={basket}
             stored={showingLive && !custom ? stored : null}
             exampleName={custom && !fromSentence ? "Custom" : active.title}
+            built={preview?.id === `shopper:${draft.demo_id ?? draft.user_id ?? "custom"}` ? preview : null}
           />
         ) : null}
         <div className="h-4" />
