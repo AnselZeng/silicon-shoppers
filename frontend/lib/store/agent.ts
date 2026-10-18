@@ -71,7 +71,8 @@ export function runChatActions(actions: ChatAction[], navigate: (path: string) =
       emitStoreEvent("concierge_action", { action: "add_to_bag", product: product.name, detail: label })
     }
     if (a.action === "checkout") {
-      if (store.bag.length === 0) continue
+      // Re-read state: earlier add_to_bag actions in this same batch changed the bag.
+      if (useStorefront.getState().bag.length === 0) continue
       startCheckout()
       done.push("started checkout")
       emitStoreEvent("concierge_action", { action: "checkout" })

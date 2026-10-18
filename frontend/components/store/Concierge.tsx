@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react"
 import type { ConciergeTone } from "@/lib/layout/types"
 import { buildChatContext } from "@/lib/store/chatContext"
 import { applyChatIntent } from "@/lib/store/chatIntent"
-import { runChatActions, splitActions } from "@/lib/store/agent"
+import { runChatActions, splitActions, type ChatAction } from "@/lib/store/agent"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -106,6 +106,7 @@ export function Concierge() {
     setBusy(true)
     setDraft("")
     emitStoreEvent("concierge_query", { tone, q: message })
+    setPendingCheckout(false)
     // A stated preference the store can act on is applied right away — the shopper asked
     // out loud, so no confidence gate. The reply below is then told what changed.
     const applied = applyChatIntent(message, useStorefront.getState().layout)
@@ -162,7 +163,16 @@ export function Concierge() {
       }
       const { text, actions } = splitActions(reply)
       if (!text) throw new Error("empty reply")
-      if (actions.length) setPendingCheckout(runChatActions(actions, router.push).asksCheckout)
+      // Guard: the model may only pay when the shopper's own words confirm checkout.
+      // A premature {"action":"checkout"} becomes the Yes/No prompt instead.
+      const wantsCheckout =
+        /\b(yes|yeah|yep|sure|ok|okay|checkout|check out|pay|paying|done|finish|finished|all set|that's all|thats all|wrap|complete|purchase)\b/i.test(
+          message,
+        )
+      const safe = actions.map((a): ChatAction =>
+        a.action === "checkout" && !wantsCheckout ? { action: "ask_checkout" } : a,
+      )
+      if (safe.length) setPendingCheckout(runChatActions(safe, router.push).asksCheckout)
       history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: text }].slice(-12)
     } catch (error) {
       emitStoreEvent("concierge_error", { tone, error: error instanceof Error ? error.message : "failed" })
