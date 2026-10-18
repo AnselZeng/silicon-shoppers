@@ -58,8 +58,9 @@ Paste the printed `ALTER USER ... SET RSA_PUBLIC_KEY=...` into a Snowsight SQL w
 ```
 python -m server check       :: prints your account, user, role
 python -m server setup       :: warehouse ATELIER_WH (XSMALL, auto-suspend 60 s), database ATELIER, schema LIVE, tables
-python -m server catalog     :: the 80 store products from ..\la-hacks-app\lib\store\catalog.ts
+python -m server catalog     :: store products from the app's lib\store\catalog.ts (see --catalog-ts)
 python -m server app-user    :: SQL + key for the store's own service user (give the key to the UI team privately)
+python -m server personas    :: fill PERSONAS: the 4 UI personas, member counts over the H&M cohort
 ```
 
 ## Hackathon-day retrain
@@ -110,6 +111,7 @@ python -m server simulate --clear       :: remove synthetic shoppers before the 
 | `TRENDING` | laptop | store | top products in the last 60 minutes (views + 3 × add-to-bags) |
 | `MODEL_RUNS` | laptop | anyone | every retrain and refresh: when, which models, what came out |
 | `HM_HOMEPAGES`, `HM_ARTICLES` | laptop | team | the 100k H&M model outputs (private: H&M data terms) |
+| `PERSONAS` | laptop (`personas`) | store | the 4 UI personas: traits, member counts, description |
 | `JOB_STATE` | laptop | laptop | refresh bookkeeping |
 
 Example queries for the demo:
@@ -130,6 +132,11 @@ It's the same `HomepageDoc` as the H&M documents (`lib/model/homepage.ts`), so `
   - A sort chosen twice becomes their default ("Based on your settings").
   - Filters used twice move to the top.
   - Color filters join the highlighted colors.
+- **`shopper`:** the v1 shopper block — `id`, `label`, `persona {name, description}`, `confidence`, `persona_reason`.
+  - One of the 4 UI personas (Price Hunter, Trend Seeker, Mission Shopper, Brand Loyalist), assigned from the shopper's own events: what they add, how it's priced, sorts/filters they use, searches, repeat views.
+  - `persona` is `null` under 5 events; `confidence` rises with evidence and the margin between personas.
+  - `persona_reason` is a template filled with their own numbers ("9 bag adds; 100% on sale; sorted by price 2x") — that's the Terminal line.
+  - H&M documents get the same block from their purchase profiles (`publish-hm`), so `doc.shopper` reads identically for both kinds of shopper.
 - **`evidence`:** how many events and add-to-bags the document is based on, and what "Tested" means here.
 
 ## Cost

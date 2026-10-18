@@ -61,6 +61,58 @@ def parse_catalog_ts(path: Path) -> pd.DataFrame:
     return out[COLUMNS]
 
 
+def from_products(records: list[dict]) -> pd.DataFrame:
+    """Product objects as the store defines them (id, name, department, category, collection, price, salePrice,
+    colors, isNew, popularity): from a JSON export of the store's PRODUCTS / CATALOG array."""
+    df = pd.DataFrame(records)
+    sale = df["salePrice"] if "salePrice" in df else pd.Series(np.nan, index=df.index)
+    out = pd.DataFrame({
+        "product_id": df["id"].astype(str), "name": df["name"], "department": df["department"],
+        "category": df["category"], "collection": df.get("collection"), "price": df["price"].astype(float),
+        "sale_price": pd.to_numeric(sale, errors="coerce"),
+        "colors": df["colors"].apply(lambda c: list(c) if isinstance(c, list) and c else ["black", "navy"]),
+        "is_new": df["isNew"].map(lambda v: bool(v) if v == v else False) if "isNew" in df else False,
+        "popularity": df["popularity"].astype(float),
+    })
+    return out[COLUMNS]
+
+
+EXPORT_TS = """import * as cat from "{module}";
+const c: any = cat;
+const list = c.PRODUCTS ?? c.CATALOG ?? Object.values(c).find((v: any) => Array.isArray(v) && v[0]?.id && v[0]?.category);
+if (!list) throw new Error("no product array exported from lib/store/catalog");
+process.stdout.write(JSON.stringify(list));
+"""
+
+
+def load_store_catalog(path: Path, work: Path) -> tuple[pd.DataFrame, str]:
+    """Catalog from a .json export, or from a store app folder (runs `npx tsx` on lib/store/catalog.ts so generated
+    products are included; falls back to parsing the file's literals)."""
+    import shutil
+    import subprocess
+    path = Path(path)
+    if path.suffix == ".json":
+        return from_products(json.loads(path.read_text(encoding="utf-8"))), str(path)
+    root = path if path.is_dir() else path.parents[2]
+    ts = root / "lib" / "store" / "catalog.ts"
+    if not ts.exists():
+        raise SystemExit(f"{ts} not found: pass --catalog-ts <store app folder> or a catalog .json")
+    npx = shutil.which("npx") or shutil.which("npx.cmd")
+    if npx:
+        work.mkdir(parents=True, exist_ok=True)
+        script = work / "export_catalog.ts"
+        script.write_text(EXPORT_TS.replace("{module}", ts.with_suffix("").as_posix()), encoding="utf-8")
+        try:
+            r = subprocess.run([npx, "-y", "tsx@4.19.2", str(script)], cwd=root, capture_output=True, text=True,
+                               timeout=300, encoding="utf-8")
+            if r.returncode == 0 and r.stdout.strip().startswith("["):
+                return from_products(json.loads(r.stdout)), f"{ts} (via tsx)"
+            print(f"tsx export failed, parsing the file instead: {r.stderr.strip()[-400:]}")
+        except Exception as e:  # noqa: BLE001
+            print(f"tsx export failed ({e}), parsing the file instead")
+    return parse_catalog_ts(ts), str(ts)
+
+
 def _percent_rank(v: np.ndarray) -> np.ndarray:
     """SQL percent_rank(): (rank - 1) / (n - 1), ties share the lowest rank."""
     n = len(v)

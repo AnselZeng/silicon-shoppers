@@ -5,6 +5,7 @@ One-time setup
   check           sign in to Snowflake and print who/where you are
   setup           create the warehouse, database, schema and tables (server/schema.sql)
   catalog         upload the store catalog (../la-hacks-app/lib/store/catalog.ts) to CATALOG
+  personas        fill the PERSONAS table from the H&M cohort (4 personas, counts, traits)
   app-user        print the SQL + key for a read/write service user the store's API routes use
 
 Models
@@ -42,7 +43,7 @@ def main():
             pass
     ap = argparse.ArgumentParser(prog="python -m server", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=["keygen", "check", "setup", "catalog", "app-user", "retrain", "bundle",
+    ap.add_argument("cmd", choices=["keygen", "check", "setup", "catalog", "app-user", "personas", "retrain", "bundle",
                                     "publish-run", "publish-hm", "refresh", "loop", "rescore-all", "status", "show",
                                     "simulate"])
     ap.add_argument("arg", nargs="?")
@@ -52,7 +53,7 @@ def main():
     ap.add_argument("--session-data", action="store_true", help="retrain: also resample OTTO (slow)")
     ap.add_argument("--users", type=int, default=20, help="simulate: number of shoppers")
     ap.add_argument("--clear", action="store_true", help="simulate: remove simulated shoppers")
-    ap.add_argument("--catalog-ts", default=None, help="catalog: path to lib/store/catalog.ts")
+    ap.add_argument("--catalog-ts", default=None, help="catalog: store app folder (e.g. ..\\silicon-shoppers\\frontend) or a products .json")
     a = ap.parse_args()
 
     if a.cmd == "keygen":
@@ -96,12 +97,26 @@ def main():
             from pathlib import Path
             from . import catalog as K
             from .config import APP_DIR
-            ts = Path(a.catalog_ts) if a.catalog_ts else APP_DIR / "lib" / "store" / "catalog.ts"
-            cat = K.parse_catalog_ts(ts)
+            from .config import WORK
+            src = Path(a.catalog_ts) if a.catalog_ts else APP_DIR
+            cat, where = K.load_store_catalog(src, WORK)
             db.replace("CATALOG", cat, variant=("colors",))
-            print(f"catalog: {len(cat)} products from {ts}")
+            print(f"catalog: {len(cat)} products from {where}")
         elif a.cmd == "app-user":
             app_user(db)
+        elif a.cmd == "personas":
+            import pandas as pd
+            from . import personas as P
+            from .config import REPO
+            db.setup()
+            df = pd.read_parquet(REPO / "data" / "processed" / "fused_final.parquet")
+            ref = P.Ref(df)
+            rows = P.personas_rows(df, ref, pd.Timestamp.utcnow().isoformat())
+            db.replace("PERSONAS", rows, variant=("key_traits",))
+            if db.kind != "local":
+                n = db.n
+                db.execute(f"GRANT SELECT ON TABLE {n['database']}.{n['schema']}.PERSONAS TO ROLE ATELIER_APP_ROLE")
+            print(rows[["persona_id", "name", "n_members_hm", "high_conf_share"]].to_string(index=False))
         elif a.cmd == "publish-run":
             db.close()
             from . import retrain
@@ -125,7 +140,7 @@ def main():
             refresh.refresh_once(db, users=users)
         elif a.cmd == "status":
             for t in ("EVENTS", "CATALOG", "USER_LAYOUTS", "USER_LAYOUTS_HISTORY", "TRENDING", "MODEL_RUNS",
-                      "HM_HOMEPAGES"):
+                      "HM_HOMEPAGES", "PERSONAS"):
                 n = db.query(f"SELECT COUNT(*) AS N FROM {t}")["n"].iloc[0]
                 print(f"{t:<22}{int(n):>10,}")
             r = db.query("SELECT RUN_ID, KIND, STATUS, FINISHED_AT FROM MODEL_RUNS ORDER BY FINISHED_AT DESC LIMIT 5")
