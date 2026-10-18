@@ -124,7 +124,14 @@ SELECT UPDATED_AT, HOMEPAGE:layout:category_order:value, HOMEPAGE:layout:default
 
 ## What's in a shopper's document
 
-It's the same `HomepageDoc` as the H&M documents (`lib/model/homepage.ts`), so `modelLayout()` works unchanged. Store shoppers' documents also have:
+Stored documents are `atelier.store_layout.v1` (the `frontend/lib/model/storeLayout.ts` contract): the UI reads
+`format`, `source`, `shopper`, `layout` (22 decisions, each `{value, changed, reason, source}`) and `products`
+directly — `doc.layout.department_order.value`, `doc.shopper.persona.name`. Internals ride along in
+`model_meta` (`predicted_mix`, `session`, `preferences`, `evidence`, `store_products`, `hm_products`), which the
+spec says renderers ignore. The frontend adapter accepts both shapes; `modelLayoutV1()` handles v1 and
+`modelLayout()` keeps working for old HomepageDoc rows.
+
+Inside `model_meta` (store shoppers' documents also have these):
 
 - **`store_products`:** store product ids ranked for them, with a `why`. `rankCatalog()` uses it when present.
 - **`session`:** the live session model's style and decisions from their earlier visits. `modelLayout()` uses them until this visit's live decisions switch on.
@@ -132,12 +139,15 @@ It's the same `HomepageDoc` as the H&M documents (`lib/model/homepage.ts`), so `
   - A sort chosen twice becomes their default ("Based on your settings").
   - Filters used twice move to the top.
   - Color filters join the highlighted colors.
+- **`evidence`:** how many events and add-to-bags the document is based on, and what "Tested" means here.
+
+And at the top level:
+
 - **`shopper`:** the v1 shopper block — `id`, `label`, `persona {name, description}`, `confidence`, `persona_reason`.
   - One of the 4 UI personas (Price Hunter, Trend Seeker, Mission Shopper, Brand Loyalist), assigned from the shopper's own events: what they add, how it's priced, sorts/filters they use, searches, repeat views.
   - `persona` is `null` under 5 events; `confidence` rises with evidence and the margin between personas.
   - `persona_reason` is a template filled with their own numbers ("9 bag adds; 100% on sale; sorted by price 2x") — that's the Terminal line.
   - H&M documents get the same block from their purchase profiles (`publish-hm`), so `doc.shopper` reads identically for both kinds of shopper.
-- **`evidence`:** how many events and add-to-bags the document is based on, and what "Tested" means here.
 
 ## Cost
 

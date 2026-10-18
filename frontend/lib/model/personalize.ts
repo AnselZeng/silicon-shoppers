@@ -7,16 +7,18 @@
 // A 60 s poll picks up the laptop's refreshed document (it rescores shoppers about every 2 min).
 // Without Snowflake env vars or the model file the store simply keeps its defaults.
 
-import { fromStoreEvent, modelLayout, type DecisionLogEntry } from "@/lib/model/adapter";
+import { fromStoreEvent, isStoreLayoutDoc, modelLayout, modelLayoutV1, type DecisionLogEntry }
+  from "@/lib/model/adapter";
 import { getShopperId, queueEvent } from "@/lib/model/eventSink";
 import type { HomepageDoc } from "@/lib/model/homepage";
+import type { StoreLayoutDoc } from "@/lib/model/storeLayout";
 import { SessionTracker, type SessionDecisions, type SessionModel } from "@/lib/model/sessionStyle";
 import { useStorefront } from "@/lib/store/storeState";
 import type { StoreEvent } from "@/lib/sim/protocol";
 
 const POLL_MS = 60_000;
 
-let home: HomepageDoc | null = null;
+let home: HomepageDoc | StoreLayoutDoc | null = null;
 let tracker: SessionTracker | null = null;
 let trackerReady: Promise<void> | null = null;
 let updatedAt: string | null = null;
@@ -48,7 +50,7 @@ async function refreshLayout(): Promise<void> {
   try {
     const res = (await fetch(`/api/layout?userId=${encodeURIComponent(getShopperId())}`).then((r) =>
       r.json(),
-    )) as { homepage?: HomepageDoc | null; updatedAt?: string | null };
+    )) as { homepage?: HomepageDoc | StoreLayoutDoc | null; updatedAt?: string | null };
     if (!res.homepage || (res.updatedAt ?? null) === updatedAt) return;
     home = res.homepage;
     updatedAt = res.updatedAt ?? null;
@@ -75,7 +77,7 @@ function signature(decisions: SessionDecisions): string {
 
 function apply(live?: SessionDecisions): void {
   if (!home) return;
-  const { layout, log } = modelLayout(home, live);
+  const { layout, log } = isStoreLayoutDoc(home) ? modelLayoutV1(home, live) : modelLayout(home, live);
   lastSignature = live ? signature(live) : "";
   lastLog = log;
   useStorefront.getState().setLayout(layout, live ? "Live session" : "H&M model");

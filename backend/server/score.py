@@ -19,6 +19,7 @@ import pandas as pd
 
 from . import catalog as K
 from . import hm_features as H
+from . import layout_v1 as V1
 from . import personas as PERSONA
 from .config import REPO, SESSION_LAST_EVENTS
 
@@ -267,7 +268,12 @@ def build_docs(B: dict, session_model: dict | None, events: pd.DataFrame, attrs:
             "store_products": rank_store(attrs, mix, colors, ev, trending),
             "session": ses, "preferences": pref,
         }
-        out.append({"user_id": u, "n_events": int(len(ev)), "n_carts": n_carts, "homepage": doc})
+        # store the v1 document: the UI reads format/source/shopper/layout/products directly and
+        # ignores model_meta (predicted_mix, session, preferences, evidence, store_products)
+        dept_order = sorted(mix["department"], key=mix["department"].get, reverse=True)
+        v1 = V1.to_v1(doc, source="merged",
+                      products=V1.products_by_department(doc["store_products"], attrs, dept_order))
+        out.append({"user_id": u, "n_events": int(len(ev)), "n_carts": n_carts, "homepage": v1})
     return pd.DataFrame(out)
 
 

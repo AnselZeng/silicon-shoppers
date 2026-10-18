@@ -283,7 +283,7 @@ def shopper_block(user_id: str, assigned: dict | None) -> dict:
     """The v1 `shopper` block for a store shopper's document."""
     if not assigned:
         return {"id": user_id, "label": "New shopper", "persona": None, "confidence": "low"}
-    return {"id": user_id, "label": assigned["name"],
+    return {"id": user_id, "label": assigned["name"], "persona_id": assigned["persona_id"],
             "persona": {"name": assigned["name"], "description": assigned["description"]},
             "confidence": assigned["confidence"], "persona_reason": assigned["reason"]}
 

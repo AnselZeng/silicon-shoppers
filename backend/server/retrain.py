@@ -193,10 +193,12 @@ def publish_hm(db=None):
         if ck not in am.index:
             return P.shopper_block(str(ck), None)
         r = am.loc[ck]
-        return P.shopper_block(str(ck), {"name": r["persona_name"],
+        return P.shopper_block(str(ck), {"persona_id": r["persona_id"], "name": r["persona_name"],
                                          "description": P.PERSONAS[r["persona_id"]]["description"],
                                          "confidence": r["persona_confidence"], "reason": r["reason"]})
-    pages["homepage"] = [dict(h, shopper=block(ck)) for h, ck in zip(pages["homepage"], pages["customer_key"])]
+    from . import layout_v1 as V1
+    pages["homepage"] = [V1.to_v1(dict(h, shopper=block(ck)), source="hm_shopper")
+                         for h, ck in zip(pages["homepage"], pages["customer_key"])]
     t0 = time.time()
     db.replace("HM_ARTICLES", arts[["article_id", "name", "category", "department", "color", "price_scaled"]])
     db.replace("HM_HOMEPAGES", pages[["customer_key", "stratum", "homepage"]], variant=("homepage",))

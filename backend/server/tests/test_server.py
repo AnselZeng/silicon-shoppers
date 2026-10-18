@@ -96,14 +96,21 @@ def test_docs_cold_and_warm(B):
     d = {r.user_id: r.homepage for r in docs.itertuples()}
     for doc in d.values():
         json.dumps(doc)                                  # serializable as a VARIANT
-        assert set(doc["layout"]) >= {"landing_department", "category_order", "section_order", "default_sort",
-                                      "color_highlight", "filter_order", "hero", "grid_columns", "recently_viewed",
-                                      "compare_panel", "cart_reminder", "popups", "price_filter_first"}
-        assert abs(sum(doc["predicted_mix"]["category"].values()) - 1) < 1e-3
-    assert d["warm"]["layout"]["default_sort"] == {**d["warm"]["layout"]["default_sort"], "value": "price_asc",
-                                                   "class": "Based on your settings"}
-    assert d["cold"]["evidence"]["add_to_bags"] == 0
-    assert pids[0] not in [p["product_id"] for p in d["warm"]["store_products"]]   # already in the bag
+        assert doc["format"] == "atelier.store_layout.v1" and doc["source"] == "merged"
+        assert set(doc["layout"]) == {"landing_department", "department_order", "category_order",
+                                      "homepage_sections", "quick_access", "hero", "default_sort",
+                                      "filter_order", "price_mode", "budget", "color_highlight",
+                                      "sale_badges", "search", "popups", "grid_columns", "quick_view",
+                                      "quick_add", "compare_panel", "recently_viewed", "cart_reminder",
+                                      "product_page", "checkout"}
+        assert "persona" in doc["shopper"] and "confidence" in doc["shopper"]
+        meta = doc["model_meta"]
+        assert abs(sum(meta["predicted_mix"]["category"].values()) - 1) < 1e-3
+    sort = d["warm"]["layout"]["default_sort"]
+    assert sort["value"] == "price_asc" and sort["changed"] and sort["source"] == "You said"
+    assert d["cold"]["model_meta"]["evidence"]["add_to_bags"] == 0
+    warm_ids = [p["product_id"] for p in d["warm"]["model_meta"]["store_products"]]
+    assert pids[0] not in warm_ids   # already in the bag
 
 
 @need_bundle
@@ -114,7 +121,7 @@ def test_more_carts_move_the_prediction(B):
     now = dt.datetime(2026, 10, 17, 20, 0)
     rows = [("u", "add_to_bag", now - dt.timedelta(minutes=i), dresses[i % len(dresses)], None, {}) for i in range(6)]
     docs = score.build_docs(B, None, _events(rows), cat, ["u", "nobody"], {}, "t", now)
-    full = [r.homepage["predicted_mix"]["category"]["cat_garment_full_body"] for r in docs.itertuples()]
+    full = [r.homepage["model_meta"]["predicted_mix"]["category"]["cat_garment_full_body"] for r in docs.itertuples()]
     assert full[0] > full[1] * 1.5
 
 

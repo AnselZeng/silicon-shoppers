@@ -11,6 +11,7 @@ import type { StoreEvent } from "@/lib/sim/protocol";
 import { CATEGORIES, type Category, type Department, type Product } from "@/lib/store/types";
 import type { HMCategory, HMDepartment, HomepageDoc } from "./homepage";
 import type { SessionDecisions, SessionEvent } from "./sessionStyle";
+import { toLayoutConfig, type StoreLayoutDoc } from "./storeLayout";
 
 // ---------- vocabulary bridges (H&M data -> demo store) ----------
 
@@ -78,7 +79,8 @@ export interface DecisionLogEntry {
   key: string;
   value: string;
   reason: string;
-  source: "H&M model" | "Live session" | "Your settings" | "Default";
+  source: "H&M model" | "AI shopper" | "Live session" | "You said" | "Your settings" | "Default" |
+          "Store default";
   /** Tested = beat the store default on held-out purchases; Estimated = browsing-based */
   evidence: string;
 }
@@ -120,6 +122,75 @@ export function mergeSessionDecisions(live?: SessionDecisions, stored?: Partial<
       { value: "default", active: false, reason: "Store default" };
   }
   return out as unknown as SessionDecisions;
+}
+
+/** The stored document is v1 (atelier.store_layout.v1) since the personas change; older docs were HomepageDoc. */
+export function isStoreLayoutDoc(home: unknown): home is StoreLayoutDoc {
+  return (home as { format?: string } | null | undefined)?.format === "atelier.store_layout.v1";
+}
+
+/** model_meta carries what the v1 spec lets the UI ignore: the internals the store still needs. */
+function meta(home: HomepageDoc | StoreLayoutDoc): Partial<HomepageDoc> {
+  return isStoreLayoutDoc(home) ? ((home.model_meta ?? {}) as unknown as Partial<HomepageDoc>) : home;
+}
+
+/** v1 documents: toLayoutConfig covers the LayoutConfig fields; this adds ordering, colors and the log. */
+export function modelLayoutV1(home: StoreLayoutDoc, liveSession?: SessionDecisions): ModelLayout {
+  const L = home.layout;
+  const m = meta(home);
+  const session = mergeSessionDecisions(liveSession, m.session?.decisions);
+  const log: DecisionLogEntry[] = (Object.keys(L) as (keyof typeof L)[])
+    .filter((k) => L[k].changed)
+    .map((k) => ({ key: k, value: JSON.stringify(L[k].value), reason: L[k].reason,
+                  source: L[k].source, evidence: "stored decision" }));
+  const s = (key: string, value: unknown, reason: string) =>
+    log.push({ key, value: String(value), reason, source: "Live session", evidence: "Estimated from your clicks" });
+
+  const categoryOrder = uniq<Category>([
+    ...L.category_order.value.flatMap((c) => HM_TO_APP_CATEGORIES[c as HMCategory] ?? []),
+    ...CATEGORIES,
+  ]);
+
+  let gridDensity: 2 | 3 | 4 = L.grid_columns.value;
+  let comparePanel = L.compare_panel.value === "on";
+  let recentlyViewed = L.recently_viewed.value === "prominent";
+  let cartReminder = L.cart_reminder.value === "on";
+  let productPage: ModelLayout["productPage"] = L.product_page.value;
+  let heroMinimized = L.hero.minimized;
+  if (session) {
+    if (session.grid_columns.active) { gridDensity = session.grid_columns.value; s("gridDensity", gridDensity, session.grid_columns.reason); }
+    if (session.quick_add.active) s("quickViewEmphasis", true, session.quick_add.reason);
+    if (session.compare_panel.active) { comparePanel = true; s("comparePanel", "on", session.compare_panel.reason); }
+    if (session.recently_viewed.active) { recentlyViewed = true; s("recentlyViewed", "prominent", session.recently_viewed.reason); }
+    if (session.cart_reminder.active) { cartReminder = true; s("cartReminder", "on", session.cart_reminder.reason); }
+    if (session.product_page.active) {
+      productPage = session.product_page.value;
+      heroMinimized = heroMinimized || productPage === "compact";
+      s("productPage", productPage, session.product_page.reason);
+    }
+  }
+
+  const base = toLayoutConfig(home);
+  return {
+    layout: {
+      ...DEFAULT_LAYOUT,
+      ...base,
+      gridDensity,
+      heroMinimized,
+      quickViewEmphasis: Boolean(session?.quick_add.active) || base.quickViewEmphasis === true,
+    },
+    categoryOrder,
+    landingDepartment: HM_TO_APP_DEPARTMENT[L.landing_department.value as HMDepartment] ?? "women",
+    highlightColors: uniq([
+      ...((m.preferences?.color_filters ?? []) as StoreColor[]),
+      ...L.color_highlight.value.map((c) => HM_TO_APP_COLOR[c]).filter((c): c is StoreColor => !!c),
+    ]).slice(0, 3),
+    comparePanel,
+    recentlyViewedProminent: recentlyViewed,
+    cartReminder,
+    productPage,
+    log,
+  };
 }
 
 export function modelLayout(home: HomepageDoc, liveSession?: SessionDecisions): ModelLayout {
@@ -220,22 +291,24 @@ export function modelLayout(home: HomepageDoc, liveSession?: SessionDecisions): 
  * predicted share of the product's H&M group x department fit, boosted for highlighted colors,
  * with popularity as a tie-breaker. Products in groups the model can't map keep a small base score.
  */
-export function rankCatalog(products: Product[], home: HomepageDoc): Product[] {
-  if (home.store_products?.length) {
+export function rankCatalog(products: Product[], home: HomepageDoc | StoreLayoutDoc): Product[] {
+  const m = meta(home);
+  const colorsHm = home.layout.color_highlight.value;
+  if (m.store_products?.length) {
     // refresh job's ranking (predicted mix + what they viewed + trending; bagged items left out), rest after
-    const pos = new Map(home.store_products.map((p, i) => [p.product_id, i]));
+    const pos = new Map(m.store_products.map((p, i) => [p.product_id, i]));
     const ranked = products.filter((p) => pos.has(p.id)).sort((a, b) => pos.get(a.id)! - pos.get(b.id)!);
-    return [...ranked, ...rankCatalogFromMix(products.filter((p) => !pos.has(p.id)), home)];
+    return [...ranked, ...rankCatalogFromMix(products.filter((p) => !pos.has(p.id)), m, colorsHm)];
   }
-  return rankCatalogFromMix(products, home);
+  return rankCatalogFromMix(products, m, colorsHm);
 }
 
-function rankCatalogFromMix(products: Product[], home: HomepageDoc): Product[] {
-  const cat = home.predicted_mix.category;
-  const dept = home.predicted_mix.department;
+function rankCatalogFromMix(products: Product[], m: Partial<HomepageDoc>, colorsHm: string[]): Product[] {
+  const cat: Record<string, number> = m.predicted_mix?.category ?? {};
+  const dept: Record<string, number> = m.predicted_mix?.department ?? {};
   const women = (dept.dept_ladieswear ?? 0) + (dept.dept_divided ?? 0);
   const men = dept.dept_menswear ?? 0;
-  const colors = new Set(home.layout.color_highlight.value.map((c) => HM_TO_APP_COLOR[c]).filter(Boolean));
+  const colors = new Set(colorsHm.map((c) => HM_TO_APP_COLOR[c]).filter(Boolean));
   const groupSize: Partial<Record<HMCategory, number>> = {};
   for (const [hm, cats] of Object.entries(HM_TO_APP_CATEGORIES) as [HMCategory, Category[]][]) groupSize[hm] = cats.length;
   const score = (p: Product) => {
