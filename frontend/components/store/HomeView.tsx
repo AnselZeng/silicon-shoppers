@@ -3,14 +3,17 @@
 import Link from "next/link"
 import { AdBanner } from "@/components/store/ads/AdBanner"
 import { GarmentImage } from "@/components/store/GarmentImage"
+import { LayoutFlash } from "@/components/store/LayoutFlash"
 import { AdSlot } from "@/components/store/ads/AdSlot"
 import { ProductGrid } from "@/components/store/ProductGrid"
 import { adContent } from "@/lib/ads/placement"
-import { resolveHome } from "@/lib/layout/home"
+import { blockName, resolveHome } from "@/lib/layout/home"
+import { LISTING_LINE_FLASH } from "@/lib/layout/steps"
 import { categoryHref, collectionHref, departmentPath } from "@/lib/layout/links"
-import { FILTER_LABEL, type ColorMerchandising, type HomeBlock, type LayoutConfig, type ProductSource } from "@/lib/layout/types"
+import { FILTER_LABEL, type ColorMerchandising, type LayoutConfig, type ProductSource } from "@/lib/layout/types"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { useStorefront } from "@/lib/store/storeState"
+import { cn } from "@/lib/utils"
 import { CATEGORY_LABEL, type CollectionName } from "@/lib/store/types"
 
 const SORT_LINE = {
@@ -56,21 +59,6 @@ function rowTitle(source: ProductSource): string {
   }
 }
 
-function transitionName(block: HomeBlock): string {
-  if (block.type === "product_row") {
-    const source = block.source
-    if (source.kind === "category") return `row-cat-${source.category}`
-    if (source.kind === "collection") return `row-col-${source.collection.replace(/\s+/g, "-")}`
-    if (source.kind === "under_price") return `row-under-${source.max}`
-    return `row-${source.kind}`
-  }
-  if (block.type === "collection_spotlight") return `spot-${block.collection.replace(/\s+/g, "-")}`
-  if (block.type === "ad_banner") return `ad-${block.adId}`
-  if (block.type === "editorial_text") return `copy-${block.copyKey}`
-  if (block.type === "category_tiles") return "tiles"
-  return "hero"
-}
-
 function rowHref(source: ProductSource, layout: LayoutConfig): string | null {
   switch (source.kind) {
     case "for_you":
@@ -113,6 +101,25 @@ function CollectionSpotlight({ layout, collection }: { layout: LayoutConfig; col
   )
 }
 
+/**
+ * The sort / filter / color line under the hero. When a layout step changes it, it grows
+ * before the change, swaps text while enlarged, and settles back as the box fades.
+ */
+function ListingLine({ layout }: { layout: LayoutConfig }) {
+  const enlarged = useStorefront(
+    (state) => LISTING_LINE_FLASH in state.layoutFlash.names && !state.layoutFlash.leaving,
+  )
+  return (
+    <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
+      <span className={cn("layout-pulse relative inline-block origin-left", enlarged && "is-on")}>
+        <LayoutFlash name={LISTING_LINE_FLASH} className="-inset-x-2 -inset-y-1" tag="right" />
+        {SORT_LINE[layout.listing.defaultSort]} · Filters lead with{" "}
+        {FILTER_LABEL[layout.listing.filterOrder[0] ?? "category"]} · {MERCH_LINE[layout.listing.colorMerchandising]}
+      </span>
+    </p>
+  )
+}
+
 export function HomeView() {
   const layout = useStorefront((state) => state.layout)
   const blocks = resolveHome(layout)
@@ -121,16 +128,14 @@ export function HomeView() {
     <div>
       {blocks.map((entry) => {
         const block = entry.block
-        const name = transitionName(block)
+        const name = blockName(block)
         const lead = blocks.find((item) => item.block.type === "product_row")?.block === block
         if (block.type === "hero") {
           return (
-            <div key={name} style={{ viewTransitionName: name }}>
+            <div key={name} style={{ viewTransitionName: name }} className="relative">
+              <LayoutFlash name={name} />
               <AdSlot slot="hero" />
-              <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
-                {SORT_LINE[layout.listing.defaultSort]} · Filters lead with{" "}
-                {FILTER_LABEL[layout.listing.filterOrder[0] ?? "category"]} · {MERCH_LINE[layout.listing.colorMerchandising]}
-              </p>
+              <ListingLine layout={layout} />
             </div>
           )
         }
@@ -138,7 +143,8 @@ export function HomeView() {
           if (entry.products.length === 0) return null
           const href = rowHref(entry.block.source, layout)
           return (
-            <section key={name} style={{ viewTransitionName: name }} className="px-6 py-10">
+            <section key={name} style={{ viewTransitionName: name }} className="relative px-6 py-10">
+              <LayoutFlash name={name} />
               <div className="mb-6 flex items-baseline justify-between">
                 <h2 className={lead ? "font-serif text-4xl tracking-tight" : "text-[11px] tracking-[0.22em] uppercase"}>
                   {entry.block.title ?? rowTitle(entry.block.source)}
@@ -155,7 +161,8 @@ export function HomeView() {
         }
         if (block.type === "category_tiles") {
           return (
-            <section key={name} style={{ viewTransitionName: name }} className="px-6 py-10">
+            <section key={name} style={{ viewTransitionName: name }} className="relative px-6 py-10">
+              <LayoutFlash name={name} />
               <h2 className="mb-6 text-[11px] tracking-[0.22em] uppercase">Shop by category</h2>
               <div className={`grid grid-cols-2 gap-4 md:grid-cols-3 ${TILE_COLS[block.categories.length] ?? "lg:grid-cols-6"}`}>
                 {block.categories.map((category) => (
@@ -173,7 +180,8 @@ export function HomeView() {
         }
         if (block.type === "collection_spotlight") {
           return (
-            <div key={name} style={{ viewTransitionName: name }}>
+            <div key={name} style={{ viewTransitionName: name }} className="relative">
+              <LayoutFlash name={name} />
               <CollectionSpotlight layout={layout} collection={block.collection} />
             </div>
           )
@@ -182,7 +190,8 @@ export function HomeView() {
           const text = layout.copy[block.copyKey]
           if (!text) return null
           return (
-            <section key={name} style={{ viewTransitionName: name }} className="px-6 py-12">
+            <section key={name} style={{ viewTransitionName: name }} className="relative px-6 py-12">
+              <LayoutFlash name={name} />
               <p
                 className={`mx-auto max-w-2xl text-center font-serif tracking-tight ${
                   block.copyKey === "intro" ? "text-2xl" : "text-lg leading-relaxed text-neutral-700"
@@ -195,7 +204,8 @@ export function HomeView() {
         }
         if (block.type === "ad_banner") {
           return (
-            <div key={name} style={{ viewTransitionName: name }}>
+            <div key={name} style={{ viewTransitionName: name }} className="relative">
+              <LayoutFlash name={name} />
               <AdBanner ad={adContent(layout, block.adId)} slot="home_block" className="mx-6 my-6" />
             </div>
           )

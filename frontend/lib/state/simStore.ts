@@ -13,12 +13,15 @@ interface SimState {
   preview: Preview | null
   fixtures: FixtureEntry[]
   iframe: HTMLIFrameElement | null
+  /** Stage of the layout swap playing in the store, or null when it has settled. */
+  layoutProgress: { index: number; total: number } | null
   setRoute: (route: string) => void
   setViewport: (viewport: ViewportChoice) => void
   setLayoutPreview: (preview: string) => void
   setPreview: (preview: Preview | null) => void
   setFixtures: (fixtures: FixtureEntry[]) => void
   setIframe: (iframe: HTMLIFrameElement | null) => void
+  setLayoutProgress: (progress: { index: number; total: number } | null) => void
 }
 
 export const useSimStore = create<SimState>((set) => ({
@@ -28,10 +31,12 @@ export const useSimStore = create<SimState>((set) => ({
   preview: null,
   fixtures: [],
   iframe: null,
+  layoutProgress: null,
   setRoute: (route) => set({ route }),
   setViewport: (viewport) => set({ viewport }),
   setLayoutPreview: (layoutPreview) => set({ layoutPreview }),
   setPreview: (preview) => set({ preview }),
   setFixtures: (fixtures) => set({ fixtures }),
   setIframe: (iframe) => set({ iframe }),
+  setLayoutProgress: (layoutProgress) => set({ layoutProgress }),
 }))

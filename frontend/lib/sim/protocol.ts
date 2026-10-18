@@ -42,6 +42,9 @@ export type ParentPayload =
 export type StorePayload =
   | { type: "store_event"; event: StoreEvent }
   | { type: "store_ready" }
+  /** A layout swap plays in stages; index is 1-based. */
+  | { type: "layout_step"; index: number; total: number; label: string }
+  | { type: "layout_settled" }
 
 export interface SimEnvelope<T> {
   source: typeof SIM_SOURCE
@@ -69,7 +72,12 @@ export function isParentPayload(payload: ParentPayload | StorePayload): payload 
 }
 
 export function isStorePayload(payload: ParentPayload | StorePayload): payload is StorePayload {
-  return payload.type === "store_event" || payload.type === "store_ready"
+  return (
+    payload.type === "store_event" ||
+    payload.type === "store_ready" ||
+    payload.type === "layout_step" ||
+    payload.type === "layout_settled"
+  )
 }
 
 export function postSimMessage(target: Window, payload: ParentPayload | StorePayload) {

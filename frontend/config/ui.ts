@@ -15,6 +15,27 @@ export const UI_CONFIG = {
   loyalistCollection: "Essentials",
 } as const
 
+/**
+ * Pacing of a layout swap in the store. Each stage: scroll to it, box what is about to
+ * change (leadMs), play the change (animMs), keep the box (holdMs), fade it (fadeMs).
+ * Scrolls take scrollMinMs plus scrollMsPerPx per pixel travelled, capped at scrollMaxMs.
+ */
+export const LAYOUT_MOTION = {
+  animMs: 1100,
+  leadMs: 700,
+  holdMs: 700,
+  fadeMs: 350,
+  /** Pause after a stage with nothing to box. */
+  gapMs: 250,
+  scrollMinMs: 700,
+  scrollMsPerPx: 0.4,
+  scrollMaxMs: 1600,
+  /** Clearance under the sticky header when a block is scrolled into view. */
+  scrollOffsetPx: 96,
+  /** The shell gives up waiting for the store after this long. */
+  settleTimeoutMs: 40000,
+} as const
+
 export type ViewportKey = keyof typeof UI_CONFIG.demoViewports
 
 export const PERSONA_ACCENTS = {
