@@ -355,11 +355,25 @@ function pick<T>(rand: () => number, list: readonly T[]): T {
 function buildGenerated(): Product[] {
   const rand = mulberry32(20260317)
   const items: Product[] = []
-  const target = 84 - ANCHORS.length
+  const counts = new Map<string, number>()
+  for (const product of ANCHORS) {
+    const key = `${product.department}:${product.category}`
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  // The first 68 keep the original mix. The rest fill the categories that came out thin.
+  const target = 120 - ANCHORS.length
+  const kept = 84 - ANCHORS.length
   for (let i = 0; i < target; i += 1) {
     const department: Department = i % 5 === 0 || i % 5 === 1 ? "men" : "women"
     const cats = department === "women" ? WOMEN_CATS : MEN_CATS
-    const category = pick(rand, cats)
+    const rolled = pick(rand, cats)
+    const category =
+      i < kept
+        ? rolled
+        : cats.reduce((thin, cat) =>
+            (counts.get(`${department}:${cat}`) ?? 0) < (counts.get(`${department}:${thin}`) ?? 0) ? cat : thin,
+          )
+    counts.set(`${department}:${category}`, (counts.get(`${department}:${category}`) ?? 0) + 1)
     const collection = pick(rand, COLLECTION_POOL)
     const colorCount = 1 + Math.floor(rand() * 3)
     const colors: StoreColor[] = []

@@ -278,19 +278,6 @@ The same evaluation can also be repeated as the shopper vector is compressed fro
 
 The objective is therefore not simply maximum personalization, but **useful personalization from a compact behavioral profile**.
 
-## Sentry Integration
-
-Sentry is used as the observability layer for the dynamic personalization system.
-
-Relevant integrations include:
-
-- **Tracing** for measuring layout generation and product-ranking performance
-- **Session Replay** for observing sessions where the interface dynamically changes
-- **Logs** for recording shopper-vector loading and layout decisions
-- tags or metadata describing the shopper type and personalization configuration
-
-This makes it possible to inspect both the technical performance of personalization and the exact interface changes produced during a session.
-
 ## Core Demo
 
 The strongest demonstration is a direct comparison between shoppers.

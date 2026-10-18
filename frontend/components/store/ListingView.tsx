@@ -12,7 +12,27 @@ import { emitStoreEvent } from "@/lib/store/emit"
 import { applyFilters, baseProducts, listingHref, parseListingQuery } from "@/lib/store/filtering"
 import { sortProducts } from "@/lib/store/sorting"
 import { useStorefront } from "@/lib/store/storeState"
-import { modePath, type ListingMode, type ListingQuery } from "@/lib/store/types"
+import { modePath, CATEGORY_LABEL, COLLECTIONS, type ListingMode, type ListingQuery } from "@/lib/store/types"
+import { collectionSlug } from "@/lib/utils"
+
+function listingTitle(mode: ListingMode, query: ListingQuery): string {
+  if (query.categories.length === 1) {
+    const category = query.categories[0]
+    if (category) return CATEGORY_LABEL[category]
+  }
+  if (query.collections.length === 1) {
+    const slug = query.collections[0]
+    const name = COLLECTIONS.find((collection) => collectionSlug(collection) === slug)
+    if (name) return name
+  }
+  if (mode === "women") return "Women"
+  if (mode === "men") return "Men"
+  if (mode === "new-in") return "New in"
+  if (mode === "sale") return "Sale"
+  if (mode === "for-you") return "For you"
+  if (query.q) return `Search “${query.q}”`
+  return "Search"
+}
 
 export function ListingView({ mode }: { mode: ListingMode }) {
   const params = useSearchParams()
@@ -51,26 +71,13 @@ export function ListingView({ mode }: { mode: ListingMode }) {
     emitStoreEvent(event, { filter, section: filter, value: value ?? "" })
   }
 
-  const title =
-    mode === "women"
-      ? "Women"
-      : mode === "men"
-        ? "Men"
-        : mode === "new-in"
-          ? "New in"
-          : mode === "sale"
-            ? "Sale"
-            : mode === "for-you"
-              ? "For you"
-            : query.q
-              ? `Search “${query.q}”`
-              : "Search"
+  const title = listingTitle(mode, query)
 
   return (
     <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="text-[10px] tracking-[0.22em] text-neutral-500 uppercase">Atelier Nine</p>
+          <p className="text-[10px] tracking-[0.22em] text-neutral-500 uppercase">SoCal Atelier</p>
           <h1 className="font-serif text-4xl tracking-tight">{title}</h1>
           <p className="mt-2 text-xs tracking-[0.14em] text-neutral-500 uppercase">{products.length} pieces</p>
         </div>

@@ -15,7 +15,7 @@ export function Popup({ ad, open, onClose }: { ad: HouseAd; open: boolean; onClo
     >
       <DialogContent showCloseButton={false} className="bg-[#f6f3ee] text-[#141414] sm:max-w-md">
         <div className="flex items-start justify-between gap-4">
-          <p className="text-[10px] tracking-[0.22em] uppercase">Atelier Nine</p>
+          <p className="text-[10px] tracking-[0.22em] uppercase">SoCal Atelier</p>
           <AdClose onClose={() => onClose(false)} />
         </div>
         <DialogTitle className="font-serif text-2xl">{ad.headline}</DialogTitle>

@@ -1,1 +1,1 @@
-"""ATELIER NINE compact shopper profile dataset pipeline."""
+"""SOCAL ATELIER compact shopper profile dataset pipeline."""

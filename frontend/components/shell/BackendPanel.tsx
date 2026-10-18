@@ -8,21 +8,6 @@ import { fetchLiveLayout, type LiveFetch } from "@/lib/model/liveDoc"
 import type { StoreLayoutDoc } from "@/lib/model/storeLayout"
 import { useSimStore } from "@/lib/state/simStore"
 
-function show(value: unknown): string {
-  if (Array.isArray(value)) return value.slice(0, 3).join(" / ") || "none"
-  if (value && typeof value === "object") return JSON.stringify(value)
-  return String(value)
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <li className="grid grid-cols-[5.5rem_1fr] gap-2">
-      <span className="text-white/40">{label}</span>
-      <span className="break-all text-white/85">{value}</span>
-    </li>
-  )
-}
-
 function statusCopy(live: LiveFetch | null): { tone: string; title: string; detail: string } {
   if (!live) return { tone: "text-white/50", title: "Checking", detail: "Asking for this browser's layout." }
   if (live.state === "disabled") {
@@ -49,26 +34,18 @@ function statusCopy(live: LiveFetch | null): { tone: string; title: string; deta
   }
 }
 
-function storedRows(doc: StoreLayoutDoc): { label: string; value: string }[] {
+function shortId(id: string): string {
+  if (id.length <= 16) return id
+  return `${id.slice(0, 8)}…${id.slice(-4)}`
+}
+
+/** Persona and event count. Mix, reasons, and product ids already sit on the left. */
+function liveSummary(doc: StoreLayoutDoc): string {
   const meta = (doc.model_meta ?? {}) as Partial<HomepageDoc>
-  const changed = Object.entries(doc.layout).filter(([, decision]) => decision.changed)
-  const mix = meta.predicted_mix?.department
-  const topDept = mix
-    ? Object.entries(mix)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([key, share]) => `${key.replace(/^dept_/, "")} ${Math.round(share * 100)}%`)
-        .join(" · ")
-    : ""
-  const products = (meta.store_products ?? []).slice(0, 6).map((item) => item.product_id).join(", ")
-  return [
-    { label: "Persona", value: `${doc.shopper.persona?.name ?? doc.shopper.label} (${doc.shopper.confidence})` },
-    { label: "Reason", value: doc.shopper.persona_reason || "none yet" },
-    { label: "Events", value: `${meta.evidence?.events ?? 0} events · ${meta.evidence?.add_to_bags ?? 0} add-to-bags` },
-    { label: "Mix", value: topDept || "none" },
-    { label: "Changed", value: changed.length ? changed.map(([key, decision]) => `${key}=${show(decision.value)}`).join(" · ") : "still the store default" },
-    { label: "Products", value: products || "none ranked" },
-  ]
+  const name = doc.shopper.persona?.name ?? doc.shopper.label
+  const events = meta.evidence?.events ?? 0
+  const bags = meta.evidence?.add_to_bags ?? 0
+  return `${name}, ${doc.shopper.confidence} · ${events.toLocaleString("en-US")} events · ${bags} add-to-bags`
 }
 
 function count(n: number): string {
@@ -114,73 +91,57 @@ export function BackendPanel() {
   }, [])
 
   const status = statusCopy(live)
-  const rows =
+  const summary =
     live?.state === "live" && live.doc && isStoreLayoutDoc(live.doc)
-      ? storedRows(live.doc)
+      ? liveSummary(live.doc)
       : live?.state === "live" && live.doc
-        ? [{ label: "Document", value: "Older homepage shape, not a v1 layout." }]
-        : []
+        ? "Older homepage shape."
+        : status.detail
+  const updated = live?.updatedAt ? live.updatedAt.split(" ")[1]?.replace(/\.\d+$/, "") || live.updatedAt : ""
   const members = cohort?.personas.reduce((sum, persona) => sum + persona.members, 0) ?? 0
 
   return (
-    <div className="flex h-full flex-col gap-3 overflow-auto pr-1 text-[11px]">
-      <p className={status.tone}>
-        <span className="tracking-[0.14em] uppercase">{status.title}</span>
-        <span className="mt-0.5 block text-white/70">{status.detail}</span>
-      </p>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <section>
-          <p className="mb-1 text-[10px] tracking-[0.14em] text-white/40 uppercase">This browser</p>
-          <ul className="flex flex-col gap-1">
-            <Row label="Shopper" value={live?.shopperId ?? "…"} />
-            <Row label="Checked" value={checkedAt || "…"} />
-            <Row label="Updated" value={live?.updatedAt || "no layout"} />
-            {rows.map((row) => (
-              <Row key={row.label} label={row.label} value={row.value} />
-            ))}
-          </ul>
-        </section>
-        <section>
-          <p className="mb-1 text-[10px] tracking-[0.14em] text-white/40 uppercase">
-            Four types{members > 0 ? ` · ${count(members)} shoppers` : ""}
-          </p>
-          {cohort?.state === "ready" ? (
-            <ul className="flex flex-col gap-1">
+    <div className="flex h-full min-h-0 flex-col justify-center gap-3 overflow-auto text-[11px]">
+      <div>
+        <p className={status.tone}>
+          <span className="tracking-[0.14em] uppercase">{status.title}</span>
+          <span className="text-white/75"> · {summary}</span>
+        </p>
+        <p className="mt-1 text-white/40">
+          {live ? shortId(live.shopperId) : "…"}
+          {checkedAt ? ` · checked ${checkedAt}` : ""}
+          {updated ? ` · updated ${updated}` : ""}
+        </p>
+      </div>
+      <div>
+        <p className="mb-1.5 text-[10px] tracking-[0.14em] text-white/40 uppercase">
+          Four types{members > 0 ? ` · ${count(members)} shoppers` : ""}
+        </p>
+        {cohort?.state === "ready" ? (
+          <>
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-4">
               {cohort.personas.map((persona) => (
-                <li key={persona.id} className="flex items-baseline justify-between gap-3">
-                  <span className="text-white/85">{persona.name}</span>
-                  <span className="shrink-0 text-right text-white/55">
+                <li key={persona.id} className="min-w-0">
+                  <p className="truncate text-white/85">{persona.name}</p>
+                  <p className="text-white/50">
                     {count(persona.members)} · {Math.round(persona.highConfidence * 100)}% high
-                  </span>
+                  </p>
                 </li>
               ))}
-              <Row label="Events" value={count(cohort.events)} />
-              <Row label="Layouts" value={count(cohort.layouts)} />
-              <Row label="Catalog" value={count(cohort.catalog)} />
-              <Row
-                label="Trending"
-                value={
-                  live?.trending.length
-                    ? live.trending
-                        .slice(0, 6)
-                        .map((item) => `${item.productId} ${item.score}`)
-                        .join(", ")
-                    : cohort.trending > 0
-                      ? count(cohort.trending)
-                      : "none right now"
-                }
-              />
             </ul>
-          ) : (
-            <p className="text-white/55">
-              {cohort?.state === "error"
-                ? "The cohort read failed."
-                : cohort?.state === "disabled"
-                  ? "Snowflake is off, so the cohort counts are hidden."
-                  : "Reading the four types…"}
+            <p className="mt-1.5 text-white/40">
+              {count(cohort.events)} events · {count(cohort.layouts)} layouts
             </p>
-          )}
-        </section>
+          </>
+        ) : (
+          <p className="text-white/55">
+            {cohort?.state === "error"
+              ? "The cohort read failed."
+              : cohort?.state === "disabled"
+                ? "Snowflake is off, so the cohort counts are hidden."
+                : "Reading the four types…"}
+          </p>
+        )}
       </div>
     </div>
   )

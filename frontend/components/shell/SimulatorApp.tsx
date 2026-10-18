@@ -23,7 +23,7 @@ export function SimulatorApp() {
     <>
       <div className="flex min-h-screen items-center justify-center bg-[#0c0c0d] px-6 text-center text-white min-[1280px]:hidden">
         <div className="max-w-sm">
-          <p className="text-[10px] tracking-[0.28em] text-white/50 uppercase">Atelier Nine</p>
+          <p className="text-[10px] tracking-[0.28em] text-white/50 uppercase">SoCal Atelier</p>
           <h1 className="mt-3 font-serif text-3xl">Best viewed on desktop</h1>
           <p className="mt-3 text-sm text-white/70">
             The demo shell needs at least {UI_CONFIG.minWidthPx}px. The store itself still opens on its own.

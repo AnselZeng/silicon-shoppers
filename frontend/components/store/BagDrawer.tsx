@@ -42,7 +42,7 @@ export function BagDrawer() {
             <span className="tabular-nums">{formatMoney(total)}</span>
           </div>
           {layout.checkout.loyaltyPrompt ? (
-            <p className="mb-3 text-xs text-neutral-600">Earn {Math.round(total)} Atelier points with this order.</p>
+            <p className="mb-3 text-xs text-neutral-600">Earn {Math.round(total)} SoCal points with this order.</p>
           ) : null}
           {layout.checkout.showTrustBadges ? (
             <p className="mb-3 text-[10px] tracking-[0.16em] text-neutral-500 uppercase">Visa Secure · Buyer protection</p>

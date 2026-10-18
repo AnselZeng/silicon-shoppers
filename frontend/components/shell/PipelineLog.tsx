@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { BackendPanel } from "@/components/shell/BackendPanel"
-import { ObservabilityPanel } from "@/components/shell/ObservabilityPanel"
 import { Terminal } from "@/components/shell/Terminal"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -22,7 +21,6 @@ export function PipelineLog({ compact = false, onExpand }: { compact?: boolean; 
           <TabsList variant="line" className="bg-transparent">
             <TabsTrigger value="terminal" onClick={() => onExpand?.()}>Terminal</TabsTrigger>
             <TabsTrigger value="backend" onClick={() => onExpand?.()}>Backend</TabsTrigger>
-            <TabsTrigger value="obs" onClick={() => onExpand?.()}>Observability</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -30,34 +28,29 @@ export function PipelineLog({ compact = false, onExpand }: { compact?: boolean; 
   }
 
   return (
-    <div className="flex h-full flex-col gap-2 p-3">
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] tracking-[0.16em] text-white/50 uppercase">Pipeline log</span>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="ml-auto text-foreground"
-          title="Empties the bag and wishlist, closes checkout, and clears this log."
-          onClick={() => runner.reset()}
-        >
-          Clear session
-        </Button>
-      </div>
-      <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1">
-        <TabsList variant="line" className="bg-transparent">
-          <TabsTrigger value="terminal">Terminal</TabsTrigger>
-          <TabsTrigger value="backend">Backend</TabsTrigger>
-          <TabsTrigger value="obs">Observability</TabsTrigger>
-        </TabsList>
+    <div className="flex h-full flex-col px-3 py-2">
+      <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-1">
+        <div className="flex items-center gap-2">
+          <TabsList variant="line" className="bg-transparent">
+            <TabsTrigger value="terminal">Terminal</TabsTrigger>
+            <TabsTrigger value="backend">Backend</TabsTrigger>
+          </TabsList>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="ml-auto text-foreground"
+            title="Empties the bag and wishlist, closes checkout, and clears this log."
+            onClick={() => runner.reset()}
+          >
+            Clear session
+          </Button>
+        </div>
         <TabsContent value="terminal" className="min-h-0">
           <Terminal />
         </TabsContent>
         <TabsContent value="backend" className="min-h-0 overflow-auto">
           <BackendPanel />
-        </TabsContent>
-        <TabsContent value="obs" className="min-h-0 overflow-auto">
-          <ObservabilityPanel />
         </TabsContent>
       </Tabs>
     </div>

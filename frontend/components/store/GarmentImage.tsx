@@ -1,6 +1,8 @@
 import { COLOR_HEX, type StoreColor } from "@/config/ui"
 import type { GarmentType } from "@/lib/store/types"
 
+const PAPER = "#ebe6dc"
+
 export function GarmentImage({
   type,
   color,
@@ -11,11 +13,11 @@ export function GarmentImage({
   className?: string
 }) {
   const fill = (COLOR_HEX as Record<string, string>)[color] ?? COLOR_HEX.black
-  const ink = color === "white" || color === "cream" || color === "beige" ? "#2a2a2a" : "rgba(255,255,255,0.35)"
+  const ink = color === "white" || color === "cream" || color === "beige" ? "#2a2a2a" : "rgba(255,255,255,0.45)"
   return (
     <svg viewBox="0 0 200 260" className={className} role="img" aria-label={`${color} ${type}`}>
-      <rect width="200" height="260" fill="#ebe6dc" />
-      <g fill={fill} stroke={ink} strokeWidth="1.25">
+      <rect width="200" height="260" fill={PAPER} />
+      <g fill={fill} stroke={ink} strokeWidth="1.35" strokeLinejoin="round" strokeLinecap="round">
         {shape(type)}
       </g>
     </svg>
@@ -26,45 +28,81 @@ function shape(type: GarmentType) {
   switch (type) {
     case "tee":
       return (
-        <>
-          <path d="M58 48 L78 38 H122 L142 48 L168 78 L150 90 L138 74 V198 H62 V74 L50 90 L32 78 Z" />
-        </>
+        <path d="M68 78 L50 98 L38 82 L64 56 L80 46 Q100 70 120 46 L136 56 L162 82 L150 98 L132 78 V198 H68 Z" />
       )
     case "shirt":
-      return <path d="M60 46 L80 36 H120 L140 46 L166 84 L148 94 L136 72 V204 H64 V72 L52 94 L34 84 Z M92 36 L100 58 L108 36" />
+      return (
+        <>
+          <path d="M66 82 L46 108 L34 90 L64 54 L84 44 L100 66 L116 44 L136 54 L166 90 L154 108 L134 82 V208 H66 Z" />
+          <path d="M84 44 L100 66 L116 44 L110 40 L100 54 L90 40 Z" />
+          <path d="M100 66 V202 M48 100 H60 M140 100 H152" fill="none" />
+        </>
+      )
     case "knit":
       return (
         <>
-          <path d="M55 52 L76 40 H124 L145 52 L170 92 L150 102 L136 78 V210 H64 V78 L50 102 L30 92 Z" />
-          <path d="M70 96 H130 M70 116 H130 M70 136 H130 M70 156 H130" fill="none" />
+          <path d="M64 76 L48 102 L34 86 L62 52 Q100 78 138 52 L166 86 L152 102 L136 76 V208 H64 Z" />
+          <path d="M72 184 H128 M72 192 H128 M72 200 H128" fill="none" />
         </>
       )
     case "jacket":
-      return <path d="M52 48 L78 36 H122 L148 48 L176 96 L154 108 L140 74 V214 H60 V74 L46 108 L24 96 Z M100 48 V214" />
+      return (
+        <>
+          <path d="M70 78 L50 112 L36 98 L62 52 L78 42 L96 64 L100 56 L104 64 L122 42 L138 52 L164 98 L150 112 L130 78 V206 H70 Z" />
+          <path d="M100 64 V206 M74 150 H94 M106 150 H126" fill="none" />
+        </>
+      )
     case "coat":
-      return <path d="M58 34 L80 26 H120 L142 34 L176 88 L156 98 L142 62 V228 H58 V62 L44 98 L24 88 Z M100 40 V228" />
+      return (
+        <>
+          <path d="M68 70 L46 108 L32 94 L60 40 L80 30 L98 58 L100 50 L102 58 L120 30 L140 40 L168 94 L154 108 L132 70 V230 H68 Z" />
+          <path d="M100 56 V230 M72 168 H92 M108 168 H128" fill="none" />
+        </>
+      )
     case "puffer":
       return (
         <>
-          <path d="M48 50 L74 38 H126 L152 50 L178 100 L156 112 L140 78 V216 H60 V78 L44 112 L22 100 Z" />
-          <path d="M64 90 H136 M64 112 H136 M64 134 H136 M64 156 H136 M64 178 H136" fill="none" />
+          <path d="M62 78 L44 114 L28 100 L58 52 H84 L92 40 H108 L116 52 H142 L172 100 L156 114 L138 78 V210 H62 Z" />
+          <path d="M70 92 H130 M70 114 H130 M70 136 H130 M70 158 H130 M70 180 H130 M100 52 V204" fill="none" />
         </>
       )
     case "jeans":
-      return <path d="M68 42 H132 L138 150 L154 230 H118 L108 150 L100 168 L92 150 L82 230 H46 L62 150 Z" />
+      return (
+        <>
+          <path d="M70 46 H130 V62 L126 62 L134 228 H110 L102 142 H98 L90 228 H66 L74 62 H70 Z" />
+          <path d="M70 62 H130 M100 62 V96 M78 78 L90 96 M122 78 L110 96" fill="none" />
+        </>
+      )
     case "trousers":
-      return <path d="M70 40 H130 L134 140 L146 232 H112 L104 150 H96 L88 232 H54 L66 140 Z" />
+      return (
+        <>
+          <path d="M74 42 H126 V58 L122 58 L132 230 H110 L102 140 H98 L90 230 H68 L78 58 H74 Z" />
+          <path d="M74 58 H126 M86 64 V220 M114 64 V220" fill="none" />
+        </>
+      )
     case "skirt":
-      return <path d="M72 48 H128 L156 220 H44 Z" />
+      return (
+        <>
+          <path d="M76 52 H124 V68 L152 214 Q100 226 48 214 L76 68 Z" />
+          <path d="M76 68 H124" fill="none" />
+        </>
+      )
     case "dress":
-      return <path d="M78 36 H122 L136 70 L168 220 H32 L64 70 Z M92 36 H108 L100 58 Z" />
+      return (
+        <path d="M66 80 L50 98 L38 84 L68 50 Q100 76 132 50 L162 84 L150 98 L134 80 L146 118 L172 222 H28 L54 118 Z" />
+      )
     case "shoes":
-      return <path d="M28 150 H118 L168 168 L172 190 H36 L28 170 Z" />
+      return (
+        <>
+          <path d="M34 208 L34 158 L56 146 L74 126 L112 136 L158 158 L186 178 L186 208 Z" />
+          <path d="M72 140 C108 148 142 160 170 174" fill="none" />
+        </>
+      )
     case "bag":
       return (
         <>
-          <path d="M58 90 H142 L150 210 H50 Z" />
-          <path d="M78 90 C78 60 122 60 122 90" fill="none" strokeWidth="3" />
+          <path d="M58 96 H142 L150 204 H50 Z" />
+          <path d="M78 96 C78 62 122 62 122 96 M100 110 V190 M58 186 H142" fill="none" strokeWidth="2.4" />
         </>
       )
   }

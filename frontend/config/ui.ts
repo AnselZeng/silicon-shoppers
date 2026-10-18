@@ -51,7 +51,6 @@ export const LOG_COLORS = {
   layout: "#86efac",
   model: "#c4b5fd",
   llm: "#f0abfc",
-  sentry: "#fdba74",
   visa: "#7dd3fc",
 } as const
 
