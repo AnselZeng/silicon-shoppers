@@ -3,14 +3,12 @@
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { UI_CONFIG } from "@/config/ui"
+import { AdSlot } from "@/components/store/ads/AdSlot"
 import { BagDrawer } from "@/components/store/BagDrawer"
 import { ClientOnly } from "@/components/store/ClientOnly"
 import { Concierge } from "@/components/store/Concierge"
 import { Header } from "@/components/store/Header"
-import { Hero } from "@/components/store/Hero"
 import { LayoutToast } from "@/components/store/LayoutToast"
-import { Popup } from "@/components/store/Popup"
-import { PromoStrip } from "@/components/store/PromoStrip"
 import { QuickView } from "@/components/store/QuickView"
 import { VisaCheckout } from "@/components/store/VisaCheckout"
 import { WishlistDrawer } from "@/components/store/WishlistDrawer"
@@ -50,7 +48,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       if (state.adCaps[capKey("popup", popupAd)]) return
       state.markAd(capKey("popup", popupAd), "shown")
       state.setPopupOpen(true)
-      emitStoreEvent("popup_shown", { adId: popupAd })
+      emitStoreEvent("ad_shown", { slot: "popup", adId: popupAd })
     }, popup?.triggerValue ?? UI_CONFIG.popupDelayMs)
     return () => window.clearTimeout(timer)
   }, [popupAd, popupCapped, popup?.triggerValue, sessionNonce])
@@ -93,12 +91,11 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="storefront min-h-screen bg-[#f6f3ee] text-[#141414]">
-      <PromoStrip />
+      <AdSlot slot="top_strip" />
       <Header />
-      {pathname === "/store" || pathname.startsWith("/store/product/") ? null : <Hero compact />}
       <main>{children}</main>
       <ClientOnly>
-        <Popup />
+        <AdSlot slot="popup" />
         <QuickView />
         <BagDrawer />
         <WishlistDrawer />

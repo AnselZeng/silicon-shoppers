@@ -43,6 +43,7 @@ export const DEFAULT_LAYOUT: LayoutConfig = {
     placements: [
       { slot: "top_strip", adIds: ["shipping"] },
       { slot: "hero", adIds: ["collection_women"] },
+      { slot: "listing_banner", adIds: ["collection_women"] },
       { slot: "popup", adIds: ["newsletter"], trigger: "delay", triggerValue: 2200 },
     ],
   },

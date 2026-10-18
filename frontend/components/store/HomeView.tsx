@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { AdBanner } from "@/components/store/ads/AdBanner"
 import { GarmentImage } from "@/components/store/GarmentImage"
-import { Hero } from "@/components/store/Hero"
+import { AdSlot } from "@/components/store/ads/AdSlot"
 import { ProductGrid } from "@/components/store/ProductGrid"
 import { adContent } from "@/lib/ads/placement"
 import { resolveHome } from "@/lib/layout/home"
@@ -110,7 +110,7 @@ export function HomeView() {
         if (block.type === "hero") {
           return (
             <div key={key}>
-              <Hero />
+              <AdSlot slot="hero" />
               <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
                 {SORT_LINE[layout.listing.defaultSort]} · Filters lead with{" "}
                 {FILTER_LABEL[layout.listing.filterOrder[0] ?? "category"]} · {MERCH_LINE[layout.listing.colorMerchandising]}

@@ -104,9 +104,11 @@ export function modelLayout(doc: HomepageDoc, basketIds: string[] = []): LayoutC
     basketIds: [...basketIds],
   }
 
+  const heroAd = modelHeroAd(doc, department)
   const placements: AdPlacement[] = [
     { slot: "top_strip", adIds: ["shipping"] },
-    { slot: "hero", adIds: [modelHeroAd(doc, department)] },
+    { slot: "hero", adIds: [heroAd] },
+    { slot: "listing_banner", adIds: [heroAd] },
   ]
   if (L.popups.value === "on") placements.push({ slot: "popup", adIds: ["newsletter"], trigger: "delay", triggerValue: 2200 })
   layout.ads = { placements }

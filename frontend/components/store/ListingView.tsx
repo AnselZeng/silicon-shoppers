@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { UI_CONFIG } from "@/config/ui"
+import { AdSlot } from "@/components/store/ads/AdSlot"
 import { FilterSidebar } from "@/components/store/FilterSidebar"
 import { ProductGrid } from "@/components/store/ProductGrid"
 import { SortDropdown } from "@/components/store/SortDropdown"
@@ -78,6 +79,7 @@ export function ListingView({ mode }: { mode: ListingMode }) {
       <div className="flex flex-col items-start gap-6 md:flex-row md:gap-8">
         <FilterSidebar query={query} onQuery={onQuery} />
         <div className="min-w-0 flex-1">
+          <AdSlot slot="listing_banner" />
           <ProductGrid products={products.slice(0, visible)} />
           {visible < products.length ? (
             <button

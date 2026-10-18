@@ -44,7 +44,7 @@ describe("v1 -> v2 mapping", () => {
         v2.home.blocks.map((b) => (b.type === "product_row" ? b.source.kind : b.type)),
         ["hero", "sale", "category_tiles", "new_in", "bestsellers"],
       ],
-      heroVariant: [hero?.adIds, ["sale_women"]],
+      heroVariant: [[hero?.adIds, v2.ads.placements.find((p) => p.slot === "listing_banner")?.adIds], [["sale_women"], ["sale_women"]]],
       heroMinimized: [v2.home.heroSize, "compact"],
       popupEnabled: [popup !== undefined, true],
       popupVariant: [popup?.adIds, ["new_women"]],

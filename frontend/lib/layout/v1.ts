@@ -98,6 +98,8 @@ export function migrateV1(v1: LayoutConfigV1): LayoutConfig {
   const placements: AdPlacement[] = [
     { slot: "top_strip", adIds: [STRIP_AD[v1.heroVariant]] },
     { slot: "hero", adIds: [HERO_AD[v1.heroVariant]] },
+    // v1 also drew the hero, compact, above every listing
+    { slot: "listing_banner", adIds: [HERO_AD[v1.heroVariant]] },
   ]
   if (v1.popupEnabled) {
     placements.push({ slot: "popup", adIds: [POPUP_AD[v1.popupVariant]], trigger: "delay", triggerValue: 2200 })
