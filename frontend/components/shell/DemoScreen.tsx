@@ -8,10 +8,12 @@ import { useSimStore, type ViewportChoice } from "@/lib/state/simStore"
 
 const VIEWS: { id: ViewportChoice; label: string }[] = [
   { id: "web", label: "Web" },
+  { id: "tablet", label: "Tablet" },
   { id: "mobile", label: "Mobile" },
 ]
 
 const PHONE = { width: 402, height: 844 }
+const TABLET = { width: 820, height: 1180 }
 
 export function DemoScreen() {
   const viewport = useSimStore((state) => state.viewport)
@@ -21,7 +23,7 @@ export function DemoScreen() {
   const stageRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
   const web = UI_CONFIG.demoViewports.web
-  const frame = viewport === "web" ? web : PHONE
+  const frame = viewport === "web" ? web : viewport === "tablet" ? TABLET : PHONE
 
   useEffect(() => {
     setIframe(frameRef.current)
@@ -58,6 +60,9 @@ export function DemoScreen() {
             {view.label}
           </button>
         ))}
+        <span className="ml-auto tabular-nums tracking-normal text-white/45">
+          {frame.width} × {frame.height}
+        </span>
       </div>
       <div ref={stageRef} className="flex min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-hidden px-6 py-5">
         {viewport === "web" ? (
@@ -68,6 +73,21 @@ export function DemoScreen() {
             >
               <BrowserChrome mode="web" />
               <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full flex-1 bg-white" />
+            </div>
+          </div>
+        ) : viewport === "tablet" ? (
+          <div style={{ width: TABLET.width * scale, height: TABLET.height * scale }}>
+            <div
+              className="flex origin-top-left flex-col overflow-hidden rounded-[1.75rem] bg-[#1c1c1e] p-3 shadow-[0_28px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/15"
+              style={{ width: TABLET.width, height: TABLET.height, transform: `scale(${scale})` }}
+            >
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.25rem] bg-white">
+                <BrowserChrome mode="tablet" />
+                <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full min-w-0 flex-1 bg-white" />
+                <div className="flex h-5 shrink-0 items-center justify-center bg-[#f4f1ea]">
+                  <span className="h-1 w-28 rounded-full bg-neutral-900/80" />
+                </div>
+              </div>
             </div>
           </div>
         ) : (

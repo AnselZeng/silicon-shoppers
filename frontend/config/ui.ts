@@ -6,6 +6,7 @@ export const UI_CONFIG = {
   controlsPanelHeight: 0.45,
   demoViewports: {
     web: { width: 1280, height: 800 },
+    tablet: { width: 820, height: 1180 },
     mobile: { width: 390, height: 780 },
   },
   defaultViewport: "web",

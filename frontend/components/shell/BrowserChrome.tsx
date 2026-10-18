@@ -12,7 +12,7 @@ export function BrowserChrome({ mode }: { mode: ViewportChoice }) {
   const route = useSimStore((state) => state.route)
   const url = shopUrl(route)
 
-  if (mode === "mobile") {
+  if (mode === "mobile" || mode === "tablet") {
     return (
       <div className="shrink-0 bg-[#f4f1ea] text-[#1a1a1a]">
         <div className="flex h-8 items-center justify-between px-5 text-[11px] font-medium">
