@@ -78,6 +78,7 @@ export function Header() {
             value={draft}
             placeholder="Search"
             onChange={(event) => setDraft(event.target.value)}
+            suppressHydrationWarning
             className={cn(
               "h-9 w-full border border-[#d9d3c8] bg-white px-3 text-sm outline-none sm:w-36",
               layout.nav.searchEmphasized && "sm:w-64 sm:ring-2 sm:ring-[#141414]",
