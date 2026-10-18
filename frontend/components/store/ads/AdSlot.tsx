@@ -7,6 +7,7 @@ import { Popup } from "@/components/store/Popup"
 import { PromoStrip } from "@/components/store/PromoStrip"
 import { adContent, capKey, placementFor } from "@/lib/ads/placement"
 import type { AdSlotId } from "@/lib/ads/types"
+import type { InlineAdSlot } from "@/lib/layout/steps"
 import { useAdShown } from "@/lib/ads/useAdShown"
 import { useRotation } from "@/lib/ads/useRotation"
 import { emitStoreEvent } from "@/lib/store/emit"
@@ -27,24 +28,43 @@ export function AdSlot({ slot, compact = false }: { slot: Exclude<AdSlotId, "gri
   if (!ad) return null
   switch (slot) {
     case "top_strip":
-      return <PromoStrip ad={ad} />
+      return (
+        <InlineSlot slot={slot}>
+          <PromoStrip ad={ad} />
+        </InlineSlot>
+      )
     case "hero":
       return (
-        <Hero
-          ad={ad}
-          compact={compact || layout.home.heroSize === "compact"}
-          count={ids.length}
-          index={index}
-          onPick={setIndex}
-        />
+        <InlineSlot slot={slot}>
+          <Hero
+            ad={ad}
+            compact={compact || layout.home.heroSize === "compact"}
+            count={ids.length}
+            index={index}
+            onPick={setIndex}
+          />
+        </InlineSlot>
       )
     case "listing_banner":
-      return <AdBanner ad={ad} slot="listing_banner" className="mb-6" />
+      return (
+        <InlineSlot slot={slot}>
+          <AdBanner ad={ad} slot="listing_banner" className="mb-6" />
+        </InlineSlot>
+      )
     case "popup":
       return <PopupSlot />
     default:
       return null
   }
+}
+
+/** Names the slot for view transitions, so a layout step can play the ad-replace animation on it. */
+function InlineSlot({ slot, children }: { slot: InlineAdSlot; children: React.ReactNode }) {
+  return (
+    <div data-ad-slot={slot} style={{ viewTransitionName: `adslot-${slot}` }}>
+      {children}
+    </div>
+  )
 }
 
 function PopupSlot() {

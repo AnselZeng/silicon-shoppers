@@ -8,10 +8,12 @@ import { AdSlot } from "@/components/store/ads/AdSlot"
 import { ProductGrid } from "@/components/store/ProductGrid"
 import { adContent } from "@/lib/ads/placement"
 import { blockName, resolveHome } from "@/lib/layout/home"
+import { LISTING_LINE_FLASH } from "@/lib/layout/steps"
 import { categoryHref, collectionHref, departmentPath } from "@/lib/layout/links"
 import { FILTER_LABEL, type ColorMerchandising, type LayoutConfig, type ProductSource } from "@/lib/layout/types"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { useStorefront } from "@/lib/store/storeState"
+import { cn } from "@/lib/utils"
 import { CATEGORY_LABEL, type CollectionName } from "@/lib/store/types"
 
 const SORT_LINE = {
@@ -99,6 +101,25 @@ function CollectionSpotlight({ layout, collection }: { layout: LayoutConfig; col
   )
 }
 
+/**
+ * The sort / filter / color line under the hero. When a layout step changes it, it grows
+ * before the change, swaps text while enlarged, and settles back as the box fades.
+ */
+function ListingLine({ layout }: { layout: LayoutConfig }) {
+  const enlarged = useStorefront(
+    (state) => LISTING_LINE_FLASH in state.layoutFlash.names && !state.layoutFlash.leaving,
+  )
+  return (
+    <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
+      <span className={cn("layout-pulse relative inline-block origin-left", enlarged && "is-on")}>
+        <LayoutFlash name={LISTING_LINE_FLASH} className="-inset-x-2 -inset-y-1" tag="right" />
+        {SORT_LINE[layout.listing.defaultSort]} · Filters lead with{" "}
+        {FILTER_LABEL[layout.listing.filterOrder[0] ?? "category"]} · {MERCH_LINE[layout.listing.colorMerchandising]}
+      </span>
+    </p>
+  )
+}
+
 export function HomeView() {
   const layout = useStorefront((state) => state.layout)
   const blocks = resolveHome(layout)
@@ -114,10 +135,7 @@ export function HomeView() {
             <div key={name} style={{ viewTransitionName: name }} className="relative">
               <LayoutFlash name={name} />
               <AdSlot slot="hero" />
-              <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
-                {SORT_LINE[layout.listing.defaultSort]} · Filters lead with{" "}
-                {FILTER_LABEL[layout.listing.filterOrder[0] ?? "category"]} · {MERCH_LINE[layout.listing.colorMerchandising]}
-              </p>
+              <ListingLine layout={layout} />
             </div>
           )
         }

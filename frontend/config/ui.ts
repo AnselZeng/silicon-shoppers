@@ -16,17 +16,24 @@ export const UI_CONFIG = {
 } as const
 
 /**
- * Pacing of a layout swap in the store: stages share totalMs, each capped at maxStepMs.
- * A stage whose change is off-screen first scrolls there, adding up to scrollMs.
+ * Pacing of a layout swap in the store. Each stage: scroll to it, box what is about to
+ * change (leadMs), play the change (animMs), keep the box (holdMs), fade it (fadeMs).
+ * Scrolls take scrollMinMs plus scrollMsPerPx per pixel travelled, capped at scrollMaxMs.
  */
 export const LAYOUT_MOTION = {
-  totalMs: 5000,
-  maxStepMs: 1100,
-  maxAnimMs: 850,
-  flashMs: 2000,
-  scrollMs: 650,
+  animMs: 1100,
+  leadMs: 700,
+  holdMs: 700,
+  fadeMs: 350,
+  /** Pause after a stage with nothing to box. */
+  gapMs: 250,
+  scrollMinMs: 700,
+  scrollMsPerPx: 0.4,
+  scrollMaxMs: 1600,
   /** Clearance under the sticky header when a block is scrolled into view. */
   scrollOffsetPx: 96,
+  /** The shell gives up waiting for the store after this long. */
+  settleTimeoutMs: 40000,
 } as const
 
 export type ViewportKey = keyof typeof UI_CONFIG.demoViewports

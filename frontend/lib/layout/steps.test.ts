@@ -50,7 +50,7 @@ describe("layoutSteps", () => {
     to.home.blocks.push({ type: "editorial_text", copyKey: "story" })
     const flash = Object.assign({}, ...layoutSteps(from, to).map((step) => step.flash))
     expect(flash["copy-story"]).toBe("New")
-    expect(flash[blockName(to.home.blocks[1])]).toBe("Moved up")
+    expect(flash[blockName(to.home.blocks[1])]).toBe("Moving up")
   })
 
   test("scrolls to the first block position that changes", () => {
@@ -63,5 +63,14 @@ describe("layoutSteps", () => {
     expect(steps[0].focus).toBe(blockName(from.home.blocks[2]))
     to.nav.order = ["men", "women", "new_in", "sale", "collections"]
     expect(layoutSteps(from, to)[0].focus).toBe("top")
+  })
+
+  test("marks a replaced ad, but not one that appears or stays the same", () => {
+    const from = cloneLayout(DEFAULT_LAYOUT)
+    const to = cloneLayout(DEFAULT_LAYOUT)
+    to.ads.placements = to.ads.placements.map((p) => (p.slot === "hero" ? { ...p, adIds: ["shipping"] } : p))
+    expect(layoutSteps(from, to)[0].adSwaps).toEqual(["hero"])
+    to.ads.placements = to.ads.placements.filter((p) => p.slot !== "hero")
+    expect(layoutSteps(from, to)[0].adSwaps).toEqual([])
   })
 })

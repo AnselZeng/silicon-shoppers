@@ -159,10 +159,63 @@
   }
 }
 
+/*
+ * Ad replace: the new ad slides over the old one, which recedes underneath. layoutMotion.ts
+ * sets data-ad-swap on <html> for the slots whose ad changes in a stage, and waits for
+ * the transition to finish, so the 1.5x stretch here needs no JS counterpart.
+ */
+:root[data-ad-swap~="top_strip"] [data-ad-slot="top_strip"],
+:root[data-ad-swap~="hero"] [data-ad-slot="hero"],
+:root[data-ad-swap~="listing_banner"] [data-ad-slot="listing_banner"] {
+  view-transition-class: ad-swap;
+}
+
+::view-transition-group(*.ad-swap) {
+  overflow: hidden;
+  animation-duration: calc(var(--layout-step-ms, 560ms) * 1.5);
+}
+
+::view-transition-old(*.ad-swap) {
+  mix-blend-mode: normal;
+  animation: ad-recede calc(var(--layout-step-ms, 560ms) * 1.5) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+::view-transition-new(*.ad-swap) {
+  mix-blend-mode: normal;
+  animation: ad-cover calc(var(--layout-step-ms, 560ms) * 1.5) cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+@keyframes ad-recede {
+  to {
+    transform: scale(0.9);
+    opacity: 0.35;
+    filter: brightness(0.5) blur(3px);
+  }
+}
+
+@keyframes ad-cover {
+  from {
+    transform: translateX(100%);
+    box-shadow: -48px 0 64px rgb(0 0 0 / 0.45);
+  }
+  85% {
+    box-shadow: -48px 0 64px rgb(0 0 0 / 0.45);
+  }
+  to {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 .layout-flash {
   outline: 2px solid #b8893b;
   outline-offset: -2px;
-  animation: layout-flash var(--layout-flash-ms, 1600ms) ease-out forwards;
+  animation: layout-flash-in 250ms ease-out backwards;
+  transition: opacity var(--layout-fade-ms, 350ms) ease-in;
+}
+
+.layout-flash.is-leaving {
+  opacity: 0;
 }
 
 .layout-flash-tag {
@@ -176,22 +229,32 @@
   white-space: nowrap;
 }
 
-@keyframes layout-flash {
-  0% {
-    opacity: 0;
-  }
-  10%,
-  70% {
-    opacity: 1;
-  }
-  100% {
+@keyframes layout-flash-in {
+  from {
     opacity: 0;
   }
 }
 
+/* Text a layout step changes in place: enlarged with a marker tint while its box is up. */
+.layout-pulse {
+  transition:
+    transform var(--layout-lead-ms, 700ms) cubic-bezier(0.4, 0, 0.2, 1),
+    color var(--layout-lead-ms, 700ms),
+    background-color var(--layout-lead-ms, 700ms);
+}
+
+.layout-pulse.is-on {
+  transform: scale(1.5);
+  color: #141414;
+  background-color: rgb(184 137 59 / 0.18);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .layout-pulse.is-on {
+    transform: none;
+  }
+
   .layout-flash {
-    animation: none;
-    opacity: 0;
+    display: none;
   }
 }

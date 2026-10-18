@@ -15,6 +15,7 @@ export interface LayoutMotionHooks {
 let epoch = 0
 let timer: number | null = null
 let active: ViewTransition | null = null
+let scrollFrame: number | null = null
 
 function isSkippedTransition(error: unknown): boolean {
   return error instanceof DOMException && error.name === "AbortError"
@@ -51,19 +52,35 @@ function scrollTarget(focus: string | null): number | null {
   return Math.abs(top - window.scrollY) < 24 ? null : top
 }
 
-/** Smooth-scrolls so the audience sees the change before it plays; resolves when the scroll ends. */
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
+}
+
+/**
+ * Scrolls so the audience sees the change before it plays; resolves when the scroll ends.
+ * Hand-rolled because the browser's smooth scroll runs at a speed we can't set: longer
+ * distances take longer, between scrollMinMs and scrollMaxMs.
+ */
 function scrollToFocus(focus: string | null): Promise<void> {
   const top = scrollTarget(focus)
   if (top === null) return Promise.resolve()
+  const from = window.scrollY
+  const distance = top - from
+  const duration = Math.min(
+    LAYOUT_MOTION.scrollMaxMs,
+    LAYOUT_MOTION.scrollMinMs + Math.abs(distance) * LAYOUT_MOTION.scrollMsPerPx,
+  )
+  const run = epoch
   return new Promise((resolve) => {
-    const done = () => {
-      window.removeEventListener("scrollend", done)
-      window.clearTimeout(fallback)
-      resolve()
+    const started = performance.now()
+    const tick = (now: number) => {
+      if (run !== epoch) return resolve()
+      const t = Math.min(1, (now - started) / duration)
+      window.scrollTo(0, from + distance * easeInOutCubic(t))
+      if (t < 1) scrollFrame = window.requestAnimationFrame(tick)
+      else resolve()
     }
-    window.addEventListener("scrollend", done, { once: true })
-    const fallback = window.setTimeout(done, LAYOUT_MOTION.scrollMs)
-    window.scrollTo({ top, behavior: "smooth" })
+    scrollFrame = window.requestAnimationFrame(tick)
   })
 }
 
@@ -72,15 +89,20 @@ export function cancelLayoutMotion() {
   epoch += 1
   if (timer !== null) window.clearTimeout(timer)
   timer = null
+  if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame)
+  scrollFrame = null
+  delete document.documentElement.dataset.adSwap
+  useStorefront.getState().setLayoutFlash({})
   active?.skipTransition()
   active = null
 }
 
 /**
- * Validates the layout once, then plays the swap in stages (see layoutSteps), each
- * inside its own view transition. Before a stage, the page scrolls to where it lands;
- * after the last one it returns to the top. flushSync makes React commit inside the
- * transition callback, so the browser's "after" snapshot shows the new stage.
+ * Validates the layout once, then plays the swap in stages (see layoutSteps). Each stage
+ * scrolls to where it lands, boxes what is about to change, plays the change in a view
+ * transition with the box riding along, holds, then fades the box. After the last stage
+ * the page returns to the top. flushSync makes React commit inside the transition
+ * callback, so the browser's "after" snapshot shows the new stage.
  */
 export function playLayout(
   raw: unknown,
@@ -95,51 +117,61 @@ export function playLayout(
   const start = document.startViewTransition?.bind(document)
 
   if (steps.length === 0 || prefersReducedMotion()) {
-    useStorefront.getState().showLayoutStep(target, {}, final)
+    useStorefront.getState().showLayoutStep(target, final)
     hooks.onSettled()
     return
   }
 
-  const interval = Math.min(LAYOUT_MOTION.maxStepMs, LAYOUT_MOTION.totalMs / steps.length)
-  const animMs = Math.round(Math.min(LAYOUT_MOTION.maxAnimMs, interval - 80))
-  document.documentElement.style.setProperty("--layout-step-ms", `${animMs}ms`)
-  document.documentElement.style.setProperty("--layout-flash-ms", `${LAYOUT_MOTION.flashMs}ms`)
+  const root = document.documentElement.style
+  root.setProperty("--layout-step-ms", `${LAYOUT_MOTION.animMs}ms`)
+  root.setProperty("--layout-fade-ms", `${LAYOUT_MOTION.fadeMs}ms`)
+  root.setProperty("--layout-lead-ms", `${LAYOUT_MOTION.leadMs}ms`)
 
-  const play = async (index: number) => {
-    if (run !== epoch) return
-    const step = steps[index]
-    const last = index === steps.length - 1
-    await scrollToFocus(step.focus)
-    if (run !== epoch) return
-    const apply = () =>
-      flushSync(() => useStorefront.getState().showLayoutStep(step.layout, step.flash, last ? final : undefined))
-    hooks.onStep(index + 1, steps.length, step.label)
-    let finished: Promise<unknown> = Promise.resolve()
-    if (start) {
-      const transition = start(apply)
-      active = transition
-      transition.ready.catch(logUnexpected)
-      finished = transition.finished.catch(logUnexpected)
-    } else {
-      apply()
-    }
-    if (!last) {
-      await waitMs(interval)
-      void play(index + 1)
-      return
-    }
-    await finished
-    if (run !== epoch) return
-    active = null
-    if (window.scrollY > 0) {
-      await waitMs(LAYOUT_MOTION.flashMs / 2)
+  /** Resolves false once a newer swap (or a cancel) has taken over. */
+  const pause = async (ms: number) => {
+    await waitMs(ms)
+    return run === epoch
+  }
+
+  const play = async () => {
+    for (const [index, step] of steps.entries()) {
+      const last = index === steps.length - 1
+      hooks.onStep(index + 1, steps.length, step.label)
+      await scrollToFocus(step.focus)
       if (run !== epoch) return
-      await scrollToFocus("top")
-      if (run !== epoch) return
+      const boxed = Object.keys(step.flash).length > 0
+      if (boxed) {
+        useStorefront.getState().setLayoutFlash(step.flash)
+        if (!(await pause(LAYOUT_MOTION.leadMs))) return
+      }
+      const apply = () => flushSync(() => useStorefront.getState().showLayoutStep(step.layout, last ? final : undefined))
+      if (start) {
+        // Read by globals.css before the old snapshot is taken: these slots play the replace animation.
+        if (step.adSwaps.length > 0) document.documentElement.dataset.adSwap = step.adSwaps.join(" ")
+        const transition = start(apply)
+        active = transition
+        transition.ready.catch(logUnexpected)
+        await transition.finished.catch(logUnexpected)
+        if (run !== epoch) return
+        active = null
+        delete document.documentElement.dataset.adSwap
+      } else {
+        apply()
+      }
+      if (boxed) {
+        if (!(await pause(LAYOUT_MOTION.holdMs))) return
+        useStorefront.getState().fadeLayoutFlash()
+        if (!(await pause(LAYOUT_MOTION.fadeMs))) return
+        useStorefront.getState().setLayoutFlash({})
+      } else if (!(await pause(LAYOUT_MOTION.gapMs))) {
+        return
+      }
     }
+    await scrollToFocus("top")
+    if (run !== epoch) return
     hooks.onSettled()
   }
-  void play(0)
+  void play()
 }
 
 /** Applies a layout in one frame, cancelling any swap in progress. */

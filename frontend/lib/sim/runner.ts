@@ -87,7 +87,7 @@ class ShellRunner {
   /** Resolves when the store finishes playing the layout swap, or after a fallback timeout. */
   private waitForSettle(): Promise<void> {
     return new Promise((resolve) => {
-      const timer = window.setTimeout(() => this.settle(), LAYOUT_MOTION.totalMs + 6000)
+      const timer = window.setTimeout(() => this.settle(), LAYOUT_MOTION.settleTimeoutMs)
       this.settleWaiters.push(() => {
         window.clearTimeout(timer)
         resolve()
