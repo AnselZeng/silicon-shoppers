@@ -1,9 +1,11 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import type { ConciergeTone } from "@/lib/layout/types"
 import { buildChatContext } from "@/lib/store/chatContext"
 import { applyChatIntent } from "@/lib/store/chatIntent"
+import { runChatActions, splitActions } from "@/lib/store/agent"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -74,6 +76,7 @@ interface Msg {
 }
 
 export function Concierge() {
+  const router = useRouter()
   // Always available to shoppers — tone still comes from the applied layout.
   const tone = useStorefront((state) => state.layout.concierge.tone)
   const open = useStorefront((state) => state.conciergeOpen)
@@ -138,7 +141,9 @@ export function Concierge() {
           const event = JSON.parse(line) as { type: string; text?: string; error?: string; model?: string; ms?: number }
           if (event.type === "delta" && event.text) {
             reply += event.text
-            setMessages((prev) => [...prev.slice(0, -1), { role: "assistant", content: reply }])
+            // The trailing <<<ACTIONS>>> block is machine-readable; never render it.
+            const shown = splitActions(reply).text
+            setMessages((prev) => [...prev.slice(0, -1), { role: "assistant", content: shown }])
           }
           if (event.type === "error") throw new Error(event.error)
           if (event.type === "done") {
@@ -152,8 +157,10 @@ export function Concierge() {
         }
         if (done) break
       }
-      if (!reply) throw new Error("empty reply")
-      history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: reply }].slice(-12)
+      const { text, actions } = splitActions(reply)
+      if (!text) throw new Error("empty reply")
+      if (actions.length) runChatActions(actions, router.push)
+      history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: text }].slice(-12)
     } catch (error) {
       emitStoreEvent("concierge_error", { tone, error: error instanceof Error ? error.message : "failed" })
       const fallback =

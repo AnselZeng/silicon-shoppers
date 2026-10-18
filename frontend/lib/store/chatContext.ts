@@ -17,7 +17,10 @@ export interface ChatContext {
   bag: { name: string; color: string; size: string; qty: number; price: number }[]
   wishlist: { name: string; price: number }[]
   route: string
-  catalog: { id: string; name: string; department: string; category: string; colors: string[]; price: number; isNew: boolean }[]
+  catalog: {
+    id: string; name: string; department: string; category: string
+    colors: string[]; sizes: string[]; price: number; isNew: boolean; description: string
+  }[]
 }
 
 export function buildChatContext(): ChatContext {
@@ -52,8 +55,10 @@ export function buildChatContext(): ChatContext {
       department: p.department,
       category: p.category,
       colors: [...p.colors],
+      sizes: [...p.sizes],
       price: effectivePrice(p),
       isNew: p.isNew,
+      description: p.description.slice(0, 140),
     })),
   }
 }
