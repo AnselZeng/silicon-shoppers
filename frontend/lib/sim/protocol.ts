@@ -1,4 +1,4 @@
-import type { LayoutConfig } from "@/lib/layout/types"
+import type { ModelContext } from "@/lib/model/homepage"
 import type { SortOption } from "@/lib/personas/schema"
 
 export const SIM_SOURCE = "atelier-nine-sim" as const
@@ -36,7 +36,8 @@ export interface StoreEvent {
 }
 
 export type ParentPayload =
-  | { type: "set_layout"; layout: LayoutConfig; presetName?: string }
+  /** layout is validated inside the store; model lets the validator apply the model policy and fall back. */
+  | { type: "set_layout"; layout: unknown; model?: ModelContext | null; presetName?: string }
   | { type: "reset" }
 
 export type StorePayload =

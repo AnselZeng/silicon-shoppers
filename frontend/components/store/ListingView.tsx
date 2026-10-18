@@ -18,9 +18,9 @@ export function ListingView({ mode }: { mode: ListingMode }) {
   const router = useRouter()
   const layout = useStorefront((state) => state.layout)
   const query = useMemo(() => parseListingQuery(new URLSearchParams(params.toString())), [params])
-  const sort = query.sort ?? layout.defaultSort
+  const sort = query.sort ?? layout.listing.defaultSort
   const path = modePath(mode)
-  const pageKey = `${params.toString()}|${layout.defaultSort}`
+  const pageKey = `${params.toString()}|${layout.listing.defaultSort}`
   const [paging, setPaging] = useState<{ key: string; count: number }>({ key: pageKey, count: UI_CONFIG.listingPageSize })
   const visible = paging.key === pageKey ? paging.count : UI_CONFIG.listingPageSize
 

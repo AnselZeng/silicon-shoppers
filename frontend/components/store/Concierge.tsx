@@ -65,8 +65,8 @@ const SCRIPTS: Record<ConciergeTone, { q: string; a: string }[]> = {
 }
 
 export function Concierge() {
-  const enabled = useStorefront((state) => state.layout.conciergeEnabled)
-  const tone = useStorefront((state) => state.layout.conciergeTone)
+  const enabled = useStorefront((state) => state.layout.concierge.enabled)
+  const tone = useStorefront((state) => state.layout.concierge.tone)
   const open = useStorefront((state) => state.conciergeOpen)
   const setOpen = useStorefront((state) => state.setConciergeOpen)
   const answer = useStorefront((state) => state.conciergeAnswer)

@@ -30,12 +30,12 @@ export function FilterSidebar({
   onQuery: (next: ListingQuery, event: "filter_applied" | "filter_removed", filter: string, value?: string) => void
 }) {
   const layout = useStorefront((state) => state.layout)
-  const signature = layout.expandedFilters.join("|")
+  const signature = layout.listing.expandedFilters.join("|")
   const [toggled, setToggled] = useState<{ signature: string; open: FilterSectionId[] }>({
     signature,
-    open: layout.expandedFilters,
+    open: layout.listing.expandedFilters,
   })
-  const expanded = toggled.signature === signature ? toggled.open : layout.expandedFilters
+  const expanded = toggled.signature === signature ? toggled.open : layout.listing.expandedFilters
   const setExpanded = (update: (current: FilterSectionId[]) => FilterSectionId[]) =>
     setToggled({ signature, open: update(expanded) })
 
@@ -47,7 +47,7 @@ export function FilterSidebar({
     <aside className="w-full shrink-0 md:w-52">
       <p className="mb-4 text-[10px] tracking-[0.22em] text-neutral-500 uppercase">Filters</p>
       <div className="flex flex-col gap-2">
-        {layout.filterOrder.map((section) => {
+        {layout.listing.filterOrder.map((section) => {
           const open = expanded.includes(section)
           return (
             <div key={section} className="border-b border-[#e4dfd6] pb-2">

@@ -10,12 +10,6 @@ export const PERSONA_IDS = [
 export type PersonaId = (typeof PERSONA_IDS)[number]
 
 export type DepartmentPref = "women" | "men" | "both"
-export type SortOption =
-  | "relevance"
-  | "newest"
-  | "price_asc"
-  | "price_desc"
-  | "bestsellers"
 
 /** Shopping traits a persona keeps. The persona builder turns these into a basket. */
 export interface PersonaTraits {
@@ -41,13 +35,15 @@ export const PERSONA_LABEL: Record<PersonaId, string> = {
   brand_loyalist: "Brand Loyalist",
 }
 
-export const SORT_OPTIONS: SortOption[] = [
+export const SORT_OPTIONS = [
   "relevance",
   "newest",
   "price_asc",
   "price_desc",
   "bestsellers",
-]
+] as const
+
+export type SortOption = (typeof SORT_OPTIONS)[number]
 
 export const SORT_LABEL: Record<SortOption, string> = {
   relevance: "Relevance",

@@ -3,13 +3,10 @@
 import Link from "next/link"
 import { Hero } from "@/components/store/Hero"
 import { ProductGrid } from "@/components/store/ProductGrid"
-import { UI_CONFIG } from "@/config/ui"
-import { FILTER_LABEL, type ColorMerchandising, type HomeSectionId } from "@/lib/layout/types"
-import { PRODUCTS } from "@/lib/store/catalog"
-import { sortProducts } from "@/lib/store/sorting"
+import { resolveHome } from "@/lib/layout/home"
+import { FILTER_LABEL, type ColorMerchandising, type ProductSource } from "@/lib/layout/types"
 import { useStorefront } from "@/lib/store/storeState"
-import { COLLECTIONS, type Product } from "@/lib/store/types"
-import { collectionSlug } from "@/lib/utils"
+import { CATEGORY_LABEL } from "@/lib/store/types"
 
 const SORT_LINE = {
   relevance: "Sorted by relevance",
@@ -26,65 +23,91 @@ const MERCH_LINE: Record<ColorMerchandising, string> = {
   color_locked: "One colorway per piece",
 }
 
-const SECTION_TITLE: Record<HomeSectionId, string> = {
-  new_in: "New in",
-  bestsellers: "Bestsellers",
-  sale_picks: "Sale picks",
-  collections: "Collections",
+function rowTitle(source: ProductSource): string {
+  switch (source.kind) {
+    case "for_you":
+      return "Picked for you"
+    case "new_in":
+      return "New in"
+    case "bestsellers":
+      return "Bestsellers"
+    case "sale":
+      return "Sale picks"
+    case "buy_again":
+      return "Buy again"
+    case "under_price":
+      return `Under $${source.max}`
+    case "category":
+      return CATEGORY_LABEL[source.category]
+    case "collection":
+      return source.collection
+  }
 }
 
-function sectionProducts(id: HomeSectionId): Product[] {
-  if (id === "new_in") return sortProducts(PRODUCTS.filter((product) => product.isNew), "newest").slice(0, 8)
-  if (id === "bestsellers") return sortProducts(PRODUCTS, "bestsellers").slice(0, 8)
-  if (id === "sale_picks") {
-    return sortProducts(
-      PRODUCTS.filter((product) => product.salePrice !== undefined),
-      "price_asc",
-    ).slice(0, 8)
-  }
-  return []
+function rowHref(source: ProductSource): string | null {
+  if (source.kind === "new_in") return "/store/new-in"
+  if (source.kind === "sale") return "/store/sale"
+  if (source.kind === "bestsellers") return "/store/women?sort=bestsellers"
+  return null
 }
 
 export function HomeView() {
   const layout = useStorefront((state) => state.layout)
+  const blocks = resolveHome(layout)
+
   return (
     <div>
-      <Hero />
-      <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
-        {SORT_LINE[layout.defaultSort]} · Filters lead with {FILTER_LABEL[layout.filterOrder[0] ?? "category"]} ·{" "}
-        {MERCH_LINE[layout.colorMerchandising]}
-      </p>
-      {layout.homeSectionOrder.map((section) => (
-        <section key={section} className="px-6 py-10">
-          <div className="mb-6 flex items-baseline justify-between">
-            <h2 className="text-[11px] tracking-[0.22em] uppercase">{SECTION_TITLE[section]}</h2>
-            {section !== "collections" ? (
-              <Link href={section === "sale_picks" ? "/store/sale" : section === "new_in" ? "/store/new-in" : "/store/women"} className="text-[10px] tracking-[0.18em] uppercase">
-                View all
-              </Link>
-            ) : null}
-          </div>
-          {section === "collections" ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {COLLECTIONS.map((collection) => {
-                const slug = collectionSlug(collection)
-                return (
+      {blocks.map((entry, index) => {
+        const block = entry.block
+        const key = `${index}-${block.type}`
+        if (block.type === "hero") {
+          return (
+            <div key={key}>
+              <Hero />
+              <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
+                {SORT_LINE[layout.listing.defaultSort]} · Filters lead with{" "}
+                {FILTER_LABEL[layout.listing.filterOrder[0] ?? "category"]} · {MERCH_LINE[layout.listing.colorMerchandising]}
+              </p>
+            </div>
+          )
+        }
+        if ("products" in entry && entry.block.type === "product_row") {
+          if (entry.products.length === 0) return null
+          const href = rowHref(entry.block.source)
+          return (
+            <section key={key} className="px-6 py-10">
+              <div className="mb-6 flex items-baseline justify-between">
+                <h2 className="text-[11px] tracking-[0.22em] uppercase">{entry.block.title ?? rowTitle(entry.block.source)}</h2>
+                {href ? (
+                  <Link href={href} className="text-[10px] tracking-[0.18em] uppercase">
+                    View all
+                  </Link>
+                ) : null}
+              </div>
+              <ProductGrid products={entry.products} />
+            </section>
+          )
+        }
+        if (block.type === "category_tiles") {
+          return (
+            <section key={key} className="px-6 py-10">
+              <h2 className="mb-6 text-[11px] tracking-[0.22em] uppercase">Shop by category</h2>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                {block.categories.map((category) => (
                   <Link
-                    key={slug}
-                    href={`/store/women?collection=${slug}`}
+                    key={category}
+                    href={`/store/women?category=${category}`}
                     className="flex min-h-36 items-end bg-[#141414] p-4 text-[#f6f3ee]"
                   >
-                    <span className="text-[12px] tracking-[0.18em] uppercase">{collection}</span>
+                    <span className="text-[12px] tracking-[0.18em] uppercase">{CATEGORY_LABEL[category]}</span>
                   </Link>
-                )
-              })}
-            </div>
-          ) : (
-            <ProductGrid products={sectionProducts(section)} />
-          )}
-        </section>
-      ))}
-      <p className="sr-only">{UI_CONFIG.loyalistCollection}</p>
+                ))}
+              </div>
+            </section>
+          )
+        }
+        return null
+      })}
     </div>
   )
 }

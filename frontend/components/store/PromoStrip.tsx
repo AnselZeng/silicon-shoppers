@@ -1,22 +1,15 @@
 "use client"
 
+import { adContent, placementFor } from "@/lib/ads/placement"
 import { useStorefront } from "@/lib/store/storeState"
 
 export function PromoStrip() {
-  const variant = useStorefront((state) => state.layout.heroVariant)
-  const copy =
-    variant === "discount_banner"
-      ? "Private sale — up to 40% off selected pieces"
-      : variant === "new_drop_banner"
-        ? "New drop — the Winter Puffer is in"
-        : variant === "collection_banner"
-          ? "Essentials — the pieces that stay"
-          : "Complimentary shipping over $150"
+  const layout = useStorefront((state) => state.layout)
+  const id = placementFor(layout, "top_strip")?.adIds[0]
+  if (!id) return null
   return (
-    <div
-      className="bg-[#141414] px-6 py-2 text-center text-[10px] tracking-[0.22em] text-[#f6f3ee] uppercase"
-    >
-      {copy}
+    <div className="bg-[#141414] px-6 py-2 text-center text-[10px] tracking-[0.22em] text-[#f6f3ee] uppercase">
+      {adContent(layout, id).headline}
     </div>
   )
 }

@@ -14,6 +14,7 @@ import { PromoStrip } from "@/components/store/PromoStrip"
 import { QuickView } from "@/components/store/QuickView"
 import { VisaCheckout } from "@/components/store/VisaCheckout"
 import { WishlistDrawer } from "@/components/store/WishlistDrawer"
+import { capKey, placementFor } from "@/lib/ads/placement"
 import { isParentPayload, postSimMessage, readEnvelope } from "@/lib/sim/protocol"
 import { emitStoreEvent, resetEmitDedupe, takeScrollMark } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
@@ -28,7 +29,6 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const routerRef = useRef(router)
   const layout = useStorefront((state) => state.layout)
-  const popupDismissed = useStorefront((state) => state.popupDismissed)
   const sessionNonce = useStorefront((state) => state.sessionNonce)
 
   useEffect(() => {
@@ -39,16 +39,21 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
     emitStoreEvent("page_view", { path: pathname })
   }, [pathname])
 
+  const popup = placementFor(layout, "popup")
+  const popupAd = popup?.adIds[0]
+  const popupCapped = useStorefront((state) => (popupAd ? Boolean(state.adCaps[capKey("popup", popupAd)]) : true))
+
   useEffect(() => {
-    if (pathname !== "/store" || !layout.popupEnabled || popupDismissed) return
+    if (!popupAd || popupCapped) return
     const timer = window.setTimeout(() => {
       const state = useStorefront.getState()
-      if (!state.layout.popupEnabled || state.popupDismissed) return
+      if (state.adCaps[capKey("popup", popupAd)]) return
+      state.markAd(capKey("popup", popupAd), "shown")
       state.setPopupOpen(true)
-      emitStoreEvent("popup_shown", { variant: state.layout.popupVariant })
-    }, UI_CONFIG.popupDelayMs)
+      emitStoreEvent("popup_shown", { adId: popupAd })
+    }, popup?.triggerValue ?? UI_CONFIG.popupDelayMs)
     return () => window.clearTimeout(timer)
-  }, [pathname, layout.popupEnabled, popupDismissed, sessionNonce])
+  }, [popupAd, popupCapped, popup?.triggerValue, sessionNonce])
 
   useEffect(() => {
     const onScroll = () => {
@@ -78,7 +83,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
         return
       }
       if (payload.type === "set_layout") {
-        useStorefront.getState().setLayout(payload.layout, payload.presetName ?? null)
+        useStorefront.getState().setLayout(payload.layout, { model: payload.model, presetName: payload.presetName })
       }
     }
     window.addEventListener("message", onMessage)

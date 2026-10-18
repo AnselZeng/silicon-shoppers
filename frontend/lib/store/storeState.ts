@@ -3,6 +3,8 @@
 import { create } from "zustand"
 import { DEFAULT_LAYOUT, cloneLayout } from "@/lib/layout/presets"
 import type { LayoutConfig } from "@/lib/layout/types"
+import { validateLayout, type ValidationReport } from "@/lib/layout/validate"
+import type { ModelContext } from "@/lib/model/homepage"
 import type { MockCapture, MockSession } from "@/lib/visa/mock"
 
 export interface BagLine {
@@ -28,10 +30,12 @@ interface StorefrontState {
   layout: LayoutConfig
   layoutPresetName: string | null
   layoutToast: string | null
+  layoutReport: ValidationReport | null
+  /** Ads already shown or dismissed this session, keyed "slot:adId". Survives setLayout; cleared on reset. */
+  adCaps: Record<string, "shown" | "dismissed">
   bag: BagLine[]
   wishlist: WishlistItem[]
   popupOpen: boolean
-  popupDismissed: boolean
   quickViewId: string | null
   bagOpen: boolean
   wishlistOpen: boolean
@@ -43,7 +47,8 @@ interface StorefrontState {
   selectedColor: Record<string, string>
   selectedSize: Record<string, string>
   sessionNonce: number
-  setLayout: (layout: LayoutConfig, presetName?: string | null) => void
+  setLayout: (raw: unknown, options?: { model?: ModelContext | null; presetName?: string | null }) => void
+  markAd: (key: string, state: "shown" | "dismissed") => void
   dismissToast: () => void
   setPopupOpen: (open: boolean) => void
   dismissPopup: () => void
@@ -68,10 +73,11 @@ export const useStorefront = create<StorefrontState>((set) => ({
   layout: cloneLayout(DEFAULT_LAYOUT),
   layoutPresetName: null,
   layoutToast: null,
+  layoutReport: null,
+  adCaps: {},
   bag: [],
   wishlist: [],
   popupOpen: false,
-  popupDismissed: false,
   quickViewId: null,
   bagOpen: false,
   wishlistOpen: false,
@@ -83,17 +89,20 @@ export const useStorefront = create<StorefrontState>((set) => ({
   selectedColor: {},
   selectedSize: {},
   sessionNonce: 0,
-  setLayout: (layout, presetName) =>
+  setLayout: (raw, options = {}) => {
+    const { layout, report } = validateLayout(raw, { model: options.model })
+    const presetName = options.presetName ?? null
     set({
-      layout: cloneLayout(layout),
-      layoutPresetName: presetName ?? null,
+      layout,
+      layoutReport: report,
+      layoutPresetName: presetName,
       layoutToast: presetName ? `Layout personalized for: ${presetName}` : null,
-      popupOpen: false,
-      popupDismissed: !layout.popupEnabled,
-    }),
+    })
+  },
+  markAd: (key, state) => set((current) => ({ adCaps: { ...current.adCaps, [key]: state } })),
   dismissToast: () => set({ layoutToast: null }),
   setPopupOpen: (open) => set({ popupOpen: open }),
-  dismissPopup: () => set({ popupOpen: false, popupDismissed: true }),
+  dismissPopup: () => set({ popupOpen: false }),
   setQuickViewId: (id) => set({ quickViewId: id }),
   setBagOpen: (open) => set({ bagOpen: open }),
   setWishlistOpen: (open) => set({ wishlistOpen: open }),
@@ -147,10 +156,11 @@ export const useStorefront = create<StorefrontState>((set) => ({
       layout: cloneLayout(DEFAULT_LAYOUT),
       layoutPresetName: null,
       layoutToast: null,
+      layoutReport: null,
+      adCaps: {},
       bag: [],
       wishlist: [],
       popupOpen: false,
-      popupDismissed: false,
       quickViewId: null,
       bagOpen: false,
       wishlistOpen: false,

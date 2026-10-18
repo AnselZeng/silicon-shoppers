@@ -23,9 +23,9 @@ export function ProductCard({
   const colors = product.colors
   const resting = colorway ?? colors[0] ?? "black"
   const [hovered, setHovered] = useState<string | null>(null)
-  const preview = layout.colorMerchandising === "hover_preview"
+  const preview = layout.listing.colorMerchandising === "hover_preview"
   const color = preview && hovered ? hovered : resting
-  const showSwatches = layout.colorMerchandising === "swatches" && colors.length > 1
+  const showSwatches = layout.listing.colorMerchandising === "swatches" && colors.length > 1
 
   return (
     <article className="group relative">
@@ -41,7 +41,7 @@ export function ProductCard({
           {onSale ? (
             <span
               className={
-                layout.showSaleBadgesProminently
+                layout.listing.card.priceStyle === "sale_emphasis"
                   ? "absolute top-3 left-3 bg-[#9f2d2d] px-2 py-1 text-[11px] font-semibold tracking-[0.16em] text-white uppercase"
                   : "absolute top-3 left-3 text-[10px] tracking-[0.2em] text-[#9f2d2d] uppercase"
               }
@@ -70,7 +70,7 @@ export function ProductCard({
           <p className="shrink-0 text-[13px] tabular-nums">
             {onSale ? (
               <>
-                <span className={layout.showSaleBadgesProminently ? "font-semibold text-[#9f2d2d]" : "text-[#9f2d2d]"}>
+                <span className={layout.listing.card.priceStyle === "sale_emphasis" ? "font-semibold text-[#9f2d2d]" : "text-[#9f2d2d]"}>
                   {formatMoney(price)}
                 </span>{" "}
                 <span className="text-neutral-400 line-through">{formatMoney(product.price)}</span>
@@ -81,7 +81,7 @@ export function ProductCard({
           </p>
         </div>
         <p className="mt-1 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
-          {layout.colorMerchandising === "split_colors" ? `${resting} · ` : ""}
+          {layout.listing.colorMerchandising === "split_colors" ? `${resting} · ` : ""}
           {product.collection}
         </p>
         {showSwatches ? (
@@ -116,7 +116,7 @@ export function ProductCard({
           openQuick(product.id)
         }}
         className={
-          layout.quickViewEmphasis
+          layout.listing.card.quickView === "emphasized"
             ? "absolute bottom-16 left-3 z-10 bg-black px-3 py-1.5 text-[10px] tracking-[0.18em] text-white uppercase"
             : "absolute bottom-16 left-3 z-10 bg-white/90 px-3 py-1.5 text-[10px] tracking-[0.18em] uppercase opacity-0 transition group-hover:opacity-100"
         }
