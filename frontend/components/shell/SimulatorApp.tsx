@@ -1,12 +1,17 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { UI_CONFIG } from "@/config/ui"
 import { DemoScreen } from "@/components/shell/DemoScreen"
 import { PersonaPanel } from "@/components/shell/PersonaPanel"
+import { Splitter, useStoredSize } from "@/components/shell/Splitter"
 import { runner } from "@/lib/sim/runner"
 
+const LEFT = { initial: 35, min: 20, max: 60 }
+
 export function SimulatorApp() {
+  const shellRef = useRef<HTMLDivElement>(null)
+  const [leftPct, setLeftPct] = useStoredSize("shell.leftPct", LEFT.initial)
   useEffect(() => {
     const onMessage = (event: MessageEvent) => runner.handleMessage(event)
     window.addEventListener("message", onMessage)
@@ -28,11 +33,22 @@ export function SimulatorApp() {
           </a>
         </div>
       </div>
-      <div className="dark hidden h-screen min-w-[1280px] bg-[#0c0c0d] text-white min-[1280px]:flex">
-        <div className="h-full w-[35%] min-w-0 overflow-hidden border-r border-white/10">
+      <div ref={shellRef} className="dark hidden h-screen min-w-[1280px] bg-[#0c0c0d] text-white min-[1280px]:flex">
+        <div className="h-full min-w-0 shrink-0 overflow-hidden" style={{ width: `${leftPct}%` }}>
           <PersonaPanel />
         </div>
-        <div className="h-full w-[65%] min-w-0">
+        <Splitter
+          axis="x"
+          label="Resize the left panel"
+          size={leftPct}
+          min={LEFT.min}
+          max={LEFT.max}
+          initial={LEFT.initial}
+          step={2}
+          unitPerPx={() => 100 / (shellRef.current?.clientWidth || 1)}
+          onChange={setLeftPct}
+        />
+        <div className="h-full min-w-0 flex-1">
           <DemoScreen />
         </div>
       </div>

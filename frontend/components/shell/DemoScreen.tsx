@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { UI_CONFIG } from "@/config/ui"
 import { BrowserChrome } from "@/components/shell/BrowserChrome"
 import { PipelineLog } from "@/components/shell/PipelineLog"
+import { Splitter, useStoredSize } from "@/components/shell/Splitter"
 import { useSimStore, type ViewportChoice } from "@/lib/state/simStore"
 
 const VIEWS: { id: ViewportChoice; label: string }[] = [
@@ -13,6 +14,10 @@ const VIEWS: { id: ViewportChoice; label: string }[] = [
 ]
 
 const PHONE = { width: 402, height: 844 }
+/** Pipeline log height in px; the screen above keeps at least SCREEN_MIN px. */
+// Below `full` it snaps to `collapsed`, a strip with just the tabs.
+const LOG = { initial: 220, full: 180, collapsed: 48 }
+const SCREEN_MIN = 240
 const TABLET = { width: 820, height: 1180 }
 
 export function DemoScreen() {
@@ -22,6 +27,18 @@ export function DemoScreen() {
   const frameRef = useRef<HTMLIFrameElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
+  const columnRef = useRef<HTMLDivElement>(null)
+  const [columnHeight, setColumnHeight] = useState(0)
+  const [logPx, setLogPx] = useStoredSize("shell.logPx", LOG.initial)
+  // Until the column is measured, don't cap the stored height.
+  const logMax = columnHeight ? Math.max(LOG.full, columnHeight - SCREEN_MIN) : Math.max(LOG.full, logPx)
+  const logHeight = Math.min(logPx, logMax)
+  const logCollapsed = logHeight < LOG.full
+  /** Snap: past halfway between collapsed and full it closes to the tabs strip, otherwise it stays full height. */
+  const resizeLog = (next: number) => {
+    if (next >= LOG.full) setLogPx(next)
+    else setLogPx(next < (LOG.full + LOG.collapsed) / 2 ? LOG.collapsed : LOG.full)
+  }
   const web = UI_CONFIG.demoViewports.web
   const frame = viewport === "web" ? web : viewport === "tablet" ? TABLET : PHONE
 
@@ -46,8 +63,16 @@ export function DemoScreen() {
     return () => observer.disconnect()
   }, [frame.width, frame.height])
 
+  useEffect(() => {
+    const column = columnRef.current
+    if (!column) return
+    const observer = new ResizeObserver(() => setColumnHeight(column.clientHeight))
+    observer.observe(column)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <div className="flex h-full flex-col bg-[#141416]">
+    <div ref={columnRef} className="flex h-full flex-col bg-[#141416]">
       <div className="flex items-center gap-2 px-4 py-2 text-[11px] text-white/70">
         <span className="tracking-[0.16em] uppercase">Screen</span>
         {VIEWS.map((view) => (
@@ -107,8 +132,19 @@ export function DemoScreen() {
           </div>
         )}
       </div>
-      <div className="h-[220px] shrink-0 overflow-hidden border-t border-white/10">
-        <PipelineLog />
+      <Splitter
+        axis="y"
+        label="Resize the pipeline log"
+        size={logHeight}
+        min={LOG.collapsed}
+        max={logMax}
+        initial={LOG.initial}
+        step={20}
+        invert
+        onChange={resizeLog}
+      />
+      <div className="shrink-0 overflow-hidden" style={{ height: logHeight }}>
+        <PipelineLog compact={logCollapsed} onExpand={() => setLogPx(LOG.initial)} />
       </div>
     </div>
   )
