@@ -37,7 +37,7 @@ export function Terminal() {
           setDraft("")
         }}
       >
-        <span className="px-2 py-1 text-white/40">atelier $</span>
+        <span className="px-2 py-1 text-white/40">socal $</span>
         <input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}

@@ -23,7 +23,7 @@ export function emitStoreEvent(
   const event = {
     type,
     timestamp: Date.now(),
-    route: window.location.pathname,
+    route: window.location.pathname + window.location.search,
     properties,
   }
   const key = `${type}:${JSON.stringify(properties)}`

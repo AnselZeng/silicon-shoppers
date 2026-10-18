@@ -1,4 +1,4 @@
-# ATELIER NINE Shopper Profiles: dataset v1
+# SOCAL ATELIER Shopper Profiles: dataset v1
 
 Frozen 2026-10-04
 

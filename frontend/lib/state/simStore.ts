@@ -21,6 +21,9 @@ interface SimState {
   llmPending: boolean
   /** What the LLM has written so far on the current Run, as it streams in. */
   llmText: string
+  /** Fake browser chrome: the store iframe has a page behind or ahead of this one. */
+  canBack: boolean
+  canForward: boolean
   setRoute: (route: string) => void
   setViewport: (viewport: ViewportChoice) => void
   setLayoutPreview: (preview: string) => void
@@ -31,6 +34,7 @@ interface SimState {
   noteLive: () => void
   setLlmPending: (pending: boolean) => void
   setLlmText: (text: string) => void
+  setHistory: (canBack: boolean, canForward: boolean) => void
 }
 
 export const useSimStore = create<SimState>((set) => ({
@@ -44,6 +48,8 @@ export const useSimStore = create<SimState>((set) => ({
   liveRevision: 0,
   llmPending: false,
   llmText: "",
+  canBack: false,
+  canForward: false,
   setRoute: (route) => set({ route }),
   setViewport: (viewport) => set({ viewport }),
   setLayoutPreview: (layoutPreview) => set({ layoutPreview }),
@@ -54,4 +60,5 @@ export const useSimStore = create<SimState>((set) => ({
   noteLive: () => set((state) => ({ liveRevision: state.liveRevision + 1 })),
   setLlmPending: (llmPending) => set({ llmPending }),
   setLlmText: (llmText) => set({ llmText }),
+  setHistory: (canBack, canForward) => set({ canBack, canForward }),
 }))

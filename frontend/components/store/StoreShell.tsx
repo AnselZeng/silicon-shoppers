@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { AdSlot } from "@/components/store/ads/AdSlot"
 import { IntrusiveAds } from "@/components/store/ads/IntrusiveAds"
@@ -27,10 +27,37 @@ function publishReady() {
   postToShell({ type: "store_ready" })
 }
 
+const HISTORY_KEY = "atelier_frame_history"
+
+type FrameHistory = { entries: string[]; index: number }
+
+function framePath(pathname: string, search: string): string {
+  return search ? `${pathname}?${search}` : pathname
+}
+
+function readFrameHistory(path: string): FrameHistory {
+  const fresh = { entries: [path], index: 0 }
+  const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined
+  if (nav?.type !== "reload") return fresh
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(HISTORY_KEY) ?? "") as FrameHistory
+    if (Array.isArray(saved.entries) && saved.entries[saved.index] === path) return saved
+  } catch {
+    /* a new visit starts at this page */
+  }
+  return fresh
+}
+
 export function StoreShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const search = useSearchParams().toString()
+  const path = framePath(pathname, search)
   const router = useRouter()
   const routerRef = useRef(router)
+  const historyRef = useRef<FrameHistory>({ entries: [], index: 0 })
+  const popped = useRef(false)
+  /** Set before router.back/forward. Next updates the path without a popstate we can rely on. */
+  const move = useRef<"back" | "forward" | null>(null)
 
   useEffect(() => {
     routerRef.current = router
@@ -41,9 +68,46 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    emitStoreEvent("page_view", { path: pathname })
+    const onPop = () => {
+      popped.current = true
+    }
+    window.addEventListener("popstate", onPop)
+    return () => window.removeEventListener("popstate", onPop)
+  }, [])
+
+  useEffect(() => {
+    emitStoreEvent("page_view", { path })
     useStorefront.getState().notePage(pathname)
-  }, [pathname])
+    const hist = historyRef.current
+    const goingBack = move.current === "back" || (popped.current && path === hist.entries[hist.index - 1])
+    const goingForward = move.current === "forward" || (popped.current && path === hist.entries[hist.index + 1])
+    if (hist.entries.length === 0) {
+      historyRef.current = readFrameHistory(path)
+    } else if (goingBack && path === hist.entries[hist.index - 1]) {
+      hist.index -= 1
+    } else if (goingForward && path === hist.entries[hist.index + 1]) {
+      hist.index += 1
+    } else if (hist.entries[hist.index] !== path) {
+      const entries = hist.entries.slice(0, hist.index + 1)
+      entries.push(path)
+      hist.entries = entries
+      hist.index = entries.length - 1
+    }
+    popped.current = false
+    move.current = null
+    const current = historyRef.current
+    try {
+      sessionStorage.setItem(HISTORY_KEY, JSON.stringify(current))
+    } catch {
+      /* private mode: the arrows still work until a reload */
+    }
+    postToShell({
+      type: "history_state",
+      canBack: current.index > 0,
+      canForward: current.index < current.entries.length - 1,
+      path,
+    })
+  }, [path, pathname])
 
   useEffect(() => {
     const onScroll = () => {
@@ -71,6 +135,22 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
         useStorefront.getState().resetStorefront()
         routerRef.current.push("/store")
         window.setTimeout(publishReady, 140)
+        return
+      }
+      if (payload.type === "history") {
+        if (payload.action === "reload") {
+          window.location.reload()
+          return
+        }
+        const hist = historyRef.current
+        if (payload.action === "back" && hist.index > 0) {
+          move.current = "back"
+          routerRef.current.back()
+        }
+        if (payload.action === "forward" && hist.index < hist.entries.length - 1) {
+          move.current = "forward"
+          routerRef.current.forward()
+        }
         return
       }
       if (payload.type === "set_layout") {

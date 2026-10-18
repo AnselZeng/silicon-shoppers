@@ -1,4 +1,4 @@
-# ATELIER NINE Compact Shopper Profile Dataset, v1 (frozen 2026-10-04)
+# SOCAL ATELIER Compact Shopper Profile Dataset, v1 (frozen 2026-10-04)
 
 ## Source and license
 H&M Personalized Fashion Recommendations (Kaggle). Non-commercial academic use; no redistribution of

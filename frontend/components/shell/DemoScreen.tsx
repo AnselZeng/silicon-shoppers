@@ -15,9 +15,9 @@ const VIEWS: { id: ViewportChoice; label: string }[] = [
 
 const PHONE = { width: 402, height: 844 }
 /** Pipeline log height in px; the screen above keeps at least SCREEN_MIN px. */
-// `full` is the smallest height where the terminal still shows one log line (header, tabs, one
-// line, command input). Below it the log snaps to `collapsed`, a strip with just the tabs.
-const LOG = { initial: 220, full: 153, collapsed: 48 }
+// `full` is the smallest height where the terminal still shows one log line (tabs, one line,
+// command input). Below it the log snaps to `collapsed`, a strip with just the tabs.
+const LOG = { initial: 220, full: 128, collapsed: 48 }
 const SCREEN_MIN = 240
 const TABLET = { width: 820, height: 1180 }
 
@@ -101,7 +101,7 @@ export function DemoScreen() {
               style={{ width: web.width, height: web.height, transform: `scale(${scale})` }}
             >
               <BrowserChrome mode="web" />
-              <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full flex-1 bg-white" />
+              <iframe ref={frameRef} title="SOCAL ATELIER" src="/store" className="min-h-0 w-full flex-1 bg-white" />
             </div>
           </div>
         ) : viewport === "tablet" ? (
@@ -112,7 +112,7 @@ export function DemoScreen() {
             >
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.25rem] bg-white">
                 <BrowserChrome mode="tablet" />
-                <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full min-w-0 flex-1 bg-white" />
+                <iframe ref={frameRef} title="SOCAL ATELIER" src="/store" className="min-h-0 w-full min-w-0 flex-1 bg-white" />
                 <div className="flex h-5 shrink-0 items-center justify-center bg-[#f4f1ea]">
                   <span className="h-1 w-28 rounded-full bg-neutral-900/80" />
                 </div>
@@ -127,7 +127,7 @@ export function DemoScreen() {
             >
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[2rem] bg-white">
                 <BrowserChrome mode="mobile" />
-                <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full min-w-0 flex-1 bg-white" />
+                <iframe ref={frameRef} title="SOCAL ATELIER" src="/store" className="min-h-0 w-full min-w-0 flex-1 bg-white" />
                 <div className="flex h-5 shrink-0 items-center justify-center bg-[#f4f1ea]">
                   <span className="h-1 w-28 rounded-full bg-neutral-900/80" />
                 </div>
@@ -138,7 +138,7 @@ export function DemoScreen() {
       </div>
       <Splitter
         axis="y"
-        label="Resize the pipeline log"
+        label="Resize the log"
         size={logHeight}
         min={LOG.collapsed}
         max={logMax}

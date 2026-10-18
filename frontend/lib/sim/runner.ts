@@ -15,9 +15,7 @@ import {
   type StoreEvent,
 } from "@/lib/sim/protocol"
 import { describeStoreEvent } from "@/lib/sim/tracker"
-import { withSpan } from "@/lib/sentry/helpers"
 import { useLogStore } from "@/lib/state/logStore"
-import { useObsStore } from "@/lib/state/obsStore"
 import { useSimStore } from "@/lib/state/simStore"
 
 /** Parent side of the iframe: pushes layouts into the store and logs what the shopper does there. */
@@ -58,6 +56,11 @@ class ShellRunner {
       this.settle()
       return
     }
+    if (payload.type === "history_state") {
+      useSimStore.getState().setHistory(payload.canBack, payload.canForward)
+      useSimStore.getState().setRoute(payload.path)
+      return
+    }
     this.onStoreEvent(payload.event)
   }
 
@@ -93,7 +96,6 @@ class ShellRunner {
       if (preview.report.fellBack) logs.push("layout", `validator fell back: ${preview.report.error ?? "invalid"}`)
       for (const change of preview.report.changes) logs.push("layout", `fixed · ${change}`)
     }
-    withSpan("layout.apply", () => preview.id)
     this.send({
       type: "set_layout",
       layout: preview.layout,
@@ -134,20 +136,12 @@ class ShellRunner {
   private onStoreEvent(event: StoreEvent) {
     const logs = useLogStore.getState()
     logs.push("tracker", describeStoreEvent(event))
-    useObsStore.getState().addCrumb(event.type, describeStoreEvent(event))
     if (event.type === "page_view") useSimStore.getState().setRoute(event.route)
     if (event.type === "checkout_started") {
       logs.push("visa", `session ${String(event.properties.sessionId)} · $${String(event.properties.amount)}`)
-      useObsStore.getState().note(`visa.session ${String(event.properties.sessionId)}`)
-      withSpan("visa.session", () => event.properties.sessionId ?? "", {
-        amount: Number(event.properties.amount ?? 0),
-      })
     }
     if (event.type === "payment_completed") {
       logs.push("visa", `captured ${String(event.properties.orderId)}`)
-      withSpan("visa.capture", () => String(event.properties.orderId ?? ""), {
-        amount: Number(event.properties.amount ?? 0),
-      })
     }
     if (event.type === "loyalty_awarded") {
       logs.push("visa", `loyalty ${String(event.properties.points)} pts`)
@@ -177,7 +171,6 @@ class ShellRunner {
       `${doc.demo_id ?? doc.user_id ?? "shopper"} · ${doc.evidence?.add_to_bags ?? 0} add-to-bags · ${doc.store_products?.length ?? 0} ranked products`,
     )
     logs.push("llm", sentence.trim() ? `asking the LLM · shopper said "${sentence.trim()}"` : "asking the LLM")
-    const span = useObsStore.getState().startSpan("llm.layout", { label })
     this.llmGeneration = generation
     useSimStore.getState().setLlmPending(true)
     useSimStore.getState().setLlmText("")
@@ -192,14 +185,10 @@ class ShellRunner {
       useSimStore.getState().setLlmText(text)
     })
     if (this.llmGeneration === generation) useSimStore.getState().setLlmPending(false)
-    if (generation !== this.generation) {
-      useObsStore.getState().endSpan(span, "ok")
-      return
-    }
+    if (generation !== this.generation) return
     let result = reply.ok ? llmStage(reply.layout, model) : null
     let builtBy: BuiltBy
     if (reply.ok && result && !result.report.fellBack) {
-      useObsStore.getState().endSpan(span, "ok")
       builtBy = { kind: "llm", model: reply.model, cached: reply.cached, ms: reply.ms, text: reply.text }
       logs.push(
         "llm",
@@ -207,8 +196,6 @@ class ShellRunner {
       )
     } else {
       const error = reply.ok ? `layout failed validation: ${result?.report.error ?? "invalid"}` : reply.error
-      useObsStore.getState().endSpan(span, "error")
-      useObsStore.getState().note(`llm.layout error · ${error}`)
       console.error("LLM layout failed, using the model's rules", error)
       logs.push("llm", `error · ${error}`)
       logs.push("llm", "falling back to the model's rules")
@@ -229,7 +216,6 @@ class ShellRunner {
     logs.push("layout", `${label} · nav ${result.layout.nav.order.join(" ")} · ${result.layout.home.blocks.length} blocks`)
     if (result.report.fellBack) logs.push("layout", `validator fell back: ${result.report.error ?? "invalid"}`)
     for (const change of result.report.changes) logs.push("layout", `fixed · ${change}`)
-    withSpan("layout.apply", () => id)
     const settled = this.waitForSettle()
     this.send({
       type: "set_layout",
@@ -281,7 +267,6 @@ class ShellRunner {
 
   reset() {
     useLogStore.getState().clear()
-    useObsStore.getState().clear()
     this.send({ type: "reset" })
     useLogStore.getState().push("sim", "session cleared")
   }

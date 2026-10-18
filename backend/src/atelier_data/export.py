@@ -263,7 +263,7 @@ def data_card(cfg):
     per = cfg["cohort"]["per_stratum"]
     st = pf["strata"]
     lines = [
-        "# ATELIER NINE Compact Shopper Profile Dataset, v1 (frozen 2026-10-04)", "",
+        "# SOCAL ATELIER Compact Shopper Profile Dataset, v1 (frozen 2026-10-04)", "",
         "## Source and license",
         "H&M Personalized Fashion Recommendations (Kaggle). Non-commercial academic use; no redistribution of",
         "competition data. This build releases only aggregate reports; row-level files are private.", "",
