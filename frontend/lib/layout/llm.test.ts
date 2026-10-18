@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest"
 import { adContent, intrusiveCount, placementFor, tilePositions } from "@/lib/ads/placement"
 import { resolveHome } from "@/lib/layout/home"
-import { llmStage, modelStage, withModelData } from "@/lib/layout/pipeline"
+import { llmStage, withModelData } from "@/lib/layout/pipeline"
+import { DEFAULT_LAYOUT } from "@/lib/layout/presets"
+import type { LayoutConfig } from "@/lib/layout/types"
 import { LlmLayoutSchema } from "@/lib/layout/schema"
 import { fixtureLlm, fixtureModel } from "@/lib/testing/fixtures"
 
@@ -53,9 +55,43 @@ describe("hand-written LLM output through the pipeline", () => {
     }
   })
 
-  test("the LLM layout differs from the model layout it builds on", () => {
-    const model = fixtureModel("fixture-women-new")
-    expect(llmStage(fixtureLlm("fixture-women-new"), model).layout).not.toEqual(modelStage(model).layout)
+  test("a menswear-heavy profile shows Men first and lands collection links in menswear", () => {
+    const { layout } = llmStage(fixtureLlm("fixture-men-sale"), fixtureModel("fixture-men-sale"))
+    expect(layout.nav.order[0]).toBe("men")
+    expect(layout.nav.department).toBe("men")
+  })
+})
+
+function rows(layout: LayoutConfig) {
+  return resolveHome(layout).flatMap((entry) => ("products" in entry ? [entry] : []))
+}
+
+describe("two contrasting fixtures", () => {
+  const men = llmStage(fixtureLlm("fixture-men-sale"), fixtureModel("fixture-men-sale")).layout
+  const women = llmStage(fixtureLlm("fixture-women-new"), fixtureModel("fixture-women-new")).layout
+
+  test("produce different nav order, home blocks and products", () => {
+    expect(men.nav.order).not.toEqual(women.nav.order)
+    expect(JSON.stringify(men.home.blocks)).not.toEqual(JSON.stringify(women.home.blocks))
+    const menProducts = rows(men).flatMap((r) => r.products.map((p) => p.id))
+    const womenProducts = rows(women).flatMap((r) => r.products.map((p) => p.id))
+    const overlap = menProducts.filter((id) => womenProducts.includes(id))
+    expect(overlap.length).toBeLessThan(Math.min(menProducts.length, womenProducts.length) / 4)
+    expect(rows(men)[0]?.products.map((p) => p.id)).not.toEqual(rows(women)[0]?.products.map((p) => p.id))
+  })
+
+  test("both differ from the house default", () => {
+    expect(men).not.toEqual(DEFAULT_LAYOUT)
+    expect(women).not.toEqual(DEFAULT_LAYOUT)
+  })
+
+  test("department rows only show the shopper's department; buy_again shows the basket", () => {
+    const basket = fixtureModel("fixture-men-sale").basketIds
+    for (const entry of rows(men)) {
+      const kind = entry.block.source.kind
+      if (kind === "buy_again") expect(entry.products.every((p) => basket.includes(p.id))).toBe(true)
+      else if (kind !== "for_you") expect(entry.products.every((p) => p.department === "men"), kind).toBe(true)
+    }
   })
 })
 

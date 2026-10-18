@@ -1,6 +1,7 @@
 "use client"
 
 import { PERSONA_ACCENTS } from "@/config/ui"
+import { ModelOutput } from "@/components/shell/ModelOutput"
 import { TraitEditor } from "@/components/shell/TraitEditor"
 import { intrusiveCount } from "@/lib/ads/placement"
 import { previewId } from "@/lib/layout/preview"
@@ -25,7 +26,7 @@ export function PersonaPanel() {
         <div>
           <p className="text-[10px] tracking-[0.22em] text-white/40 uppercase">Silicon Shoppers</p>
           <h1 className="text-sm font-medium">Layout preview</h1>
-          <p className="text-[10px] text-white/40">Default, then the model layout, then the LLM layout</p>
+          <p className="text-[10px] text-white/40">Model output is JSON for the LLM; only the LLM layout changes the store</p>
         </div>
       </div>
       <div className="px-4 pb-2">
@@ -70,7 +71,9 @@ export function PersonaPanel() {
             </div>
           ))}
         </div>
-        {preview ? (
+        {preview?.stage === "model" && preview.doc ? (
+          <ModelOutput doc={preview.doc} basket={preview.basket} />
+        ) : preview ? (
           <div className="mt-3">
             <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">
               {preview.label} · {intrusiveCount(preview.layout)} intrusive ads

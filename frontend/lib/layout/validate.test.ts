@@ -5,8 +5,8 @@ import { LlmLayoutSchema } from "@/lib/layout/schema"
 import type { LayoutConfig } from "@/lib/layout/types"
 import { validateLayout } from "@/lib/layout/validate"
 import { resolveHome } from "@/lib/layout/home"
-import { llmStage, modelStage } from "@/lib/layout/pipeline"
-import { modelLayout } from "@/lib/model/adapter"
+import { llmStage, withModelData } from "@/lib/layout/pipeline"
+import type { ModelContext } from "@/lib/model/homepage"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { sortProducts } from "@/lib/store/sorting"
 import { CATEGORIES } from "@/lib/store/types"
@@ -217,7 +217,9 @@ describe("validator without model output", () => {
 
 describe("validator with model output", () => {
   const model = fixtureModel("fixture-men-sale")
-  const modelBase = () => modelLayout(model.doc, model.basketIds)
+  /** The house default with the model's product data copied in, as code does for LLM output. */
+  const withData = (ctx: ModelContext) => withModelData(cloneLayout(DEFAULT_LAYOUT), ctx) as LayoutConfig
+  const modelBase = () => withData(model)
 
   test("keeps the model's section rows in section_order, other blocks stay put", () => {
     const cfg = modelBase()
@@ -236,7 +238,7 @@ describe("validator with model output", () => {
 
   test("category tiles and the category filter follow category_order", () => {
     const women = fixtureModel("fixture-women-new")
-    const cfg = modelLayout(women.doc, women.basketIds)
+    const cfg = withData(women)
     cfg.listing.categoryOrder = [...CATEGORIES].reverse()
     cfg.home.blocks = [{ type: "hero" }, { type: "category_tiles", categories: ["coats", "jeans", "dresses", "shirts"] }, { type: "product_row", source: { kind: "new_in" }, limit: 8 }]
     const { layout } = validateLayout(cfg, { model: women })
@@ -247,7 +249,7 @@ describe("validator with model output", () => {
 
   test("the newsletter is removed unless the model's popups is on; other popups are the LLM's choice", () => {
     const cfg = modelBase()
-    cfg.ads.placements.push({ slot: "popup", adIds: ["newsletter"], trigger: "delay", triggerValue: 1000 })
+    expect(cfg.ads.placements.find((p) => p.slot === "popup")?.adIds).toEqual(["newsletter"])
     expect(validateLayout(cfg, { model }).layout.ads.placements.some((p) => p.slot === "popup")).toBe(false)
 
     const on = structuredClone(model)
@@ -255,12 +257,14 @@ describe("validator with model output", () => {
     expect(validateLayout(cfg, { model: on }).layout.ads.placements.find((p) => p.slot === "popup")?.adIds).toEqual(["newsletter"])
 
     const offer = modelBase()
+    offer.ads.placements = offer.ads.placements.filter((p) => p.slot !== "popup")
     offer.ads.placements.push({ slot: "popup", adIds: ["offer_men"], trigger: "exit_intent" })
     expect(validateLayout(offer, { model }).layout.ads.placements.find((p) => p.slot === "popup")?.adIds).toEqual(["offer_men"])
   })
 
   test("fills an empty hero from the model's hero decision", () => {
     const cfg = modelBase()
+    cfg.nav.department = "men"
     cfg.ads.placements = cfg.ads.placements.filter((p) => p.slot !== "hero")
     expect(validateLayout(cfg, { model }).layout.ads.placements.find((p) => p.slot === "hero")?.adIds).toEqual(["sale_men"])
   })
@@ -277,10 +281,10 @@ describe("validator with model output", () => {
     expect(layout.reasons[0]?.text).toBe(model.doc.layout.landing_department.reason)
   })
 
-  test("a broken LLM config falls back to the model layout", () => {
+  test("a broken LLM config falls back to the house default, untouched by the model", () => {
     const { layout, report } = llmStage({ version: 2, nav: { order: "men" } }, model)
     expect(report.fellBack).toBe(true)
-    expect(layout).toEqual(modelStage(model).layout)
+    expect(layout).toEqual(DEFAULT_LAYOUT)
   })
 
   test("removes products repeated across rows, rows filled top to bottom", () => {
@@ -302,7 +306,11 @@ describe("validator with model output", () => {
 
   test("department filtering applies to every source except for_you and buy_again", () => {
     const cfg = modelBase()
-    cfg.home.blocks.push({ type: "product_row", source: { kind: "under_price", max: 100 }, limit: 8 })
+    cfg.nav.department = "men"
+    cfg.home.blocks.push(
+      { type: "product_row", source: { kind: "for_you" }, limit: 8 },
+      { type: "product_row", source: { kind: "under_price", max: 100 }, limit: 8 },
+    )
     const { layout } = validateLayout(cfg, { model })
     for (const entry of resolveHome(layout)) {
       if (!("products" in entry)) continue

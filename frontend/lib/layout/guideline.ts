@@ -96,7 +96,8 @@ shopper's basket) are copied into your layout by code after you answer.
    (Tested / Estimated / Assumed / Based on your settings), a \`validated\` flag and a reason;
    \`predicted_mix\` (predicted shares by H&M category group, department and section);
    \`evidence.add_to_bags\` (how many add-to-bags the prediction rests on).
-2. **The model layout**: the layout code already built from those decisions. Start from it.
+2. **The house default layout**: the store everyone gets. You turn the model's output into this
+   shopper's layout; code doesn't build one from the model on its own.
 3. **This guideline.**
 
 H&M departments map to the store's: Ladieswear and Divided → women, Menswear → men. Sport and

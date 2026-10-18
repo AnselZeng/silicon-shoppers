@@ -1,9 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { resolveHome } from "@/lib/layout/home"
-import { modelStage } from "@/lib/layout/pipeline"
-import type { LayoutConfig } from "@/lib/layout/types"
-import { validateLayout } from "@/lib/layout/validate"
-import { forYouIds, modelLayout, rankCatalog } from "@/lib/model/adapter"
+import { forYouIds, rankCatalog } from "@/lib/model/adapter"
 import type { HMDepartment, HomepageDoc } from "@/lib/model/homepage"
 import { APP_TO_HM_CATEGORY, HM_TO_APP_CATEGORIES, HM_TO_APP_COLOR, HM_TO_APP_DEPARTMENT } from "@/lib/model/mapping"
 import { heroAdFor, modelCategoryOrder, modelDepartment } from "@/lib/model/policy"
@@ -25,7 +21,6 @@ describe("H&M -> store mapping (ported from the backend)", () => {
     expect(modelDepartment(doc)).toBe("women")
     expect(modelDepartment(withDept(doc, "dept_sport"))).toBeNull()
     expect(modelDepartment(withDept(doc, "dept_baby_children"))).toBeNull()
-    expect(modelLayout(withDept(doc, "dept_sport")).nav.department).toBeNull()
   })
 
   test("every store category maps to exactly one H&M group and back", () => {
@@ -80,20 +75,10 @@ describe("fixtures follow build_docs", () => {
   })
 })
 
-describe("model layout", () => {
-  test.each(IDS)("%s passes the validator unchanged", (id) => {
-    const model = fixtureModel(id)
-    const { layout, report } = modelStage(model)
-    expect(report.fellBack).toBe(false)
-    expect(report.changes).toEqual([])
-    expect(validateLayout(layout, { model }).report.changes).toEqual([])
-  })
-
+describe("For You data copied from the model", () => {
   test("for_you comes from store_products, without basket items", () => {
     const model = fixtureModel("fixture-men-sale")
-    const layout = modelLayout(model.doc, model.basketIds)
-    expect(layout.home.forYouIds).toEqual(model.doc.store_products?.map((p) => p.product_id))
-    expect(layout.home.basketIds).toEqual(model.basketIds)
+    expect(forYouIds(model.doc, model.basketIds)).toEqual(model.doc.store_products?.map((p) => p.product_id))
   })
 
   test("without store_products, rankCatalog fills for_you", () => {
@@ -103,64 +88,5 @@ describe("model layout", () => {
     expect(ids).toHaveLength(24)
     expect(ids.some((id) => model.basketIds.includes(id))).toBe(false)
     expect(rankCatalog(PRODUCTS, doc)[0]?.department).toBe("men")
-  })
-
-  test("reasons are the model's own strings and class labels", () => {
-    const { doc } = fixtureModel("fixture-low-evidence")
-    const { layout } = modelStage(fixtureModel("fixture-low-evidence"))
-    const department = layout.reasons.find((r) => r.field === "nav.department")
-    expect(department).toMatchObject({ source: "model", text: doc.layout.landing_department.reason, class: "Tested" })
-    expect(layout.reasons.every((r) => r.source === "model")).toBe(true)
-  })
-
-  test("a menswear-heavy profile shows Men first and lands collection links in menswear", () => {
-    const { layout } = modelStage(fixtureModel("fixture-men-sale"))
-    expect(layout.nav.order[0]).toBe("men")
-    expect(layout.nav.department).toBe("men")
-    expect(layout.ads.placements.find((p) => p.slot === "hero")?.adIds).toEqual(["sale_men"])
-  })
-})
-
-function rows(layout: LayoutConfig) {
-  return resolveHome(layout).flatMap((entry) => ("products" in entry ? [entry] : []))
-}
-
-describe("two contrasting fixtures", () => {
-  const men = modelStage(fixtureModel("fixture-men-sale")).layout
-  const women = modelStage(fixtureModel("fixture-women-new")).layout
-
-  test("produce different nav order, home blocks and products", () => {
-    expect(men.nav.order).not.toEqual(women.nav.order)
-    expect(JSON.stringify(men.home.blocks)).not.toEqual(JSON.stringify(women.home.blocks))
-    const menProducts = rows(men).flatMap((r) => r.products.map((p) => p.id))
-    const womenProducts = rows(women).flatMap((r) => r.products.map((p) => p.id))
-    const overlap = menProducts.filter((id) => womenProducts.includes(id))
-    expect(overlap.length).toBeLessThan(Math.min(menProducts.length, womenProducts.length) / 4)
-    const menTop = rows(men)[0]?.products.slice(0, 8).map((p) => p.id)
-    const womenTop = rows(women)[0]?.products.slice(0, 8).map((p) => p.id)
-    expect(menTop).not.toEqual(womenTop)
-  })
-
-  test("keep the model's section rows in the model's order, with no product repeated", () => {
-    for (const [id, layout] of [["fixture-men-sale", men], ["fixture-women-new", women]] as const) {
-      const order = fixtureModel(id).doc.layout.section_order.value
-      const sections = layout.home.blocks.flatMap((b) =>
-        b.type === "product_row" && b.source.kind !== "for_you" ? [b.source.kind] : [],
-      )
-      expect(sections).toEqual(order.filter((s) => sections.includes(s)))
-      const shown = rows(layout).flatMap((r) => r.products.map((p) => p.id))
-      expect(new Set(shown).size).toBe(shown.length)
-    }
-  })
-
-  test("department rows only show the shopper's department; buy_again shows the basket", () => {
-    for (const entry of rows(men)) {
-      const kind = entry.block.source.kind
-      if (kind === "buy_again") {
-        expect(entry.products.every((p) => fixtureModel("fixture-men-sale").basketIds.includes(p.id))).toBe(true)
-      } else if (kind !== "for_you") {
-        expect(entry.products.every((p) => p.department === "men")).toBe(true)
-      }
-    }
   })
 })

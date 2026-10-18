@@ -4,7 +4,7 @@ import type { DecisionClass, HMCategory, HMHero, HomepageDoc } from "@/lib/model
 import { HM_TO_APP_CATEGORIES, HM_TO_APP_DEPARTMENT } from "@/lib/model/mapping"
 import { CATEGORIES, type Category, type Department } from "@/lib/store/types"
 
-/** What the model decided, in store terms. Shared by modelLayout and the validator. */
+/** What the model decided, in store terms. The validator uses these to apply the model policy to LLM output. */
 
 function uniq<T>(xs: T[]): T[] {
   return xs.filter((x, i) => xs.indexOf(x) === i)
