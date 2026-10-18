@@ -172,7 +172,12 @@ export function Concierge() {
       const safe = actions.map((a): ChatAction =>
         a.action === "checkout" && !wantsCheckout ? { action: "ask_checkout" } : a,
       )
-      if (safe.length) setPendingCheckout(runChatActions(safe, router.push).asksCheckout)
+      if (safe.length) {
+        const result = runChatActions(safe, (path: string) => router.push(path))
+        // Buttons are the "are you done?" ask — show them whenever the agent bagged
+        // something, whether or not the model remembered to emit ask_checkout.
+        setPendingCheckout(result.asksCheckout || safe.some((a) => a.action === "add_to_bag"))
+      }
       history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: text }].slice(-12)
     } catch (error) {
       emitStoreEvent("concierge_error", { tone, error: error instanceof Error ? error.message : "failed" })
@@ -196,7 +201,7 @@ export function Concierge() {
     setPendingCheckout(false)
     emitStoreEvent("concierge_action", { action: "checkout_confirm", detail: yes ? "yes" : "no" })
     if (yes) {
-      runChatActions([{ action: "checkout" }], router.push)
+      runChatActions([{ action: "checkout" }], (path: string) => router.push(path))
       setMessages((prev) => [
         ...prev,
         { role: "assistant" as const, content: autoPay ? "On it! Paying now, you're all set." : "Taking you to payment, one click left!" },

@@ -72,17 +72,26 @@ export function runChatActions(actions: ChatAction[], navigate: (path: string) =
     }
     if (a.action === "checkout") {
       // Re-read state: earlier add_to_bag actions in this same batch changed the bag.
-      if (useStorefront.getState().bag.length === 0) continue
+      if (useStorefront.getState().bag.length === 0) {
+        emitStoreEvent("concierge_action", { action: "checkout_skipped", detail: "bag empty" })
+        continue
+      }
       startCheckout()
       done.push("started checkout")
       emitStoreEvent("concierge_action", { action: "checkout" })
       // Auto-pay on: the agent clicks Pay too. Off: stop on the Visa sheet, shopper clicks.
       if (!useStorefront.getState().agentAutoPay) continue
       window.setTimeout(() => {
-        const captured = captureCheckout()
-        if (captured) {
-          emitStoreEvent("concierge_action", { action: "paid", detail: `order ${captured.orderId} · $${captured.amount}` })
-          navigate("/store/confirmation")
+        try {
+          const captured = captureCheckout()
+          if (captured) {
+            emitStoreEvent("concierge_action", { action: "paid", detail: `order ${captured.orderId} · $${captured.amount}` })
+            navigate("/store/confirmation")
+          } else {
+            emitStoreEvent("concierge_action", { action: "pay_failed", detail: "no visa session" })
+          }
+        } catch (err) {
+          emitStoreEvent("concierge_action", { action: "pay_failed", detail: String(err) })
         }
       }, 1600)
     }
