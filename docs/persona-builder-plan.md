@@ -145,7 +145,7 @@ The basket is **derived** from `profile` + `edits` by the generator (memoised in
 | `exportPersona(id)` | JSON with the persona **and** its derived basket. |
 | `importPersona(raw)` | Parses v2, or migrates v1 (below). Ids that clash get a suffix, as today. |
 
-**Persistence:** zustand `persist` with `localStorage` key `refit.personas`, `version: 2`, saving `personas` and `selectedId`. Reads and writes go through try/catch, and the store falls back to the presets when storage is empty or blocked. Presets are always re-read from code, so a code update to a preset reaches judges who already opened the demo, unless they edited it.
+**Persistence:** zustand `persist` with `localStorage` key `silicon-shoppers.personas`, `version: 2`, saving `personas` and `selectedId`. Reads and writes go through try/catch, and the store falls back to the presets when storage is empty or blocked. Presets are always re-read from code, so a code update to a preset reaches judges who already opened the demo, unless they edited it.
 
 **v1 migration** (stored state and imported files): `preferredDepartment` women/men/both → `menShare` 10/90/50, `priceSensitivity` → `saleShare` (same value, capped at 80), `noveltySeeking` → `newShare`, `maxBudget` → `priceLevel` (20→10, 400→95, linear), `colorPreference` → first three `colors`, basket size 12, seed from the id's hash. Lossy, but it gives a sensible persona rather than an error.
 

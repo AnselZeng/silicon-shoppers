@@ -19,7 +19,7 @@ const newsreader = Newsreader({
 })
 
 export const metadata: Metadata = {
-  title: "ATELIER NINE — Refit",
+  title: "Silicon Shoppers",
   description: "A storefront that rewrites itself from the first few clicks.",
 }
 

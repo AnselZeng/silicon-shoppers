@@ -1,4 +1,4 @@
-# Refit / ATELIER NINE
+# Silicon Shoppers / ATELIER NINE
 
 A fake fashion store that rebuilds its layout for each shopper: nav, hero, home rows, ads, sort, filters and cards, from an H&M-trained model's output and an LLM that designs within a fixed schema.
 

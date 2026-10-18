@@ -1,4 +1,4 @@
-# Refit: goal and work plan
+# Silicon Shoppers: goal and work plan
 
 Last updated: 2026-10-17
 

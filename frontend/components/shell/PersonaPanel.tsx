@@ -23,7 +23,7 @@ export function PersonaPanel() {
     <div className="flex h-full flex-col">
       <div className="flex items-baseline justify-between px-4 pt-4 pb-2">
         <div>
-          <p className="text-[10px] tracking-[0.22em] text-white/40 uppercase">Refit</p>
+          <p className="text-[10px] tracking-[0.22em] text-white/40 uppercase">Silicon Shoppers</p>
           <h1 className="text-sm font-medium">Layout preview</h1>
           <p className="text-[10px] text-white/40">Default, then the model layout, then the LLM layout</p>
         </div>
