@@ -12,7 +12,7 @@ import { LayoutToast } from "@/components/store/LayoutToast"
 import { QuickView } from "@/components/store/QuickView"
 import { VisaCheckout } from "@/components/store/VisaCheckout"
 import { WishlistDrawer } from "@/components/store/WishlistDrawer"
-import { initPersonalization } from "@/lib/model/personalize"
+import { hasLiveLayout, initPersonalization } from "@/lib/model/personalize"
 import { isParentPayload, postSimMessage, readEnvelope, type StorePayload } from "@/lib/sim/protocol"
 import { applyLayoutNow, cancelLayoutMotion, playLayout } from "@/lib/store/layoutMotion"
 import { emitStoreEvent, resetEmitDedupe, takeScrollMark } from "@/lib/store/emit"
@@ -74,6 +74,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
         return
       }
       if (payload.type === "set_layout") {
+        if (payload.automatic && hasLiveLayout()) return
         const options = { model: payload.model, presetName: payload.presetName }
         if (payload.immediate === true) {
           applyLayoutNow(payload.layout, options)

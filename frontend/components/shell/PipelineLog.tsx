@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { BackendPanel } from "@/components/shell/BackendPanel"
 import { ObservabilityPanel } from "@/components/shell/ObservabilityPanel"
 import { Terminal } from "@/components/shell/Terminal"
 import { Button } from "@/components/ui/button"
@@ -28,10 +29,14 @@ export function PipelineLog() {
       <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1">
         <TabsList variant="line" className="bg-transparent">
           <TabsTrigger value="terminal">Terminal</TabsTrigger>
+          <TabsTrigger value="backend">Backend</TabsTrigger>
           <TabsTrigger value="obs">Observability</TabsTrigger>
         </TabsList>
         <TabsContent value="terminal" className="min-h-0">
           <Terminal />
+        </TabsContent>
+        <TabsContent value="backend" className="min-h-0 overflow-auto">
+          <BackendPanel />
         </TabsContent>
         <TabsContent value="obs" className="min-h-0 overflow-auto">
           <ObservabilityPanel />

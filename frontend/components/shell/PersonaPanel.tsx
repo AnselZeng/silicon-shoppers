@@ -6,9 +6,11 @@ import { ModelOutput } from "@/components/shell/ModelOutput"
 import { PredictedMix } from "@/components/shell/PredictedMix"
 import { Button } from "@/components/ui/button"
 import { DEMO_SHOPPERS, shopperFromSentence } from "@/lib/layout/demoShoppers"
+import { isStoreLayoutDoc } from "@/lib/model/adapter"
 import { loadFixture } from "@/lib/model/fixtures"
-import { applyMix } from "@/lib/model/mix"
 import type { HomepageDoc } from "@/lib/model/homepage"
+import { draftFromLive, fetchLiveLayout, sameMix, type LiveFetch } from "@/lib/model/liveDoc"
+import { applyMix } from "@/lib/model/mix"
 import { runner } from "@/lib/sim/runner"
 import { useLogStore } from "@/lib/state/logStore"
 import { usePersonaStore } from "@/lib/state/personaStore"
@@ -21,7 +23,10 @@ export function PersonaPanel() {
   const select = usePersonaStore((state) => state.select)
   const layoutPreview = useSimStore((state) => state.layoutPreview)
   const fixtures = useSimStore((state) => state.fixtures)
+  const liveRevision = useSimStore((state) => state.liveRevision)
   const [sentence, setSentence] = useState("")
+  const [live, setLive] = useState<LiveFetch | null>(null)
+  const [followLive, setFollowLive] = useState(true)
   const [busy, setBusy] = useState(false)
   const runToken = useRef(0)
   const previousPreview = useRef("default")
@@ -35,6 +40,24 @@ export function PersonaPanel() {
   const active = fromSentence ?? selected
   const persona = personas.find((item) => item.id === active.id) ?? personas[0]
   const onDefault = layoutPreview === "default" || layoutPreview === ""
+  const stored = live?.state === "live" && live.doc && isStoreLayoutDoc(live.doc) ? live.doc : null
+  const showingLive = followLive && stored !== null
+  const liveKey = showingLive ? `${live?.updatedAt ?? ""}` : "fixture"
+
+  useEffect(() => {
+    let cancel = false
+    const load = () => {
+      void fetchLiveLayout().then((next) => {
+        if (!cancel) setLive(next)
+      })
+    }
+    load()
+    const timer = window.setInterval(load, 20000)
+    return () => {
+      cancel = true
+      window.clearInterval(timer)
+    }
+  }, [liveRevision])
 
   useEffect(() => {
     const entry = fixtures.find((item) => item.id === active.fixtureId)
@@ -42,7 +65,8 @@ export function PersonaPanel() {
     let cancel = false
     void loadFixture(entry).then((fixture) => {
       if (cancel || !fixture) return
-      const next = applyMix(fixture.doc)
+      const fromLive = showingLive && stored ? draftFromLive(fixture.doc, stored) : null
+      const next = fromLive ?? applyMix(fixture.doc)
       setModelDoc(next)
       setDraft(next)
       setBasket(entry.basket)
@@ -50,7 +74,16 @@ export function PersonaPanel() {
     return () => {
       cancel = true
     }
-  }, [active.fixtureId, fixtures])
+    // stored is read from this render; liveKey already changes when the laptop writes a new document
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active.fixtureId, fixtures, liveKey, showingLive])
+
+  useEffect(() => {
+    if (!showingLive || !stored) return
+    const name = stored.shopper.persona?.name
+    const match = DEMO_SHOPPERS.find((shopper) => shopper.title.toLowerCase() === name?.toLowerCase())
+    if (match && match.id !== selectedId) select(match.id)
+  }, [showingLive, stored, selectedId, select])
 
   async function run() {
     if (fixtures.length === 0 || busy) return
@@ -59,12 +92,20 @@ export function PersonaPanel() {
     setBusy(true)
     if (persona) select(persona.id)
     const doc = draft ?? modelDoc
-    if (!doc) {
+    const liveMix = stored?.model_meta?.predicted_mix as HomepageDoc["predicted_mix"] | undefined
+    const untouched = Boolean(showingLive && stored && doc && liveMix && sameMix(doc.predicted_mix, liveMix))
+    if (!doc && !untouched) {
       setBusy(false)
       return
     }
-    useLogStore.getState().push("sim", `running ${active.title}`)
-    await runner.previewDocument(doc, basket, active.title)
+    if (untouched && stored) {
+      const label = stored.shopper.persona?.name ?? stored.shopper.label
+      useLogStore.getState().push("sim", `running ${label}`)
+      await runner.previewStored(stored, label)
+    } else if (doc) {
+      useLogStore.getState().push("sim", `running ${active.title}`)
+      await runner.previewDocument(doc, basket, active.title)
+    }
     if (runToken.current === token) setBusy(false)
   }
 
@@ -80,6 +121,22 @@ export function PersonaPanel() {
       <div className="px-4 pt-4 pb-3">
         <p className="text-[10px] tracking-[0.22em] text-white/40 uppercase">Silicon Shoppers</p>
         <h1 className="mt-1 text-sm font-medium">Refit the store for one shopper</h1>
+        <p className="mt-2 text-[11px] leading-snug text-white/55">
+          {showingLive
+            ? `This JSON is the document stored for ${live?.shopperId}. The laptop rewrites it on the next refresh.`
+            : stored
+              ? "Showing a fixture preview, not this browser's stored document."
+              : live?.state === "waiting"
+                ? `No document stored for ${live.shopperId} yet. The JSON below is a stand-in until the laptop refreshes.`
+                : live?.state === "error"
+                  ? "Could not read the stored document. The JSON below is a stand-in."
+                  : `Snowflake is off. The JSON below is a hand-written stand-in${live?.shopperId ? ` for ${live.shopperId}` : ""}.`}
+        </p>
+        {stored && !followLive ? (
+          <button type="button" className="mt-1 text-[11px] text-white underline" onClick={() => setFollowLive(true)}>
+            Show the stored document
+          </button>
+        ) : null}
       </div>
       <div className="px-4">
         <button
@@ -106,6 +163,7 @@ export function PersonaPanel() {
                 key={shopper.id}
                 type="button"
                 onClick={() => {
+                  setFollowLive(false)
                   select(shopper.id)
                   setSentence("")
                 }}
@@ -166,7 +224,7 @@ export function PersonaPanel() {
             Stop
           </Button>
         </div>
-        {draft ? <ModelOutput doc={draft} basket={basket} /> : null}
+        {draft ? <ModelOutput doc={draft} basket={basket} stored={showingLive ? stored : null} /> : null}
         <div className="h-4" />
       </ScrollArea>
     </div>

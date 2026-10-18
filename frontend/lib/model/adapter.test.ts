@@ -1,8 +1,10 @@
 import { describe, expect, test } from "vitest"
-import { forYouIds, rankCatalog } from "@/lib/model/adapter"
+import { forYouIds, isStoreLayoutDoc, modelLayoutV1, rankCatalog } from "@/lib/model/adapter"
 import type { HMDepartment, HomepageDoc } from "@/lib/model/homepage"
 import { APP_TO_HM_CATEGORY, HM_TO_APP_CATEGORIES, HM_TO_APP_COLOR, HM_TO_APP_DEPARTMENT } from "@/lib/model/mapping"
+import { fromIntent } from "@/lib/model/storeLayout"
 import { heroAdFor, modelCategoryOrder, modelDepartment } from "@/lib/model/policy"
+import { validateLayout } from "@/lib/layout/validate"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { CATEGORIES } from "@/lib/store/types"
 import { fixtureEntries, fixtureModel } from "@/lib/testing/fixtures"
@@ -88,5 +90,36 @@ describe("For You data copied from the model", () => {
     expect(ids).toHaveLength(24)
     expect(ids.some((id) => model.basketIds.includes(id))).toBe(false)
     expect(rankCatalog(PRODUCTS, doc)[0]?.department).toBe("men")
+  })
+})
+
+describe("atelier.store_layout.v1 becomes a store layout", () => {
+  test("a menswear price document keeps department, sale row, and guest checkout", () => {
+    const doc = fromIntent({
+      departments: ["dept_menswear"],
+      priority: "price",
+      budget: null,
+      summary: "menswear on sale",
+      source: "keywords",
+    })
+    doc.layout.checkout = {
+      ...doc.layout.checkout,
+      value: "guest_express",
+      changed: true,
+      reason: "guest",
+      source: "H&M model",
+    }
+    doc.shopper.persona_reason = "9 bag adds"
+    expect(isStoreLayoutDoc(doc)).toBe(true)
+    const { layout } = modelLayoutV1(doc)
+    expect(layout.version).toBe(2)
+    expect(layout.nav.department).toBe("men")
+    expect(layout.nav.order[0]).toBe("men")
+    expect(layout.home.blocks.some((block) => block.type === "product_row" && block.source.kind === "sale")).toBe(true)
+    expect(layout.listing.expandedFilters).toEqual(["price", "sale"])
+    expect(layout.listing.card.priceStyle).toBe("sale_emphasis")
+    expect(layout.checkout.variant).toBe("guest_fast")
+    expect(layout.checkout.expressCheckout).toBe(true)
+    expect(validateLayout(layout).report.fellBack).toBe(false)
   })
 })

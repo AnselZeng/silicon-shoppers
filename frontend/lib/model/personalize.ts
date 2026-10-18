@@ -10,10 +10,10 @@ import { fromStoreEvent, isStoreLayoutDoc, modelLayout, modelLayoutV1, type Deci
   from "@/lib/model/adapter";
 import { getShopperId, queueEvent } from "@/lib/model/eventSink";
 import type { HomepageDoc } from "@/lib/model/homepage";
-import type { StoreLayoutDoc } from "@/lib/model/storeLayout";
 import { SessionTracker, type SessionDecisions, type SessionModel } from "@/lib/model/sessionStyle";
+import type { StoreLayoutDoc } from "@/lib/model/storeLayout";
+import { postSimMessage, type StoreEvent } from "@/lib/sim/protocol";
 import { useStorefront } from "@/lib/store/storeState";
-import type { StoreEvent } from "@/lib/sim/protocol";
 
 const POLL_MS = 60_000;
 
@@ -24,10 +24,31 @@ let updatedAt: string | null = null;
 let poll: ReturnType<typeof setInterval> | null = null;
 let lastSignature = "";
 let lastLog: DecisionLogEntry[] = [];
+let live = false;
+let reported = "";
+
+/** True once this visit has applied a document from USER_LAYOUTS. */
+export function hasLiveLayout(): boolean {
+  return live;
+}
 
 /** The most recent decision log (one entry per layout decision, with reason + source). */
 export function getDecisionLog(): DecisionLogEntry[] {
   return lastLog;
+}
+
+function report(status: {
+  state: "disabled" | "waiting" | "applied";
+  persona?: string;
+  confidence?: string;
+  reason?: string;
+  updatedAt?: string | null;
+}): void {
+  const shopperId = getShopperId();
+  const key = JSON.stringify({ shopperId, ...status });
+  if (key === reported || typeof window === "undefined" || window.parent === window) return;
+  reported = key;
+  postSimMessage(window.parent, { type: "model_status", shopperId, ...status });
 }
 
 /** First-paint fetch, session-model load and the refresh poll. Call once on store mount. */
@@ -49,14 +70,48 @@ async function refreshLayout(): Promise<void> {
   try {
     const res = (await fetch(`/api/layout?userId=${encodeURIComponent(getShopperId())}`).then((r) =>
       r.json(),
-    )) as { homepage?: HomepageDoc | StoreLayoutDoc | null; updatedAt?: string | null };
-    if (!res.homepage || (res.updatedAt ?? null) === updatedAt) return;
+    )) as {
+      homepage?: HomepageDoc | StoreLayoutDoc | null;
+      updatedAt?: string | null;
+      disabled?: boolean;
+    };
+    if (res.disabled) {
+      report({ state: "disabled" });
+      return;
+    }
+    if (!res.homepage) {
+      report({ state: "waiting" });
+      return;
+    }
+    if ((res.updatedAt ?? null) === updatedAt) return;
     home = res.homepage;
     updatedAt = res.updatedAt ?? null;
+    live = true;
     apply(tracker?.current().decisions);
+    report(describe(home, updatedAt));
   } catch {
     // no backend configured: defaults stay
   }
+}
+
+function describe(doc: HomepageDoc | StoreLayoutDoc, at: string | null): {
+  state: "applied";
+  persona?: string;
+  confidence?: string;
+  reason?: string;
+  updatedAt: string | null;
+} {
+  if (isStoreLayoutDoc(doc)) {
+    const shopper = doc.shopper;
+    return {
+      state: "applied",
+      persona: shopper.persona?.name ?? shopper.label,
+      confidence: shopper.confidence,
+      reason: shopper.persona_reason,
+      updatedAt: at,
+    };
+  }
+  return { state: "applied", persona: doc.demo_id ?? doc.user_id, updatedAt: at };
 }
 
 /** Feed one store event: upload it for the slow loop and let the live model react. */

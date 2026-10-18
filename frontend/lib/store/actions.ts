@@ -28,6 +28,7 @@ export function addProductToBag(product: Product) {
   })
   emitStoreEvent("add_to_bag", {
     productId: product.id,
+    color,
     price: unitPrice,
     onSale: product.salePrice !== undefined,
   })

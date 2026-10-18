@@ -1,7 +1,8 @@
 import { LAYOUT_MOTION } from "@/config/ui"
 import { validateLayout } from "@/lib/layout/validate"
 import { buildPreview } from "@/lib/layout/preview"
-import { modelLayout } from "@/lib/model/adapter"
+import { modelLayout, modelLayoutV1 } from "@/lib/model/adapter"
+import type { StoreLayoutDoc } from "@/lib/model/storeLayout"
 import type { HomepageDoc, ModelContext } from "@/lib/model/homepage"
 import { loadFixtureIndex } from "@/lib/model/fixtures"
 import {
@@ -27,7 +28,21 @@ class ShellRunner {
     if (!parsed || !isStorePayload(parsed.payload)) return
     const payload = parsed.payload
     if (payload.type === "store_ready") {
-      void this.pushPreview()
+      void this.pushPreview(this.generation, false, true)
+      return
+    }
+    if (payload.type === "model_status") {
+      useSimStore.getState().noteLive()
+      const logs = useLogStore.getState()
+      if (payload.state === "disabled") {
+        logs.push("model", `snowflake off · shopper ${payload.shopperId}`)
+      } else if (payload.state === "waiting") {
+        logs.push("model", `shopper ${payload.shopperId} · no layout yet (the laptop scores on its next refresh)`)
+      } else {
+        const who = payload.persona ?? "shopper"
+        const conf = payload.confidence ? ` (${payload.confidence})` : ""
+        logs.push("model", `${who}${conf} · ${payload.reason || payload.shopperId}`)
+      }
       return
     }
     if (payload.type === "layout_step") {
@@ -48,7 +63,7 @@ class ShellRunner {
     useLogStore.getState().push("model", `${fixtures.length} fixtures loaded (hand-written, not model output)`)
   }
 
-  async pushPreview(generation = this.generation, immediate = false) {
+  async pushPreview(generation = this.generation, immediate = false, automatic = false) {
     const sim = useSimStore.getState()
     const preview = await buildPreview(sim.layoutPreview, sim.fixtures)
     if (generation !== this.generation) return
@@ -81,6 +96,7 @@ class ShellRunner {
       model: preview.model,
       presetName: preview.stage === "llm" ? preview.label : undefined,
       immediate,
+      automatic,
     })
   }
 
@@ -177,6 +193,34 @@ class ShellRunner {
       model,
       presetName: label,
     })
+    return settled
+  }
+
+  /** Apply the document the laptop stored for this shopper. */
+  previewStored(doc: StoreLayoutDoc, label: string): Promise<void> {
+    const generation = ++this.generation
+    const id = `live:${doc.shopper.id}`
+    useSimStore.getState().setLayoutPreview(id)
+    const built = modelLayoutV1(doc)
+    const result = validateLayout(built.layout)
+    if (generation !== this.generation) return Promise.resolve()
+    useSimStore.getState().setPreview({
+      id,
+      stage: "model",
+      label,
+      layout: result.layout,
+      model: null,
+      doc: null,
+      basket: [],
+      report: result.report,
+    })
+    const logs = useLogStore.getState()
+    const reason = doc.shopper.persona_reason
+    logs.push("model", reason ? `${label} · ${reason}` : `${label} · stored document`)
+    logs.push("layout", `${label} · nav ${result.layout.nav.order.join(" ")} · ${result.layout.home.blocks.length} blocks`)
+    if (result.report.fellBack) logs.push("layout", `validator fell back: ${result.report.error ?? "invalid"}`)
+    const settled = this.waitForSettle()
+    this.send({ type: "set_layout", layout: result.layout, presetName: label })
     return settled
   }
 

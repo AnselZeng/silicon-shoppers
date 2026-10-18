@@ -15,6 +15,8 @@ interface SimState {
   iframe: HTMLIFrameElement | null
   /** Stage of the layout swap playing in the store, or null when it has settled. */
   layoutProgress: { index: number; total: number } | null
+  /** Bumped when the store reports a Snowflake layout, so the panel refetches it. */
+  liveRevision: number
   setRoute: (route: string) => void
   setViewport: (viewport: ViewportChoice) => void
   setLayoutPreview: (preview: string) => void
@@ -22,6 +24,7 @@ interface SimState {
   setFixtures: (fixtures: FixtureEntry[]) => void
   setIframe: (iframe: HTMLIFrameElement | null) => void
   setLayoutProgress: (progress: { index: number; total: number } | null) => void
+  noteLive: () => void
 }
 
 export const useSimStore = create<SimState>((set) => ({
@@ -32,6 +35,7 @@ export const useSimStore = create<SimState>((set) => ({
   fixtures: [],
   iframe: null,
   layoutProgress: null,
+  liveRevision: 0,
   setRoute: (route) => set({ route }),
   setViewport: (viewport) => set({ viewport }),
   setLayoutPreview: (layoutPreview) => set({ layoutPreview }),
@@ -39,4 +43,5 @@ export const useSimStore = create<SimState>((set) => ({
   setFixtures: (fixtures) => set({ fixtures }),
   setIframe: (iframe) => set({ iframe }),
   setLayoutProgress: (layoutProgress) => set({ layoutProgress }),
+  noteLive: () => set((state) => ({ liveRevision: state.liveRevision + 1 })),
 }))

@@ -36,7 +36,15 @@ export interface StoreEvent {
 
 export type ParentPayload =
   /** layout is validated inside the store; model lets the validator apply the model policy and fall back. */
-  | { type: "set_layout"; layout: unknown; model?: ModelContext | null; presetName?: string; immediate?: boolean }
+  | {
+      type: "set_layout"
+      layout: unknown
+      model?: ModelContext | null
+      presetName?: string
+      immediate?: boolean
+      /** Store-ready replay. The store keeps a Snowflake layout instead of this one. */
+      automatic?: boolean
+    }
   | { type: "reset" }
 
 export type StorePayload =
@@ -45,6 +53,16 @@ export type StorePayload =
   /** A layout swap plays in stages; index is 1-based. */
   | { type: "layout_step"; index: number; total: number; label: string }
   | { type: "layout_settled" }
+  /** The store loaded, or applied, the laptop's layout for this browser's shopper id. */
+  | {
+      type: "model_status"
+      shopperId: string
+      state: "disabled" | "waiting" | "applied"
+      persona?: string
+      confidence?: string
+      reason?: string
+      updatedAt?: string | null
+    }
 
 export interface SimEnvelope<T> {
   source: typeof SIM_SOURCE
@@ -76,7 +94,8 @@ export function isStorePayload(payload: ParentPayload | StorePayload): payload i
     payload.type === "store_event" ||
     payload.type === "store_ready" ||
     payload.type === "layout_step" ||
-    payload.type === "layout_settled"
+    payload.type === "layout_settled" ||
+    payload.type === "model_status"
   )
 }
 
