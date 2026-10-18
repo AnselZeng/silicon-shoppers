@@ -1,0 +1,120 @@
+dataset_version: "v1-2026-10-04"
+schema_version: "1.0"
+seed: 20261004
+
+duckdb:
+  memory_limit: "6GB"
+  threads: 6
+  max_temp_directory_size: "8GB"
+
+dates:
+  target_window_days: 28        # length of both dev and final target windows
+
+cohort:
+  per_stratum: 25000
+  strata:                       # inclusive bounds on capped purchase units before the dev cutoff
+    light: [1, 2]
+    lower_mid: [3, 5]
+    upper_mid: [6, 10]
+    heavy: [11, null]
+  hash_salt: "hm-cohort-v1|20261004|"
+  split_salt: "hm-split-v1|"     # compressor fit split
+  attack_salt: "hm-attack-v1|"   # attacker train/test split
+  showcase_salt: "hm-showcase-v1|"
+
+units:
+  multiplicity_cap: 3
+  recency_half_life_days: 180
+
+features:
+  pseudo_count: 5
+  top_product_groups: 7
+  novelty_days: 28
+  novelty_left_censor_days: 28
+  markdown_ratio: 0.70
+  anchor_quantile: 0.90
+  anchor_min_rows: 20
+  price_anomaly_ratio: 0.01
+  departments: ["Ladieswear", "Menswear", "Divided", "Sport", "Baby/Children"]
+
+confidence:
+  low_below_units: 5            # units < 5 -> low
+  high_from_units: 15           # units >= 15 -> high; otherwise medium
+
+reliability:
+  min_units: 6
+  min_spearman: 0.4
+
+rules:
+  trigger_high: 0.85
+  trigger_low: 0.15
+  breadth_high: 0.67
+  breadth_low: 0.33
+  hero_category_min_share: 0.40
+  color_min_known_units: 3
+  color_top_n: 2
+
+evaluation:
+  assortment_days: 56
+  bestseller_days: 28
+  section_new_days: 28
+  bestseller_top_fraction: 0.10
+  recent_popularity_days: 28    # scoring-harness baseline: population units in the 28 days before the cutoff
+  bootstrap_resamples: 1000
+  bootstrap_chunk: 50
+  shuffle_permutations: 200
+  ceiling_hit3: 0.85
+
+compression:
+  history_budgets: [1, 3, 10, "all"]
+  dims: [4, 8, 25]
+  precisions: ["float32", "int8"]
+  fit_percent: 80
+  random_subset_draws: 10
+  mi_sample: 30000
+  retain_fraction: 0.95
+
+exposure:
+  age_min: 16
+  age_max: 90
+  age_bands:                    # inclusive bounds
+    - ["<25", 16, 24]
+    - ["25-34", 25, 34]
+    - ["35-49", 35, 49]
+    - ["50+", 50, 90]
+  linkability_sample: 10000
+  linkability_min_units: 6
+  uniqueness_round_decimals: 2
+  hgb_max_iter: 100
+
+showcase:
+  per_stratum: 250
+  kmeans_k: 10
+  per_cluster: 15
+  adapted_quota: 100
+
+catalog:
+  n_articles: 400
+
+fusion:                         # H&M + OTTO fused vectors (fusion.py)
+  vector_dims: 37               # 25 profile + basket_size, activity_spread + 9 browsing + match_confidence
+  k: 50                         # OTTO donors averaged per H&M shopper
+  visit_gap_minutes: 30
+  utc_offset_hours: 2           # OTTO is German; its train weeks (Aug 2022) fall in CEST
+  donor_salt: "otto-donor-v1|"
+  holdout_salt: "otto-holdout-v1|"
+  memory_limit: "20GB"          # OTTO stages only
+  threads: 16
+
+smoke:                          # overrides applied with --smoke
+  cohort.per_stratum: 2000
+  evaluation.bootstrap_resamples: 100
+  evaluation.shuffle_permutations: 20
+  compression.random_subset_draws: 2
+  compression.mi_sample: 4000
+  exposure.linkability_sample: 1000
+  showcase.per_stratum: 50
+  showcase.kmeans_k: 4
+  showcase.per_cluster: 5
+  showcase.adapted_quota: 20
+  catalog.n_articles: 100

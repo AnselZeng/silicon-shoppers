@@ -1,0 +1,59 @@
+rows:
+  transactions: 31788324
+  articles: 105542
+  customers: 1371980
+t_dat_min: '2018-09-20'
+t_dat_max: '2020-09-22'
+departments:
+- Baby/Children
+- Divided
+- Ladieswear
+- Menswear
+- Sport
+product_groups:
+- Garment Upper body
+- Garment Lower body
+- Garment Full body
+- Swimwear
+- Underwear
+- Accessories
+- Shoes
+- Socks & Tights
+- Nightwear
+- Unknown
+- Bags
+- Items
+- Cosmetic
+- Underwear/nightwear
+- Furniture
+- Garment and Shoe care
+- Stationery
+- Interior textile
+- Fun
+color_mapping:
+  Beige: neutral
+  Black: neutral
+  Blue: cool
+  Bluish Green: cool
+  Brown: neutral
+  Green: cool
+  Grey: neutral
+  Khaki green: cool
+  Lilac Purple: cool
+  Metal: neutral
+  Mole: neutral
+  Orange: warm
+  Pink: warm
+  Red: warm
+  Turquoise: cool
+  Unknown: unknown
+  White: neutral
+  Yellow: warm
+  Yellowish Green: cool
+  undefined: unknown
+unmapped_colors: []
+unmapped_unit_share: 0.0
+solid_present: true
+store_channel_id: 1
+online_channel_id: 2
+channel_status: verified_by_2020_closure_pattern

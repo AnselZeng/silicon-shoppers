@@ -1,0 +1,188 @@
+{
+  "window": {
+    "cutoff": "2019-08-26",
+    "target": [
+      "2019-08-26",
+      "2019-09-23"
+    ],
+    "role": "test"
+  },
+  "shoppers": 100000,
+  "layout": {
+    "category_order": {
+      "gain": 0.0007163908278544562,
+      "ci95": [
+        -0.0005868215070385183,
+        0.00208996993959463
+      ],
+      "adapted": 0.8092815803575643,
+      "baseline": 0.8085651895297098,
+      "changed_users": 13201,
+      "changed_gain": 0.000815918195348212,
+      "validated": false
+    },
+    "landing_department": {
+      "gain": 0.002245051331183689,
+      "ci95": [
+        0.0007701781826681571,
+        0.0039375885707068825
+      ],
+      "adapted": 0.6314560711860472,
+      "baseline": 0.6292110198548636,
+      "changed_users": 265,
+      "changed_gain": 0.12737489345036515,
+      "validated": true
+    },
+    "section_order": {
+      "gain": 0.019584547570940677,
+      "ci95": [
+        0.0179566733809918,
+        0.02123498735501713
+      ],
+      "adapted": 0.8908722802556213,
+      "baseline": 0.8712877326846805,
+      "changed_users": 10330,
+      "changed_gain": 0.026210684430615187,
+      "validated": true
+    },
+    "default_sort": {
+      "gain": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "adapted": 0.8650522937533588,
+      "baseline": 0.8650522937533588,
+      "changed_users": 0,
+      "changed_gain": null,
+      "validated": false
+    },
+    "color_highlight": {
+      "gain": 0.047132572347697826,
+      "ci95": [
+        0.038737935804579654,
+        0.055785336427693816
+      ],
+      "adapted": 0.5149733287031408,
+      "baseline": 0.467840756355443,
+      "changed_users": 6281,
+      "changed_gain": 0.047132572347697826,
+      "validated": true
+    },
+    "_extra": {
+      "cat_hit1": {
+        "adapted": 0.6802793481875623,
+        "baseline": 0.6895244429664117,
+        "baseline_recent": 0.6895244429664117
+      },
+      "cat_hit3": {
+        "adapted": 0.8964416361822415,
+        "baseline": 0.8875290987695378,
+        "baseline_recent": 0.8875290987695378
+      },
+      "eval_users": 15035,
+      "per_stratum": {
+        "light": {
+          "category_order": 0.0007690555417135617,
+          "landing_department": 0.0,
+          "section_order": 0.013669307225649059,
+          "default_sort": 0.0,
+          "color_highlight": 0.015292166222574078
+        },
+        "lower_mid": {
+          "category_order": -0.00216072182067637,
+          "landing_department": 0.003156436632831483,
+          "section_order": 0.015686324533851024,
+          "default_sort": 0.0,
+          "color_highlight": 0.05181708930789846
+        },
+        "upper_mid": {
+          "category_order": 0.0008982617148029289,
+          "landing_department": 0.0006257411146364131,
+          "section_order": 0.016816183416789934,
+          "default_sort": 0.0,
+          "color_highlight": 0.04335602866791577
+        },
+        "heavy": {
+          "category_order": 0.001362756674154143,
+          "landing_department": 0.0030225005691107386,
+          "section_order": 0.022493012229893666,
+          "default_sort": 0.0,
+          "color_highlight": 0.052831275672184576
+        }
+      }
+    }
+  },
+  "items": {
+    "include": {
+      "model": {
+        "map12": 0.020159687199799055,
+        "by_stratum": {
+          "light": 0.01936081252142359,
+          "lower_mid": 0.02316681214809493,
+          "upper_mid": 0.021564110232550424,
+          "heavy": 0.0189238956216377
+        }
+      },
+      "popular": {
+        "map12": 0.004365602215334694,
+        "by_stratum": {
+          "light": 0.003819194957716841,
+          "lower_mid": 0.005271890670546914,
+          "upper_mid": 0.0045403237117976085,
+          "heavy": 0.004142291424796954
+        }
+      },
+      "rebuy+pop": {
+        "map12": 0.01260731114173443,
+        "by_stratum": {
+          "light": 0.013903166977072839,
+          "lower_mid": 0.017504062527310026,
+          "upper_mid": 0.012476483663306828,
+          "heavy": 0.011229079882117195
+        }
+      }
+    },
+    "hide": {
+      "model": {
+        "map12": 0.006100445826156182,
+        "by_stratum": {
+          "light": 0.0053792381961250664,
+          "lower_mid": 0.007474105079910993,
+          "upper_mid": 0.006810085832295235,
+          "heavy": 0.005559585908911598
+        }
+      },
+      "popular": {
+        "map12": 0.003998240088038854,
+        "by_stratum": {
+          "light": 0.0037189236353150474,
+          "lower_mid": 0.005175820888318333,
+          "upper_mid": 0.003989836731760585,
+          "heavy": 0.003743760635530286
+        }
+      },
+      "rebuy+pop": {
+        "map12": 0.003998240088038854,
+        "by_stratum": {
+          "light": 0.0037189236353150474,
+          "lower_mid": 0.005175820888318333,
+          "upper_mid": 0.003989836731760585,
+          "heavy": 0.003743760635530286
+        }
+      }
+    },
+    "buyers": 15035,
+    "candidates_per_buyer": 113.31020951114067,
+    "pair_recall": 0.09925670618134977
+  },
+  "frozen_manifest": {
+    "frozen_at": "2026-10-15T21:35:23",
+    "sha256": {
+      "models.pkl": "2554ea6520dc972f42202d10a71a6a8b084eabb3a8cde103fa6fa5cfd38a9cb3",
+      "item_ranker.txt": "d9c748d3292f6329a7070b4ce47b2d2a5a09bae88390b0a1fde60e7e17e1b31d",
+      "choice.json": "1f22d61c76dc48a48882c865ced02b02a4987fdfd0cb90618f7bbfba03eb6877"
+    }
+  },
+  "rerun": false
+}

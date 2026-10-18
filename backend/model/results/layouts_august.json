@@ -1,0 +1,2360 @@
+{
+ "train": [
+  "p01",
+  "p02",
+  "p03",
+  "p04",
+  "p05",
+  "p06",
+  "p07",
+  "p08",
+  "p09",
+  "p10",
+  "p11",
+  "dev"
+ ],
+ "valid": "final",
+ "features": 197,
+ "combos": [
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "offset",
+    "sec": "regress"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.024780703784587986,
+     "ci95": [
+      0.023002170191445934,
+      0.026480842440527785
+     ],
+     "adapted": 0.8595141807294514,
+     "baseline": 0.8347334769448634,
+     "changed_users": 5101,
+     "changed_gain": 0.04994033226927357,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.010852864600239815,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.01570931652452474,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.018169157854558443,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.030075182807850327,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "offset",
+    "sec": "long"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.018291986006450576,
+     "ci95": [
+      0.016636750124405752,
+      0.019806064100121607
+     ],
+     "adapted": 0.8530254629513141,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4205,
+     "changed_gain": 0.044718576967018295,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.005313404527005769,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.009482706729900507,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.013345560586877742,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.022918052971509294,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "blend",
+    "sec": "regress"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.024780703784587986,
+     "ci95": [
+      0.023002170191445934,
+      0.026480842440527785
+     ],
+     "adapted": 0.8595141807294514,
+     "baseline": 0.8347334769448634,
+     "changed_users": 5101,
+     "changed_gain": 0.04994033226927357,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.010852864600239815,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.01570931652452474,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.018169157854558443,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.030075182807850327,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "blend",
+    "sec": "long"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.018291986006450576,
+     "ci95": [
+      0.016636750124405752,
+      0.019806064100121607
+     ],
+     "adapted": 0.8530254629513141,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4205,
+     "changed_gain": 0.044718576967018295,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.005313404527005769,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.009482706729900507,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.013345560586877742,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.022918052971509294,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "offset",
+    "sec": "regress"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.024780703784587986,
+     "ci95": [
+      0.023002170191445934,
+      0.026480842440527785
+     ],
+     "adapted": 0.8595141807294514,
+     "baseline": 0.8347334769448634,
+     "changed_users": 5101,
+     "changed_gain": 0.04994033226927357,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.010852864600239815,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.01570931652452474,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.018169157854558443,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.030075182807850327,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "offset",
+    "sec": "long"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.018291986006450576,
+     "ci95": [
+      0.016636750124405752,
+      0.019806064100121607
+     ],
+     "adapted": 0.8530254629513141,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4205,
+     "changed_gain": 0.044718576967018295,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.005313404527005769,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.009482706729900507,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.013345560586877742,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.022918052971509294,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "blend",
+    "sec": "regress"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.024780703784587986,
+     "ci95": [
+      0.023002170191445934,
+      0.026480842440527785
+     ],
+     "adapted": 0.8595141807294514,
+     "baseline": 0.8347334769448634,
+     "changed_users": 5101,
+     "changed_gain": 0.04994033226927357,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.010852864600239815,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.01570931652452474,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.018169157854558443,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.030075182807850327,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "blend",
+    "sec": "long"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.018291986006450576,
+     "ci95": [
+      0.016636750124405752,
+      0.019806064100121607
+     ],
+     "adapted": 0.8530254629513141,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4205,
+     "changed_gain": 0.044718576967018295,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.005313404527005769,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.009482706729900507,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.013345560586877742,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.022918052971509294,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "offset",
+    "sec": "long_dev"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.02311529730027728,
+     "ci95": [
+      0.021392737532066587,
+      0.024707257572308804
+     ],
+     "adapted": 0.8578487742451407,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4743,
+     "changed_gain": 0.05010020161223918,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.010725759879897136,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.010652451119769146,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.0171154558491642,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.028670518351960626,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "blend",
+    "sec": "long_dev"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.02311529730027728,
+     "ci95": [
+      0.021392737532066587,
+      0.024707257572308804
+     ],
+     "adapted": 0.8578487742451407,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4743,
+     "changed_gain": 0.05010020161223918,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.010725759879897136,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.010652451119769146,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.0171154558491642,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.028670518351960626,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "offset",
+    "sec": "long_dev"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.02311529730027728,
+     "ci95": [
+      0.021392737532066587,
+      0.024707257572308804
+     ],
+     "adapted": 0.8578487742451407,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4743,
+     "changed_gain": 0.05010020161223918,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.010725759879897136,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.010652451119769146,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.0171154558491642,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.028670518351960626,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "blend",
+    "sec": "long_dev"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.02311529730027728,
+     "ci95": [
+      0.021392737532066587,
+      0.024707257572308804
+     ],
+     "adapted": 0.8578487742451407,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4743,
+     "changed_gain": 0.05010020161223918,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.010725759879897136,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.010652451119769146,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.0171154558491642,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.028670518351960626,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "offset",
+    "sec": "rank_dev"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.028472589791158864,
+     "ci95": [
+      0.02654308060364364,
+      0.030293362955957425
+     ],
+     "adapted": 0.8632060667360223,
+     "baseline": 0.8347334769448634,
+     "changed_users": 5793,
+     "changed_gain": 0.05052619075662232,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.01546518931021131,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.01783453789288729,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.02356777477796028,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.03342595615652553,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "blend",
+    "sec": "rank_dev"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.028472589791158864,
+     "ci95": [
+      0.02654308060364364,
+      0.030293362955957425
+     ],
+     "adapted": 0.8632060667360223,
+     "baseline": 0.8347334769448634,
+     "changed_users": 5793,
+     "changed_gain": 0.05052619075662232,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.01546518931021131,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.01783453789288729,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.02356777477796028,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.03342595615652553,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "offset",
+    "sec": "rank_dev"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.028472589791158864,
+     "ci95": [
+      0.02654308060364364,
+      0.030293362955957425
+     ],
+     "adapted": 0.8632060667360223,
+     "baseline": 0.8347334769448634,
+     "changed_users": 5793,
+     "changed_gain": 0.05052619075662232,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.01546518931021131,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.01783453789288729,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.02356777477796028,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.03342595615652553,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "blend",
+    "sec": "rank_dev"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.028472589791158864,
+     "ci95": [
+      0.02654308060364364,
+      0.030293362955957425
+     ],
+     "adapted": 0.8632060667360223,
+     "baseline": 0.8347334769448634,
+     "changed_users": 5793,
+     "changed_gain": 0.05052619075662232,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.01546518931021131,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.01783453789288729,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.02356777477796028,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.03342595615652553,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "offset",
+    "sec": "regress_dev"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.022701017232913616,
+     "ci95": [
+      0.020980258911003236,
+      0.024094169795874996
+     ],
+     "adapted": 0.8574344941777771,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4729,
+     "changed_gain": 0.049347950339258186,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.01234809121724351,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.011631823494443399,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.016473779496839206,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.02783658391332369,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "offset",
+    "dept": "blend",
+    "sec": "regress_dev"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": 0.005164713904989367,
+     "ci95": [
+      0.003873745343149478,
+      0.0064939323942165865
+     ],
+     "adapted": 0.8257936687229237,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8904,
+     "changed_gain": 0.006486634725909265,
+     "validated": true
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.022701017232913616,
+     "ci95": [
+      0.020980258911003236,
+      0.024094169795874996
+     ],
+     "adapted": 0.8574344941777771,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4729,
+     "changed_gain": 0.049347950339258186,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.7190378252704999,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9030671555038898,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": 0.003468472011861841,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.01234809121724351,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": 0.0026397677257690134,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.011631823494443399,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": 0.006051392816442308,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.016473779496839206,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": 0.005561799970184426,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.02783658391332369,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "offset",
+    "sec": "regress_dev"
+   },
+   "policy": {
+    "dept_margin": 0.05,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0005350673351209881,
+     "ci95": [
+      -0.0007512927882573774,
+      0.0017911357026531847
+     ],
+     "adapted": 0.6269439522928923,
+     "baseline": 0.6264088849577714,
+     "changed_users": 91,
+     "changed_gain": 0.06575448361162647,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.022701017232913616,
+     "ci95": [
+      0.020980258911003236,
+      0.024094169795874996
+     ],
+     "adapted": 0.8574344941777771,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4729,
+     "changed_gain": 0.049347950339258186,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.0012330456226880395,
+       "section_order": 0.01234809121724351,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": 0.0002544529262086514,
+       "section_order": 0.011631823494443399,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011093073593073592,
+       "section_order": 0.016473779496839206,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0006123429107653473,
+       "section_order": 0.02783658391332369,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  },
+  {
+   "combo": {
+    "cat": "long",
+    "dept": "blend",
+    "sec": "regress_dev"
+   },
+   "policy": {
+    "dept_margin": 0.0,
+    "sort_margin": 0.1,
+    "color_margin": 0.0
+   },
+   "valid": {
+    "category_order": {
+     "gain": -0.002689218664012096,
+     "ci95": [
+      -0.004859400322414887,
+      -0.0006876324555355921
+     ],
+     "adapted": 0.8179397361539221,
+     "baseline": 0.8206289548179343,
+     "changed_users": 8549,
+     "changed_gain": -0.0035177836378111203,
+     "validated": false
+    },
+    "landing_department": {
+     "gain": 0.0007968943229133328,
+     "ci95": [
+      -0.00043274512092400074,
+      0.0020218300326072885
+     ],
+     "adapted": 0.6272057792806847,
+     "baseline": 0.6264088849577714,
+     "changed_users": 90,
+     "changed_gain": 0.09901854681266448,
+     "validated": false
+    },
+    "section_order": {
+     "gain": 0.022701017232913616,
+     "ci95": [
+      0.020980258911003236,
+      0.024094169795874996
+     ],
+     "adapted": 0.8574344941777771,
+     "baseline": 0.8347334769448634,
+     "changed_users": 4729,
+     "changed_gain": 0.049347950339258186,
+     "validated": true
+    },
+    "default_sort": {
+     "gain": 0.0,
+     "ci95": [
+      0.0,
+      0.0
+     ],
+     "adapted": 0.8657825910428724,
+     "baseline": 0.8657825910428724,
+     "changed_users": 0,
+     "changed_gain": null,
+     "validated": false
+    },
+    "color_highlight": {
+     "gain": 0.0600348538169998,
+     "ci95": [
+      0.05204997400348347,
+      0.06809466605867956
+     ],
+     "adapted": 0.5135885148495151,
+     "baseline": 0.4535536610325153,
+     "changed_users": 6324,
+     "changed_gain": 0.0600348538169998,
+     "validated": true
+    },
+    "_extra": {
+     "cat_hit1": {
+      "adapted": 0.6997227935258875,
+      "baseline": 0.7179647679513548,
+      "baseline_recent": 0.7179647679513548
+     },
+     "cat_hit3": {
+      "adapted": 0.9002056693195029,
+      "baseline": 0.8874184029330233,
+      "baseline_recent": 0.8874184029330233
+     },
+     "eval_users": 11183,
+     "per_stratum": {
+      "light": {
+       "category_order": -0.005052590777859598,
+       "landing_department": -0.00024660912453760783,
+       "section_order": 0.01234809121724351,
+       "default_sort": 0.0,
+       "color_highlight": 0.07706930107302079
+      },
+      "lower_mid": {
+       "category_order": -0.006468799165630335,
+       "landing_department": -0.003791348600508906,
+       "section_order": 0.011631823494443399,
+       "default_sort": 0.0,
+       "color_highlight": 0.058898718681219916
+      },
+      "upper_mid": {
+       "category_order": -0.0007366256234325255,
+       "landing_department": 0.0011555081500929877,
+       "section_order": 0.016473779496839206,
+       "default_sort": 0.0,
+       "color_highlight": 0.04644531856901257
+      },
+      "heavy": {
+       "category_order": -0.002318053156631744,
+       "landing_department": 0.0016824028365761625,
+       "section_order": 0.02783658391332369,
+       "default_sort": 0.0,
+       "color_highlight": 0.06276252217722389
+      }
+     }
+    }
+   }
+  }
+ ]
+}

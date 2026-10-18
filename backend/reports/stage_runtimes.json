@@ -1,0 +1,14 @@
+{
+  "ingest": 23.2,
+  "verify": 8.3,
+  "splits": 0.0,
+  "cohort": 10.6,
+  "build": 229.2,
+  "evaluate": 4.8,
+  "export": 6.2,
+  "leakage-check": 97.0,
+  "validity": 28.6,
+  "compress": 66.5,
+  "audit": 742.7,
+  "manifest": 4.3
+}

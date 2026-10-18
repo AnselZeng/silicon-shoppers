@@ -1,0 +1,47 @@
+{
+  "cutoff_name": "dev",
+  "customers": 48447,
+  "min_spearman": 0.4,
+  "features": {
+    "cat_garment_upper_body": 0.3114958173727535,
+    "cat_garment_lower_body": 0.2727470974669196,
+    "cat_garment_full_body": 0.32975300984812306,
+    "cat_swimwear": 0.4495244905847666,
+    "cat_underwear": 0.43629732325673987,
+    "cat_accessories": 0.34538674584733825,
+    "cat_shoes": 0.47960860789926923,
+    "cat_other": 0.38472597276177284,
+    "dept_ladieswear": 0.4171402468443801,
+    "dept_menswear": 0.5585368645653168,
+    "dept_divided": 0.42563016105167406,
+    "dept_sport": 0.4807076176109829,
+    "dept_baby_children": 0.6670649008553238,
+    "color_neutral": 0.2251964478110302,
+    "color_warm": 0.21624722225227574,
+    "color_cool": 0.23226089103403785,
+    "color_concentration": 0.28688985434041586,
+    "solid_share": 0.23341162613431238,
+    "price_level": 0.4267462608685948,
+    "markdown_affinity": 0.4928839473958913,
+    "novelty_affinity": 0.21587461246766051,
+    "rebuy_share": 0.34716433743741154,
+    "channel_2_share": 0.7238487348604549,
+    "purchase_frequency": 0.8127702401473013,
+    "mainstream_score": 0.38447067986959443,
+    "cat_breadth": 0.4056717678228199
+  },
+  "blocks": {
+    "category": 0.3761923831297104,
+    "department": 0.5098159581855356,
+    "color_family": 0.22456818703244794
+  },
+  "decisions_below_threshold": [
+    "category_order",
+    "color_highlight",
+    "default_sort",
+    "hero",
+    "hero_category",
+    "section_order"
+  ],
+  "note": "Data-quality report. Rules v1 results are frozen as a hand-written baseline and were not re-run with these decisions disabled."
+}

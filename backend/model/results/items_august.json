@@ -1,0 +1,145 @@
+{
+  "train": [
+    "p01",
+    "p02",
+    "p03",
+    "p04",
+    "p05",
+    "p06",
+    "p07",
+    "p08",
+    "p09",
+    "p10",
+    "p11",
+    "dev"
+  ],
+  "features": [
+    "s_rebuy",
+    "s_variant",
+    "s_pop",
+    "s_seg",
+    "s_copurch",
+    "s_new",
+    "u7",
+    "u28",
+    "trend",
+    "online7",
+    "pop_rank",
+    "seg_rank",
+    "last_price",
+    "rel_price",
+    "art_pop_pct",
+    "item_age",
+    "cat_idx",
+    "dept_code",
+    "master_code",
+    "is_solid",
+    "bought_units",
+    "bought_age",
+    "product_units",
+    "product_age",
+    "seg_affinity",
+    "seg_pref_rank",
+    "u_price_level",
+    "u_markdown_affinity",
+    "u_novelty_affinity",
+    "u_rebuy_share",
+    "u_channel_2_share",
+    "u_purchase_frequency",
+    "u_mainstream_score",
+    "u_basket_size",
+    "u_activity_spread",
+    "u_units_all",
+    "u_days_all",
+    "u_units_30d",
+    "u_units_90d",
+    "u_days_since_last",
+    "u_mean_gap_days",
+    "m_cat",
+    "m_cat90",
+    "m_dept",
+    "m_color",
+    "m_price_gap"
+  ],
+  "trees": 215,
+  "importance_top15": {
+    "product_age": 0.1214,
+    "product_units": 0.0984,
+    "u7": 0.0601,
+    "bought_age": 0.0515,
+    "pop_rank": 0.0412,
+    "u28": 0.0398,
+    "art_pop_pct": 0.0383,
+    "m_color": 0.0375,
+    "item_age": 0.0295,
+    "rel_price": 0.0292,
+    "last_price": 0.0283,
+    "u_days_since_last": 0.0275,
+    "online7": 0.0266,
+    "seg_rank": 0.0261,
+    "seg_affinity": 0.0257
+  },
+  "valid": {
+    "include": {
+      "model": {
+        "map12": 0.01968838625231165,
+        "by_stratum": {
+          "light": 0.02121875696269449,
+          "lower_mid": 0.02327729126965768,
+          "upper_mid": 0.02091501032682933,
+          "heavy": 0.018423297855003004
+        }
+      },
+      "popular": {
+        "map12": 0.004721061328610647,
+        "by_stratum": {
+          "light": 0.004771662666237265,
+          "lower_mid": 0.004405487077242802,
+          "upper_mid": 0.005252222107801659,
+          "heavy": 0.004603520034101357
+        }
+      },
+      "rebuy+pop": {
+        "map12": 0.011561190076293784,
+        "by_stratum": {
+          "light": 0.016495351020628456,
+          "lower_mid": 0.013493719608541493,
+          "upper_mid": 0.012794972025567694,
+          "heavy": 0.010207512160329585
+        }
+      }
+    },
+    "hide": {
+      "model": {
+        "map12": 0.005354669102492116,
+        "by_stratum": {
+          "light": 0.006665111767865569,
+          "lower_mid": 0.005151788238620299,
+          "upper_mid": 0.0056278372191052705,
+          "heavy": 0.005149828959874451
+        }
+      },
+      "popular": {
+        "map12": 0.004130365346621333,
+        "by_stratum": {
+          "light": 0.0044663370834764175,
+          "lower_mid": 0.004291875497982368,
+          "upper_mid": 0.0047110591241747764,
+          "heavy": 0.003871693306315919
+        }
+      },
+      "rebuy+pop": {
+        "map12": 0.004130365346621333,
+        "by_stratum": {
+          "light": 0.0044663370834764175,
+          "lower_mid": 0.004291875497982368,
+          "upper_mid": 0.0047110591241747764,
+          "heavy": 0.003871693306315919
+        }
+      }
+    },
+    "buyers": 11183,
+    "candidates_per_buyer": 114.45756952517213,
+    "pair_recall": 0.10573429894336935
+  }
+}

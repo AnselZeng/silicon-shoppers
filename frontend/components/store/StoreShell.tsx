@@ -12,6 +12,7 @@ import { LayoutToast } from "@/components/store/LayoutToast"
 import { QuickView } from "@/components/store/QuickView"
 import { VisaCheckout } from "@/components/store/VisaCheckout"
 import { WishlistDrawer } from "@/components/store/WishlistDrawer"
+import { initPersonalization } from "@/lib/model/personalize"
 import { isParentPayload, postSimMessage, readEnvelope } from "@/lib/sim/protocol"
 import { emitStoreEvent, resetEmitDedupe, takeScrollMark } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
@@ -29,6 +30,10 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     routerRef.current = router
   }, [router])
+
+  useEffect(() => {
+    initPersonalization()
+  }, [])
 
   useEffect(() => {
     emitStoreEvent("page_view", { path: pathname })

@@ -1,0 +1,86 @@
+{
+  "category_keys": [
+    "cat_garment_upper_body",
+    "cat_garment_lower_body",
+    "cat_garment_full_body",
+    "cat_swimwear",
+    "cat_underwear",
+    "cat_accessories",
+    "cat_shoes",
+    "cat_other"
+  ],
+  "category_names": [
+    "Garment Upper body",
+    "Garment Lower body",
+    "Garment Full body",
+    "Swimwear",
+    "Underwear",
+    "Accessories",
+    "Shoes",
+    "Other"
+  ],
+  "category_group_codes": [
+    7,
+    6,
+    5,
+    15,
+    16,
+    0,
+    12
+  ],
+  "department_keys": [
+    "dept_ladieswear",
+    "dept_menswear",
+    "dept_divided",
+    "dept_sport",
+    "dept_baby_children"
+  ],
+  "department_names": [
+    "Ladieswear",
+    "Menswear",
+    "Divided",
+    "Sport",
+    "Baby/Children"
+  ],
+  "master_colors": [
+    "Beige",
+    "Black",
+    "Blue",
+    "Bluish Green",
+    "Brown",
+    "Green",
+    "Grey",
+    "Khaki green",
+    "Lilac Purple",
+    "Metal",
+    "Mole",
+    "Orange",
+    "Pink",
+    "Red",
+    "Turquoise",
+    "White",
+    "Yellow",
+    "Yellowish Green"
+  ],
+  "group_names": [
+    "Accessories",
+    "Bags",
+    "Cosmetic",
+    "Fun",
+    "Furniture",
+    "Garment Full body",
+    "Garment Lower body",
+    "Garment Upper body",
+    "Garment and Shoe care",
+    "Interior textile",
+    "Items",
+    "Nightwear",
+    "Shoes",
+    "Socks & Tights",
+    "Stationery",
+    "Swimwear",
+    "Underwear",
+    "Underwear/nightwear",
+    "Unknown"
+  ]
+}

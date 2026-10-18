@@ -1,7 +1,8 @@
 // Types for the per-shopper homepage document produced by the H&M model.
-// Ported from backend/server/app/lib/model/homepage.ts (origin/pb-backend). For store shoppers the
-// document comes from build_docs in backend/server/score.py. The live-session model is out of scope
-// here, so `session` is typed loosely and never read.
+// For store shoppers the document comes from build_docs in backend/server/score.py.
+// A returning shopper can also carry the live session model's last decisions.
+
+import type { SessionDecisions } from "@/lib/model/sessionStyle"
 
 export type DecisionClass = "Tested" | "Estimated" | "Assumed" | "Based on your settings"
 
@@ -49,6 +50,15 @@ export interface StoreProductPick {
   why: string
 }
 
+/** What the live session model concluded from the shopper's previous visits (refresh job). */
+export interface StoredSession {
+  n_events: number
+  visits: number | null
+  style: Partial<Record<string, number>>
+  decisions: Partial<SessionDecisions>
+  source: string
+}
+
 /** Sorts and filters the shopper keeps choosing. */
 export interface ShopperPreferences {
   sort?: string
@@ -84,7 +94,7 @@ export interface HomepageDoc {
   run_id?: string
   evidence?: { events: number; add_to_bags: number; validated_on: string; note: string }
   store_products?: StoreProductPick[]
-  session?: unknown
+  session?: StoredSession | null
   preferences?: ShopperPreferences
   stratum: "light" | "lower_mid" | "upper_mid" | "heavy"
   cutoff: string
@@ -103,4 +113,16 @@ export interface HomepageDoc {
 export interface ModelContext {
   doc: HomepageDoc
   basketIds: string[]
+}
+
+export interface SampleHomepages {
+  source: string
+  shoppers: HomepageDoc[]
+}
+
+/** Load the bundled demo shoppers (public/model/sample_homepages.json). */
+export async function loadSampleHomepages(): Promise<HomepageDoc[]> {
+  const res = await fetch("/model/sample_homepages.json")
+  if (!res.ok) throw new Error(`sample_homepages.json: ${res.status}`)
+  return ((await res.json()) as SampleHomepages).shoppers
 }
