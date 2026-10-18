@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from "react"
 import { PERSONA_ACCENTS } from "@/config/ui"
 import { ModelOutput } from "@/components/shell/ModelOutput"
-import { TraitEditor } from "@/components/shell/TraitEditor"
+import { PredictedMix } from "@/components/shell/PredictedMix"
 import { Button } from "@/components/ui/button"
 import { DEMO_SHOPPERS, shopperFromSentence } from "@/lib/layout/demoShoppers"
 import { loadFixture } from "@/lib/model/fixtures"
+import { applyMix } from "@/lib/model/mix"
 import type { HomepageDoc } from "@/lib/model/homepage"
 import { runner } from "@/lib/sim/runner"
 import { useLogStore } from "@/lib/state/logStore"
@@ -19,7 +20,6 @@ export function PersonaPanel() {
   const selectedId = usePersonaStore((state) => state.selectedId)
   const select = usePersonaStore((state) => state.select)
   const layoutPreview = useSimStore((state) => state.layoutPreview)
-  const preview = useSimStore((state) => state.preview)
   const fixtures = useSimStore((state) => state.fixtures)
   const [sentence, setSentence] = useState("")
   const [busy, setBusy] = useState(false)
@@ -27,6 +27,7 @@ export function PersonaPanel() {
   const previousPreview = useRef("default")
   const finishTimer = useRef<number | null>(null)
   const [modelDoc, setModelDoc] = useState<HomepageDoc | null>(null)
+  const [draft, setDraft] = useState<HomepageDoc | null>(null)
   const [basket, setBasket] = useState<string[]>([])
 
   const selected = DEMO_SHOPPERS.find((shopper) => shopper.id === selectedId) ?? DEMO_SHOPPERS[0]
@@ -41,7 +42,9 @@ export function PersonaPanel() {
     let cancel = false
     void loadFixture(entry).then((fixture) => {
       if (cancel || !fixture) return
-      setModelDoc(fixture.doc)
+      const next = applyMix(fixture.doc)
+      setModelDoc(next)
+      setDraft(next)
       setBasket(entry.basket)
     })
     return () => {
@@ -56,8 +59,13 @@ export function PersonaPanel() {
     setBusy(true)
     const started = Date.now()
     if (persona) select(persona.id)
+    const doc = draft ?? modelDoc
+    if (!doc) {
+      setBusy(false)
+      return
+    }
     useLogStore.getState().push("sim", `running ${active.title}`)
-    await runner.preview(`shopper:${active.fixtureId}`)
+    runner.previewDocument(doc, basket, active.title)
     if (runToken.current !== token) return
     const remaining = 1600 - (Date.now() - started)
     finishTimer.current = window.setTimeout(() => {
@@ -125,10 +133,10 @@ export function PersonaPanel() {
             <li key={line}>{line}</li>
           ))}
         </ul>
-        {persona ? (
+        {draft ? (
           <div className="mt-3">
-            <p className="mb-2 text-[10px] tracking-[0.14em] text-white/40 uppercase">Preferences</p>
-            <TraitEditor persona={persona} />
+            <p className="mb-2 text-[10px] tracking-[0.14em] text-white/40 uppercase">Predicted mix</p>
+            <PredictedMix doc={draft} onChange={setDraft} />
           </div>
         ) : null}
         <label className="mt-4 block text-[10px] tracking-[0.14em] text-white/40 uppercase">
@@ -164,7 +172,7 @@ export function PersonaPanel() {
             Stop
           </Button>
         </div>
-        {modelDoc ? <ModelOutput doc={preview?.doc ?? modelDoc} basket={preview?.basket ?? basket} /> : null}
+        {draft ? <ModelOutput doc={draft} basket={basket} /> : null}
         <div className="h-4" />
       </ScrollArea>
     </div>

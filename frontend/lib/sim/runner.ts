@@ -1,4 +1,7 @@
+import { validateLayout } from "@/lib/layout/validate"
 import { buildPreview } from "@/lib/layout/preview"
+import { modelLayout } from "@/lib/model/adapter"
+import type { HomepageDoc, ModelContext } from "@/lib/model/homepage"
 import { loadFixtureIndex } from "@/lib/model/fixtures"
 import {
   isStorePayload,
@@ -106,6 +109,41 @@ class ShellRunner {
     const generation = ++this.generation
     useSimStore.getState().setLayoutPreview(id)
     return this.pushPreview(generation)
+  }
+
+  /** Run from the sliders: the edited mix is already written into the document's layout decisions. */
+  previewDocument(doc: HomepageDoc, basket: string[], label: string) {
+    const generation = ++this.generation
+    const id = `shopper:${doc.demo_id ?? doc.user_id ?? "custom"}`
+    useSimStore.getState().setLayoutPreview(id)
+    const model: ModelContext = { doc, basketIds: basket }
+    const result = validateLayout(modelLayout(doc).layout, { model })
+    if (generation !== this.generation) return
+    useSimStore.getState().setPreview({
+      id,
+      stage: "llm",
+      label,
+      layout: result.layout,
+      model,
+      doc,
+      basket,
+      report: result.report,
+    })
+    const logs = useLogStore.getState()
+    logs.push(
+      "model",
+      `${doc.demo_id ?? doc.user_id ?? "shopper"} · ${doc.evidence?.add_to_bags ?? 0} add-to-bags · ${doc.store_products?.length ?? 0} ranked products`,
+    )
+    logs.push("layout", `${label} · nav ${result.layout.nav.order.join(" ")} · ${result.layout.home.blocks.length} blocks`)
+    if (result.report.fellBack) logs.push("layout", `validator fell back: ${result.report.error ?? "invalid"}`)
+    for (const change of result.report.changes) logs.push("layout", `fixed · ${change}`)
+    withSpan("layout.apply", () => id)
+    this.send({
+      type: "set_layout",
+      layout: result.layout,
+      model,
+      presetName: label,
+    })
   }
 
   /** Drops an in-flight run and puts the store back to the layout that was showing. */
