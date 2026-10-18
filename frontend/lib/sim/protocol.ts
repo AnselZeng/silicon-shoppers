@@ -20,6 +20,8 @@ export const STORE_EVENT_TYPES = [
   "checkout_started",
   "payment_completed",
   "concierge_query",
+  "concierge_reply",
+  "concierge_error",
   "loyalty_awarded",
 ] as const
 

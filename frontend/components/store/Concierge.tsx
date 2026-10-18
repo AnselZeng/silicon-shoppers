@@ -73,7 +73,7 @@ interface Msg {
 }
 
 export function Concierge() {
-  const enabled = useStorefront((state) => state.layout.concierge.enabled)
+  // Always available to shoppers — tone still comes from the applied layout.
   const tone = useStorefront((state) => state.layout.concierge.tone)
   const open = useStorefront((state) => state.conciergeOpen)
   const footer = useStorefront((state) => state.stickyFooterOpen)
@@ -89,7 +89,6 @@ export function Concierge() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
   }, [messages, open])
 
-  if (!enabled) return null
   const script = SCRIPTS[tone]
 
   const scriptedAnswer = (q: string) => script.find((item) => item.q === q)?.a ?? null
@@ -116,6 +115,7 @@ export function Concierge() {
       if (!reader) throw new Error("no stream")
       let reply = ""
       let buffer = ""
+      const asked = Date.now()
       setMessages((prev) => [...prev, { role: "assistant", content: "" }])
       for (;;) {
         const { done, value } = await reader.read()
@@ -124,18 +124,27 @@ export function Concierge() {
         buffer = done ? "" : (lines.pop() ?? "")
         for (const line of lines) {
           if (!line.trim()) continue
-          const event = JSON.parse(line) as { type: string; text?: string; error?: string }
+          const event = JSON.parse(line) as { type: string; text?: string; error?: string; model?: string; ms?: number }
           if (event.type === "delta" && event.text) {
             reply += event.text
             setMessages((prev) => [...prev.slice(0, -1), { role: "assistant", content: reply }])
           }
           if (event.type === "error") throw new Error(event.error)
+          if (event.type === "done") {
+            emitStoreEvent("concierge_reply", {
+              tone,
+              model: event.model ?? "unknown",
+              ms: event.ms ?? Date.now() - asked,
+              chars: reply.length,
+            })
+          }
         }
         if (done) break
       }
       if (!reply) throw new Error("empty reply")
       history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: reply }].slice(-12)
-    } catch {
+    } catch (error) {
+      emitStoreEvent("concierge_error", { tone, error: error instanceof Error ? error.message : "failed" })
       const fallback =
         scriptedAnswer(message) ??
         "The concierge is offline right now — but the store is still learning from everything you click."
@@ -210,9 +219,9 @@ export function Concierge() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="bg-[#141414] px-4 py-2 text-[11px] tracking-[0.18em] text-white uppercase"
+        className="ml-auto block rounded-full bg-[#141414] px-3 py-1.5 text-[10px] tracking-[0.14em] text-white uppercase shadow-md"
       >
-        {open ? "Close concierge" : "Concierge"}
+        {open ? "Close" : "Concierge"}
       </button>
     </div>
   )

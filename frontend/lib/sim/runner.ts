@@ -133,7 +133,18 @@ class ShellRunner {
 
   private onStoreEvent(event: StoreEvent) {
     const logs = useLogStore.getState()
-    logs.push("tracker", describeStoreEvent(event))
+    if (event.type === "concierge_query") {
+      logs.push("llm", `shopper asked · "${String(event.properties.q ?? "")}"`)
+    } else if (event.type === "concierge_reply") {
+      logs.push(
+        "llm",
+        `answered · ${String(event.properties.model ?? "llm")} · ${String(event.properties.ms ?? "?")}ms · ${String(event.properties.chars ?? "?")} chars`,
+      )
+    } else if (event.type === "concierge_error") {
+      logs.push("llm", `chat failed · ${String(event.properties.error ?? "unknown")} · scripted fallback`)
+    } else {
+      logs.push("tracker", describeStoreEvent(event))
+    }
     useObsStore.getState().addCrumb(event.type, describeStoreEvent(event))
     if (event.type === "page_view") useSimStore.getState().setRoute(event.route)
     if (event.type === "checkout_started") {
