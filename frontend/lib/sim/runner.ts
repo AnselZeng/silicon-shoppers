@@ -1,6 +1,8 @@
 import { LAYOUT_MOTION } from "@/config/ui"
 import { validateLayout } from "@/lib/layout/validate"
-import { buildPreview } from "@/lib/layout/preview"
+import { requestLlmLayout } from "@/lib/layout/llm"
+import { llmStage } from "@/lib/layout/pipeline"
+import { buildPreview, type BuiltBy } from "@/lib/layout/preview"
 import { modelLayout, modelLayoutV1 } from "@/lib/model/adapter"
 import type { StoreLayoutDoc } from "@/lib/model/storeLayout"
 import type { HomepageDoc, ModelContext } from "@/lib/model/homepage"
@@ -21,6 +23,8 @@ import { useSimStore } from "@/lib/state/simStore"
 /** Parent side of the iframe: pushes layouts into the store and logs what the shopper does there. */
 class ShellRunner {
   private generation = 0
+  /** Generation of the Run whose LLM call the button is waiting on. */
+  private llmGeneration = 0
   private settleWaiters: (() => void)[] = []
   handleMessage(event: MessageEvent) {
     if (event.origin !== window.location.origin) return
@@ -158,15 +162,46 @@ class ShellRunner {
 
   /**
    * Run from the sliders: the edited mix is already written into the document's layout decisions.
-   * Resolves once the store has finished playing the swap.
+   * The LLM designs the layout from it (and the shopper's sentence); if that fails for any reason the
+   * model's rules build it instead and the error is logged. Resolves once the store has finished
+   * playing the swap.
    */
-  previewDocument(doc: HomepageDoc, basket: string[], label: string): Promise<void> {
+  async previewDocument(doc: HomepageDoc, basket: string[], label: string, sentence = ""): Promise<void> {
     const generation = ++this.generation
     const id = `shopper:${doc.demo_id ?? doc.user_id ?? "custom"}`
     useSimStore.getState().setLayoutPreview(id)
     const model: ModelContext = { doc, basketIds: basket }
-    const result = validateLayout(modelLayout(doc).layout, { model })
-    if (generation !== this.generation) return Promise.resolve()
+    const logs = useLogStore.getState()
+    logs.push(
+      "model",
+      `${doc.demo_id ?? doc.user_id ?? "shopper"} · ${doc.evidence?.add_to_bags ?? 0} add-to-bags · ${doc.store_products?.length ?? 0} ranked products`,
+    )
+    logs.push("llm", sentence.trim() ? `asking the LLM · shopper said "${sentence.trim()}"` : "asking the LLM")
+    const span = useObsStore.getState().startSpan("llm.layout", { label })
+    this.llmGeneration = generation
+    useSimStore.getState().setLlmPending(true)
+    const reply = await requestLlmLayout(doc, sentence)
+    if (this.llmGeneration === generation) useSimStore.getState().setLlmPending(false)
+    if (generation !== this.generation) {
+      useObsStore.getState().endSpan(span, "ok")
+      return
+    }
+    let result = reply.ok ? llmStage(reply.layout, model) : null
+    let builtBy: BuiltBy
+    if (reply.ok && result && !result.report.fellBack) {
+      useObsStore.getState().endSpan(span, "ok")
+      builtBy = { kind: "llm", model: reply.model, cached: reply.cached, ms: reply.ms }
+      logs.push("llm", `${reply.model} · ${reply.cached ? "cached" : `${(reply.ms / 1000).toFixed(1)}s`}`)
+    } else {
+      const error = reply.ok ? `layout failed validation: ${result?.report.error ?? "invalid"}` : reply.error
+      useObsStore.getState().endSpan(span, "error")
+      useObsStore.getState().note(`llm.layout error · ${error}`)
+      console.error("LLM layout failed, using the model's rules", error)
+      logs.push("llm", `error · ${error}`)
+      logs.push("llm", "falling back to the model's rules")
+      builtBy = { kind: "rules", error }
+      result = validateLayout(modelLayout(doc).layout, { model })
+    }
     useSimStore.getState().setPreview({
       id,
       stage: "llm",
@@ -176,12 +211,8 @@ class ShellRunner {
       doc,
       basket,
       report: result.report,
+      builtBy,
     })
-    const logs = useLogStore.getState()
-    logs.push(
-      "model",
-      `${doc.demo_id ?? doc.user_id ?? "shopper"} · ${doc.evidence?.add_to_bags ?? 0} add-to-bags · ${doc.store_products?.length ?? 0} ranked products`,
-    )
     logs.push("layout", `${label} · nav ${result.layout.nav.order.join(" ")} · ${result.layout.home.blocks.length} blocks`)
     if (result.report.fellBack) logs.push("layout", `validator fell back: ${result.report.error ?? "invalid"}`)
     for (const change of result.report.changes) logs.push("layout", `fixed · ${change}`)
@@ -229,6 +260,7 @@ class ShellRunner {
     const generation = ++this.generation
     const id = fallbackId || "default"
     useSimStore.getState().setLayoutPreview(id)
+    useSimStore.getState().setLlmPending(false)
     useLogStore.getState().push("sim", "stopped")
     this.settle()
     return this.pushPreview(generation, true)
