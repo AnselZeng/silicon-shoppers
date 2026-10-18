@@ -15,6 +15,7 @@ import { useSimStore } from "@/lib/state/simStore"
 
 /** Parent side of the iframe: pushes layouts into the store and logs what the shopper does there. */
 class ShellRunner {
+  private generation = 0
   handleMessage(event: MessageEvent) {
     if (event.origin !== window.location.origin) return
     const parsed = readEnvelope(event.data)
@@ -33,29 +34,40 @@ class ShellRunner {
     useLogStore.getState().push("model", `${fixtures.length} fixtures loaded (hand-written, not model output)`)
   }
 
-  async pushPreview() {
+  async pushPreview(generation = this.generation, immediate = false) {
     const sim = useSimStore.getState()
     const preview = await buildPreview(sim.layoutPreview, sim.fixtures)
+    if (generation !== this.generation) return
     if (useSimStore.getState().layoutPreview !== sim.layoutPreview) return
     useSimStore.getState().setPreview(preview)
     const logs = useLogStore.getState()
-    if (preview.note) logs.push("layout", preview.note)
-    if (preview.doc) {
-      const doc = preview.doc
-      logs.push(
-        "model",
-        `${doc.demo_id ?? doc.user_id ?? "shopper"} · ${doc.evidence?.add_to_bags ?? 0} add-to-bags · ${doc.store_products?.length ?? 0} ranked products`,
-      )
-    }
-    if (preview.stage === "model") {
-      logs.push("model", "model output is input for the LLM; the store stays on the house default")
+    if (immediate) {
+      logs.push("layout", `back to ${preview.label}`)
     } else {
-      logs.push("layout", `${preview.label} · nav ${preview.layout.nav.order.join(" ")} · ${preview.layout.home.blocks.length} blocks`)
+      if (preview.note) logs.push("layout", preview.note)
+      if (preview.doc) {
+        const doc = preview.doc
+        logs.push(
+          "model",
+          `${doc.demo_id ?? doc.user_id ?? "shopper"} · ${doc.evidence?.add_to_bags ?? 0} add-to-bags · ${doc.store_products?.length ?? 0} ranked products`,
+        )
+      }
+      if (preview.stage === "model") {
+        logs.push("model", "model output is input for the LLM; the store stays on the house default")
+      } else {
+        logs.push("layout", `${preview.label} · nav ${preview.layout.nav.order.join(" ")} · ${preview.layout.home.blocks.length} blocks`)
+      }
+      if (preview.report.fellBack) logs.push("layout", `validator fell back: ${preview.report.error ?? "invalid"}`)
+      for (const change of preview.report.changes) logs.push("layout", `fixed · ${change}`)
     }
-    if (preview.report.fellBack) logs.push("layout", `validator fell back: ${preview.report.error ?? "invalid"}`)
-    for (const change of preview.report.changes) logs.push("layout", `fixed · ${change}`)
     withSpan("layout.apply", () => preview.id)
-    this.send({ type: "set_layout", layout: preview.layout, model: preview.model, presetName: preview.stage === "llm" ? preview.label : undefined })
+    this.send({
+      type: "set_layout",
+      layout: preview.layout,
+      model: preview.model,
+      presetName: preview.stage === "llm" ? preview.label : undefined,
+      immediate,
+    })
   }
 
   private send(payload: ParentPayload) {
@@ -91,16 +103,25 @@ class ShellRunner {
   }
 
   preview(id: string) {
+    const generation = ++this.generation
     useSimStore.getState().setLayoutPreview(id)
-    useLogStore.getState().push("layout", `preview ${id}`)
-    void this.pushPreview()
+    return this.pushPreview(generation)
+  }
+
+  /** Drops an in-flight run and puts the store back to the layout that was showing. */
+  stop(fallbackId: string) {
+    const generation = ++this.generation
+    const id = fallbackId || "default"
+    useSimStore.getState().setLayoutPreview(id)
+    useLogStore.getState().push("sim", "stopped")
+    return this.pushPreview(generation, true)
   }
 
   reset() {
     useLogStore.getState().clear()
     useObsStore.getState().clear()
     this.send({ type: "reset" })
-    useLogStore.getState().push("sim", "reset")
+    useLogStore.getState().push("sim", "session cleared")
   }
 
   command(line: string) {

@@ -24,13 +24,24 @@ function publishReady() {
 
 let layoutMotion: Promise<void> | null = null
 let queuedLayout: (() => void) | null = null
+let activeTransition: ViewTransition | null = null
+let motionEpoch = 0
 
 function isSkippedTransition(error: unknown): boolean {
   return error instanceof DOMException && error.name === "AbortError"
 }
 
 /** Animates a layout swap. A second swap waits, so the first one is not aborted mid-flight. */
-function applyWithMotion(apply: () => void) {
+function applyWithMotion(apply: () => void, immediate = false) {
+  if (immediate) {
+    motionEpoch += 1
+    queuedLayout = null
+    activeTransition?.skipTransition()
+    activeTransition = null
+    layoutMotion = null
+    apply()
+    return
+  }
   const start = document.startViewTransition?.bind(document)
   if (!start) {
     apply()
@@ -40,7 +51,9 @@ function applyWithMotion(apply: () => void) {
     queuedLayout = apply
     return
   }
+  const epoch = motionEpoch
   const transition = start(apply)
+  activeTransition = transition
   transition.ready.catch((error: unknown) => {
     if (!isSkippedTransition(error)) console.error(error)
   })
@@ -50,7 +63,9 @@ function applyWithMotion(apply: () => void) {
       if (!isSkippedTransition(error)) console.error(error)
     },
   ).then(() => {
+    if (epoch !== motionEpoch) return
     layoutMotion = null
+    activeTransition = null
     const next = queuedLayout
     queuedLayout = null
     if (next) applyWithMotion(next)
@@ -103,8 +118,9 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
         return
       }
       if (payload.type === "set_layout") {
-        applyWithMotion(() =>
-          useStorefront.getState().setLayout(payload.layout, { model: payload.model, presetName: payload.presetName }),
+        applyWithMotion(
+          () => useStorefront.getState().setLayout(payload.layout, { model: payload.model, presetName: payload.presetName }),
+          payload.immediate === true,
         )
       }
     }

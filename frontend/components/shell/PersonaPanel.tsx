@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { PERSONA_ACCENTS } from "@/config/ui"
 import { ModelOutput } from "@/components/shell/ModelOutput"
 import { TraitEditor } from "@/components/shell/TraitEditor"
@@ -9,6 +9,7 @@ import { DEMO_SHOPPERS, shopperFromSentence } from "@/lib/layout/demoShoppers"
 import { loadFixture } from "@/lib/model/fixtures"
 import type { HomepageDoc } from "@/lib/model/homepage"
 import { runner } from "@/lib/sim/runner"
+import { useLogStore } from "@/lib/state/logStore"
 import { usePersonaStore } from "@/lib/state/personaStore"
 import { useSimStore } from "@/lib/state/simStore"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -22,6 +23,9 @@ export function PersonaPanel() {
   const fixtures = useSimStore((state) => state.fixtures)
   const [sentence, setSentence] = useState("")
   const [busy, setBusy] = useState(false)
+  const runToken = useRef(0)
+  const previousPreview = useRef("default")
+  const finishTimer = useRef<number | null>(null)
   const [modelDoc, setModelDoc] = useState<HomepageDoc | null>(null)
   const [basket, setBasket] = useState<string[]>([])
 
@@ -47,11 +51,26 @@ export function PersonaPanel() {
 
   async function run() {
     if (fixtures.length === 0 || busy) return
+    const token = ++runToken.current
+    previousPreview.current = useSimStore.getState().layoutPreview || "default"
     setBusy(true)
-    const persona = personas.find((item) => item.id === active.id)
+    const started = Date.now()
     if (persona) select(persona.id)
-    runner.preview(`shopper:${active.fixtureId}`)
-    window.setTimeout(() => setBusy(false), 700)
+    useLogStore.getState().push("sim", `running ${active.title}`)
+    await runner.preview(`shopper:${active.fixtureId}`)
+    if (runToken.current !== token) return
+    const remaining = 1600 - (Date.now() - started)
+    finishTimer.current = window.setTimeout(() => {
+      if (runToken.current === token) setBusy(false)
+    }, Math.max(0, remaining))
+  }
+
+  function stop() {
+    if (!busy) return
+    runToken.current += 1
+    if (finishTimer.current !== null) window.clearTimeout(finishTimer.current)
+    setBusy(false)
+    void runner.stop(previousPreview.current)
   }
 
   return (
@@ -125,9 +144,26 @@ export function PersonaPanel() {
         {fromSentence ? (
           <p className="mt-1 text-[11px] text-white/55">Closest shopper: {fromSentence.title}</p>
         ) : null}
-        <Button type="button" className="mt-3 w-full text-foreground" disabled={fixtures.length === 0 || busy} onClick={() => void run()}>
-          {busy ? "Refitting…" : "Run"}
-        </Button>
+        <div className="mt-3 flex gap-2">
+          <Button
+            type="button"
+            className="h-10 flex-1 bg-white text-sm text-black hover:bg-neutral-200 disabled:bg-white/80 disabled:text-black disabled:opacity-100"
+            disabled={fixtures.length === 0 || busy}
+            aria-busy={busy}
+            onClick={() => void run()}
+          >
+            {busy ? "Running…" : "Run"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 border-white/30 bg-transparent px-4 text-white hover:bg-white/10 disabled:opacity-40"
+            disabled={!busy}
+            onClick={stop}
+          >
+            Stop
+          </Button>
+        </div>
         {modelDoc ? <ModelOutput doc={preview?.doc ?? modelDoc} basket={preview?.basket ?? basket} /> : null}
         <div className="h-4" />
       </ScrollArea>

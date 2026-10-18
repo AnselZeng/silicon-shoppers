@@ -36,7 +36,7 @@ export interface StoreEvent {
 
 export type ParentPayload =
   /** layout is validated inside the store; model lets the validator apply the model policy and fall back. */
-  | { type: "set_layout"; layout: unknown; model?: ModelContext | null; presetName?: string }
+  | { type: "set_layout"; layout: unknown; model?: ModelContext | null; presetName?: string; immediate?: boolean }
   | { type: "reset" }
 
 export type StorePayload =
