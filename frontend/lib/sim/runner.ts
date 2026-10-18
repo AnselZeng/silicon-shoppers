@@ -1,4 +1,5 @@
-import { previewLayout } from "@/lib/layout/preview"
+import { buildPreview } from "@/lib/layout/preview"
+import { loadFixtureIndex } from "@/lib/model/fixtures"
 import {
   isStorePayload,
   postSimMessage,
@@ -20,16 +21,37 @@ class ShellRunner {
     if (!parsed || !isStorePayload(parsed.payload)) return
     const payload = parsed.payload
     if (payload.type === "store_ready") {
-      this.pushPreview()
+      void this.pushPreview()
       return
     }
     this.onStoreEvent(payload.event)
   }
 
-  pushPreview() {
-    const { layout, presetName } = previewLayout(useSimStore.getState().layoutPreview)
-    withSpan("layout.apply", () => presetName ?? "default")
-    this.send({ type: "set_layout", layout, presetName: presetName ?? undefined })
+  async loadFixtures() {
+    const fixtures = await loadFixtureIndex()
+    useSimStore.getState().setFixtures(fixtures)
+    useLogStore.getState().push("model", `${fixtures.length} fixtures loaded (hand-written, not model output)`)
+  }
+
+  async pushPreview() {
+    const sim = useSimStore.getState()
+    const preview = await buildPreview(sim.layoutPreview, sim.fixtures)
+    if (useSimStore.getState().layoutPreview !== sim.layoutPreview) return
+    useSimStore.getState().setPreview(preview)
+    const logs = useLogStore.getState()
+    if (preview.note) logs.push("layout", preview.note)
+    if (preview.model) {
+      const doc = preview.model.doc
+      logs.push(
+        "model",
+        `${doc.demo_id ?? doc.user_id ?? "shopper"} · ${doc.evidence?.add_to_bags ?? 0} add-to-bags · ${doc.store_products?.length ?? 0} ranked products`,
+      )
+    }
+    logs.push("layout", `${preview.label} · nav ${preview.layout.nav.order.join(" ")} · ${preview.layout.home.blocks.length} blocks`)
+    if (preview.report.fellBack) logs.push("layout", `validator fell back: ${preview.report.error ?? "invalid"}`)
+    for (const change of preview.report.changes) logs.push("layout", `fixed · ${change}`)
+    withSpan("layout.apply", () => preview.id)
+    this.send({ type: "set_layout", layout: preview.layout, model: preview.model, presetName: preview.stage === "default" ? undefined : preview.label })
   }
 
   private send(payload: ParentPayload) {
@@ -67,7 +89,7 @@ class ShellRunner {
   preview(id: string) {
     useSimStore.getState().setLayoutPreview(id)
     useLogStore.getState().push("layout", `preview ${id}`)
-    this.pushPreview()
+    void this.pushPreview()
   }
 
   reset() {
@@ -85,7 +107,7 @@ class ShellRunner {
     const arg = rest.join(" ")
     switch (cmd) {
       case "help":
-        useLogStore.getState().push("sim", "help · preview <id> · reset · clear")
+        useLogStore.getState().push("sim", "help · preview default | preview <fixture-id>[:model|:llm] · reset · clear")
         return
       case "preview":
         this.preview(arg || "default")

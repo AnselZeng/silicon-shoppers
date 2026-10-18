@@ -4,6 +4,13 @@ import { DEFAULT_LAYOUT, cloneLayout } from "@/lib/layout/presets"
 import { LlmLayoutSchema } from "@/lib/layout/schema"
 import type { LayoutConfig } from "@/lib/layout/types"
 import { validateLayout } from "@/lib/layout/validate"
+import { resolveHome } from "@/lib/layout/home"
+import { llmStage, modelStage } from "@/lib/layout/pipeline"
+import { modelLayout } from "@/lib/model/adapter"
+import { PRODUCTS } from "@/lib/store/catalog"
+import { sortProducts } from "@/lib/store/sorting"
+import { CATEGORIES } from "@/lib/store/types"
+import { fixtureModel } from "@/lib/testing/fixtures"
 
 function base(): LayoutConfig {
   return cloneLayout(DEFAULT_LAYOUT)
@@ -205,5 +212,105 @@ describe("validator without model output", () => {
   test("the LLM schema converts to JSON Schema", () => {
     const schema = z.toJSONSchema(LlmLayoutSchema) as { properties: Record<string, unknown> }
     expect(Object.keys(schema.properties)).toEqual(["version", "nav", "home", "listing", "ads", "copy", "checkout", "concierge", "reasons"])
+  })
+})
+
+describe("validator with model output", () => {
+  const model = fixtureModel("fixture-men-sale")
+  const modelBase = () => modelLayout(model.doc, model.basketIds)
+
+  test("keeps the model's section rows in section_order, other blocks stay put", () => {
+    const cfg = modelBase()
+    cfg.home.blocks = [
+      { type: "hero" },
+      { type: "product_row", source: { kind: "new_in" }, limit: 4 },
+      { type: "collection_spotlight", collection: "Essentials" },
+      { type: "product_row", source: { kind: "bestsellers" }, limit: 4 },
+      { type: "product_row", source: { kind: "sale" }, limit: 8 },
+    ]
+    const { layout, report } = validateLayout(cfg, { model })
+    const kinds = layout.home.blocks.map((b) => (b.type === "product_row" ? b.source.kind : b.type))
+    expect(kinds).toEqual(["hero", "sale", "collection_spotlight", "bestsellers", "new_in"])
+    expect(report.changes.join(" ")).toMatch(/section_order/)
+  })
+
+  test("category tiles and the category filter follow category_order", () => {
+    const women = fixtureModel("fixture-women-new")
+    const cfg = modelLayout(women.doc, women.basketIds)
+    cfg.listing.categoryOrder = [...CATEGORIES].reverse()
+    cfg.home.blocks = [{ type: "hero" }, { type: "category_tiles", categories: ["coats", "jeans", "dresses", "shirts"] }, { type: "product_row", source: { kind: "new_in" }, limit: 8 }]
+    const { layout } = validateLayout(cfg, { model: women })
+    expect(layout.listing.categoryOrder[0]).toBe("dresses")
+    const tiles = layout.home.blocks.find((b) => b.type === "category_tiles")
+    expect(tiles?.type === "category_tiles" && tiles.categories).toEqual(["dresses", "shirts", "coats", "jeans"])
+  })
+
+  test("the newsletter is removed unless the model's popups is on; other popups are the LLM's choice", () => {
+    const cfg = modelBase()
+    cfg.ads.placements.push({ slot: "popup", adIds: ["newsletter"], trigger: "delay", triggerValue: 1000 })
+    expect(validateLayout(cfg, { model }).layout.ads.placements.some((p) => p.slot === "popup")).toBe(false)
+
+    const on = structuredClone(model)
+    on.doc.layout.popups = { ...on.doc.layout.popups, value: "on" }
+    expect(validateLayout(cfg, { model: on }).layout.ads.placements.find((p) => p.slot === "popup")?.adIds).toEqual(["newsletter"])
+
+    const offer = modelBase()
+    offer.ads.placements.push({ slot: "popup", adIds: ["offer_men"], trigger: "exit_intent" })
+    expect(validateLayout(offer, { model }).layout.ads.placements.find((p) => p.slot === "popup")?.adIds).toEqual(["offer_men"])
+  })
+
+  test("fills an empty hero from the model's hero decision", () => {
+    const cfg = modelBase()
+    cfg.ads.placements = cfg.ads.placements.filter((p) => p.slot !== "hero")
+    expect(validateLayout(cfg, { model }).layout.ads.placements.find((p) => p.slot === "hero")?.adIds).toEqual(["sale_men"])
+  })
+
+  test("model reasons get the model's text; LLM reasons may cite only numbers from the model output", () => {
+    const cfg = modelBase()
+    cfg.reasons = [
+      { field: "nav.department", source: "model", modelDecision: "landing_department", text: "made up", class: "Tested" },
+      { field: "ads.placements", source: "llm", text: "Offer popup: sale is 41% of next picks" },
+      { field: "home.blocks", source: "llm", text: "Sale rows first: 90% of shoppers love sales" },
+    ]
+    const { layout } = validateLayout(cfg, { model })
+    expect(layout.reasons.map((r) => r.field)).toEqual(["nav.department", "ads.placements"])
+    expect(layout.reasons[0]?.text).toBe(model.doc.layout.landing_department.reason)
+  })
+
+  test("a broken LLM config falls back to the model layout", () => {
+    const { layout, report } = llmStage({ version: 2, nav: { order: "men" } }, model)
+    expect(report.fellBack).toBe(true)
+    expect(layout).toEqual(modelStage(model).layout)
+  })
+
+  test("removes products repeated across rows, rows filled top to bottom", () => {
+    const cfg = modelBase()
+    cfg.nav.department = null
+    cfg.home.blocks = [
+      { type: "hero" },
+      { type: "product_row", source: { kind: "bestsellers" }, limit: 8 },
+      { type: "product_row", source: { kind: "under_price", max: 150 }, limit: 8 },
+      { type: "product_row", source: { kind: "category", category: "coats" }, limit: 8 },
+    ]
+    const { layout } = validateLayout(cfg, { model })
+    const resolved = resolveHome(layout).flatMap((e) => ("products" in e ? [e.products.map((p) => p.id)] : []))
+    const all = resolved.flat()
+    expect(new Set(all).size).toBe(all.length)
+    expect(resolved[0]).toHaveLength(8)
+    expect(sortProducts(PRODUCTS, "bestsellers").slice(0, 8).map((p) => p.id)).toEqual(resolved[0])
+  })
+
+  test("department filtering applies to every source except for_you and buy_again", () => {
+    const cfg = modelBase()
+    cfg.home.blocks.push({ type: "product_row", source: { kind: "under_price", max: 100 }, limit: 8 })
+    const { layout } = validateLayout(cfg, { model })
+    for (const entry of resolveHome(layout)) {
+      if (!("products" in entry)) continue
+      const kind = entry.block.source.kind
+      if (kind === "for_you" || kind === "buy_again") continue
+      expect(entry.products.every((p) => p.department === "men"), kind).toBe(true)
+    }
+    const forYou = resolveHome(layout).find((e) => "products" in e && e.block.source.kind === "for_you")
+    expect(forYou && "products" in forYou && forYou.products.some((p) => p.department === "women")).toBe(true)
   })
 })

@@ -1,0 +1,286 @@
+{
+  "demo_id": "fixture-divided",
+  "user_id": "fixture-divided",
+  "stratum": "light",
+  "cutoff": "2026-10-18",
+  "updated_at": "2026-10-17T18:00:00Z",
+  "run_id": "fixture",
+  "model": {
+    "name": "atelier-shopper-model v2 (frozen fixture)",
+    "inputs": "purchase features from your add-to-bags, mapped to H&M groups and colors"
+  },
+  "evidence": {
+    "events": 11,
+    "add_to_bags": 11,
+    "validated_on": "fixture: hand-written, not scored by the model",
+    "note": "Tested = beat the store default on held-out H&M purchases. Your store purchases are mapped to H&M product groups and colors; that mapping itself is not tested."
+  },
+  "layout": {
+    "landing_department": {
+      "value": "dept_divided",
+      "class": "Tested",
+      "validated": false,
+      "reason": "Divided: about 52% of your next picks (predicted from your 11 add-to-bags)"
+    },
+    "category_order": {
+      "value": [
+        "cat_garment_lower_body",
+        "cat_garment_upper_body",
+        "cat_accessories",
+        "cat_shoes",
+        "cat_garment_full_body",
+        "cat_underwear",
+        "cat_swimwear",
+        "cat_other"
+      ],
+      "class": "Tested",
+      "validated": true,
+      "reason": "Garment Lower body first: about 41% of your next picks (2.0x the store average)"
+    },
+    "section_order": {
+      "value": [
+        "bestsellers",
+        "sale",
+        "new_in",
+        "buy_again"
+      ],
+      "class": "Tested",
+      "validated": true,
+      "reason": "Bestsellers first: about 38% of your next picks are likely to come from it"
+    },
+    "default_sort": {
+      "value": "bestsellers",
+      "class": "Tested",
+      "validated": false,
+      "reason": "Sorted bestsellers first: store default, no shopper beat it on held-out data"
+    },
+    "color_highlight": {
+      "value": [
+        "Black",
+        "Grey"
+      ],
+      "class": "Tested",
+      "validated": false,
+      "reason": "You're likely to pick black and grey (about 47% of next picks vs 38% for the store's top colors)"
+    },
+    "price_filter_first": {
+      "value": false,
+      "class": "Assumed",
+      "validated": null,
+      "reason": "Default filters"
+    },
+    "filter_order": {
+      "value": [
+        "color",
+        "category",
+        "size",
+        "price",
+        "sale"
+      ],
+      "class": "Assumed",
+      "validated": null,
+      "reason": "Filters reordered to match your predicted shopping"
+    },
+    "hero": {
+      "value": "category",
+      "class": "Assumed",
+      "validated": null,
+      "reason": "Banner for Garment Lower body, your top predicted category"
+    },
+    "popups": {
+      "value": "off",
+      "class": "Based on your settings",
+      "validated": null,
+      "reason": "No newsletter sign-up on record"
+    },
+    "grid_columns": {
+      "value": 3,
+      "class": "Estimated",
+      "validated": null,
+      "reason": "Store default until the live model has enough clicks"
+    },
+    "recently_viewed": {
+      "value": "default",
+      "class": "Estimated",
+      "validated": null,
+      "reason": "Store default until the live model has enough clicks"
+    },
+    "compare_panel": {
+      "value": "default",
+      "class": "Estimated",
+      "validated": null,
+      "reason": "Set by the live session model (see session.decisions)"
+    },
+    "cart_reminder": {
+      "value": "default",
+      "class": "Estimated",
+      "validated": null,
+      "reason": "Set by the live session model (see session.decisions)"
+    }
+  },
+  "predicted_mix": {
+    "category": {
+      "cat_garment_lower_body": 0.41,
+      "cat_garment_upper_body": 0.37,
+      "cat_accessories": 0.08,
+      "cat_shoes": 0.06,
+      "cat_garment_full_body": 0.04,
+      "cat_underwear": 0.02,
+      "cat_swimwear": 0.01,
+      "cat_other": 0.01
+    },
+    "department": {
+      "dept_divided": 0.52,
+      "dept_ladieswear": 0.21,
+      "dept_menswear": 0.15,
+      "dept_sport": 0.08,
+      "dept_baby_children": 0.04
+    },
+    "section": {
+      "bestsellers": 0.38,
+      "sale": 0.3,
+      "new_in": 0.27,
+      "buy_again": 0.12
+    }
+  },
+  "browsing": {
+    "source": "Live session model",
+    "match_confidence": 1,
+    "exploration": 0.5,
+    "multi_visit_research": 0.5
+  },
+  "products": {
+    "for_you": [],
+    "rows": {}
+  },
+  "store_products": [
+    {
+      "product_id": "w-g23",
+      "score": 0.0377,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g24",
+      "score": 0.0375,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-sale-trouser",
+      "score": 0.0363,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g39",
+      "score": 0.0347,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g09",
+      "score": 0.034,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g59",
+      "score": 0.0317,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g15",
+      "score": 0.02806,
+      "why": "fits your predicted mix"
+    },
+    {
+      "product_id": "w-g65",
+      "score": 0.02614,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g34",
+      "score": 0.02416,
+      "why": "fits your predicted mix"
+    },
+    {
+      "product_id": "w-new-dress",
+      "score": 0.02205,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-winter-puffer",
+      "score": 0.02078,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g18",
+      "score": 0.02065,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-ess-coat",
+      "score": 0.02028,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g48",
+      "score": 0.02008,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g13",
+      "score": 0.01988,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "m-g57",
+      "score": 0.01976,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-sale-crew",
+      "score": 0.01938,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "m-wool-trouser",
+      "score": 0.01936,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g25",
+      "score": 0.01865,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-sale-knit",
+      "score": 0.01838,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g14",
+      "score": 0.01808,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g08",
+      "score": 0.01778,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-g38",
+      "score": 0.01768,
+      "why": "in a color you're likely to pick"
+    },
+    {
+      "product_id": "w-sale-cardigan",
+      "score": 0.01758,
+      "why": "in a color you're likely to pick"
+    }
+  ],
+  "session": null,
+  "preferences": {
+    "sort_counts": {},
+    "filter_counts": {},
+    "color_filters": [],
+    "recent_searches": [],
+    "filters_first": []
+  }
+}

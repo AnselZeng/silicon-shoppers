@@ -19,15 +19,17 @@ export function ListingView({ mode }: { mode: ListingMode }) {
   const layout = useStorefront((state) => state.layout)
   const query = useMemo(() => parseListingQuery(new URLSearchParams(params.toString())), [params])
   const sort = query.sort ?? layout.listing.defaultSort
+  /** For You keeps the model's ranking until the shopper picks a sort. */
+  const keepRank = mode === "for-you" && !query.sort
   const path = modePath(mode)
   const pageKey = `${params.toString()}|${layout.listing.defaultSort}`
   const [paging, setPaging] = useState<{ key: string; count: number }>({ key: pageKey, count: UI_CONFIG.listingPageSize })
   const visible = paging.key === pageKey ? paging.count : UI_CONFIG.listingPageSize
 
   const products = useMemo(() => {
-    const filtered = applyFilters(baseProducts(mode), query, mode)
-    return sortProducts(filtered, sort, query.q)
-  }, [mode, query, sort])
+    const filtered = applyFilters(baseProducts(mode, layout.home.forYouIds), query, mode)
+    return keepRank ? filtered : sortProducts(filtered, sort, query.q)
+  }, [mode, query, sort, keepRank, layout.home.forYouIds])
 
   function write(next: ListingQuery) {
     router.push(listingHref(path, next), { scroll: false })
@@ -57,6 +59,8 @@ export function ListingView({ mode }: { mode: ListingMode }) {
           ? "New in"
           : mode === "sale"
             ? "Sale"
+            : mode === "for-you"
+              ? "For you"
             : query.q
               ? `Search “${query.q}”`
               : "Search"

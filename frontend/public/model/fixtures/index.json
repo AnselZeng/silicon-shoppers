@@ -1,0 +1,81 @@
+{
+  "note": "Hand-written fixtures, not model output. See README.md.",
+  "fixtures": [
+    {
+      "id": "fixture-men-sale",
+      "label": "Menswear sale buyer",
+      "description": "12 add-to-bags, mostly men's pieces bought on markdown.",
+      "doc": "fixture-men-sale.json",
+      "basket": [
+        "m-g12",
+        "m-g16",
+        "m-g17",
+        "m-g22",
+        "m-g31",
+        "m-g42",
+        "m-g56",
+        "m-oxford",
+        "m-navy-tee",
+        "m-g41",
+        "m-g02",
+        "w-sale-crew"
+      ],
+      "llm": "fixture-men-sale.llm.json"
+    },
+    {
+      "id": "fixture-women-new",
+      "label": "Womenswear new-arrival buyer",
+      "description": "14 add-to-bags, women's pieces bought soon after they landed, many dresses.",
+      "doc": "fixture-women-new.json",
+      "basket": [
+        "w-winter-puffer",
+        "w-new-dress",
+        "w-sale-knit",
+        "w-g03",
+        "w-g04",
+        "w-g08",
+        "w-g10",
+        "w-g24",
+        "w-g25",
+        "w-g29",
+        "w-g45",
+        "w-g58",
+        "w-g54",
+        "w-g34"
+      ],
+      "llm": "fixture-women-new.llm.json"
+    },
+    {
+      "id": "fixture-low-evidence",
+      "label": "Low-evidence shopper",
+      "description": "3 add-to-bags across both departments. The model stays close to the store average.",
+      "doc": "fixture-low-evidence.json",
+      "basket": [
+        "w-sale-poplin",
+        "m-wool-trouser",
+        "w-g48"
+      ],
+      "llm": "fixture-low-evidence.llm.json"
+    },
+    {
+      "id": "fixture-divided",
+      "label": "Divided-heavy shopper",
+      "description": "11 add-to-bags of young, lower-priced women's pieces: jeans, skirts and tees (H&M Divided).",
+      "doc": "fixture-divided.json",
+      "basket": [
+        "w-sale-rib-tee",
+        "w-sale-tank",
+        "w-sale-jean",
+        "w-sale-skirt",
+        "w-g03",
+        "w-g05",
+        "w-g35",
+        "w-g60",
+        "w-g33",
+        "w-g28",
+        "w-g40"
+      ],
+      "llm": null
+    }
+  ]
+}

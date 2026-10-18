@@ -28,6 +28,7 @@ export const LOG_COLORS = {
   sim: "#a3a3a3",
   tracker: "#fde047",
   layout: "#86efac",
+  model: "#c4b5fd",
   sentry: "#fdba74",
   visa: "#7dd3fc",
 } as const

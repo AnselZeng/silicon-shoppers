@@ -11,6 +11,7 @@ export function SimulatorApp() {
   useEffect(() => {
     const onMessage = (event: MessageEvent) => runner.handleMessage(event)
     window.addEventListener("message", onMessage)
+    void runner.loadFixtures()
     return () => window.removeEventListener("message", onMessage)
   }, [])
 
