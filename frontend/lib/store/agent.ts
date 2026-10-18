@@ -58,9 +58,21 @@ export function splitActions(full: string): { text: string; actions: ChatAction[
   // Also hide a trailing partial marker while it is still streaming in ("<<<ACT").
   const text = (at === -1 ? full : full.slice(0, at)).replace(/<+[ACTIONS>]*$/i, "").trimEnd()
   if (at === -1) return { text, actions: [] }
-  const json = full.slice(at).replace(/^<+\s*ACTIONS\s*>+/, "")
+  // Models wrap the payload in ```json fences or append prose after it — pull the
+  // first array out instead of trusting the rest of the reply to be pure JSON.
+  const rest = full.slice(at).replace(/^<+\s*ACTIONS\s*>+/, "").replace(/```[a-z]*\s*/g, "")
+  const candidates = [/\[[\s\S]*\]/.exec(rest)?.[0], /\[[\s\S]*?\]/.exec(rest)?.[0], rest]
+  let parsed: unknown
+  for (const candidate of candidates) {
+    if (!candidate) continue
+    try {
+      parsed = JSON.parse(candidate)
+      break
+    } catch {
+      /* try the next candidate */
+    }
+  }
   try {
-    const parsed = JSON.parse(json) as unknown
     if (!Array.isArray(parsed)) return { text, actions: [] }
     return {
       text,
@@ -170,4 +182,51 @@ export function runChatActions(
     checkoutSkipped,
     asksCheckout: actions.some((a) => a.action === "ask_checkout"),
   }
+}
+
+/**
+ * Last-resort recovery: the model's text claims an add ("I've added the Wool Trouser
+ * in black, size M") but no add_to_bag action actually ran. Find the product it named
+ * in its own prose, honor the color/size it quoted, and do the add for real so the
+ * claim becomes true instead of a lie.
+ */
+/** Keyword-overlap lookup: "the Clean Jean" the model invented → the real Straight Jean. */
+export function suggestSimilar(text: string): string | null {
+  const words = text
+    .toLowerCase()
+    .split(/[^a-z]+/)
+    .filter((w) => w.length > 3)
+  const hit = PRODUCTS.find(
+    (p) =>
+      words.some(
+        (w) => p.name.toLowerCase().includes(w) || p.category.toLowerCase().includes(w),
+      ),
+  )
+  return hit?.name ?? null
+}
+
+export function recoverClaimedAdd(
+  text: string,
+  navigate: (path: string) => void,
+  onOrder?: (order: { orderId: string; amount: number }) => void,
+): ActionResult | null {
+  const lower = text.toLowerCase()
+  const named = PRODUCTS.filter((p) => lower.includes(p.name.toLowerCase())).sort(
+    (a, b) => b.name.length - a.name.length,
+  )[0]
+  if (!named) return null
+  const color = /\bin\s+([a-z]+)\b/i.exec(text)?.[1]?.toLowerCase()
+  const size = /\bsize\s+([a-z0-9]+)\b/i.exec(text)?.[1]?.toUpperCase()
+  return runChatActions(
+    [
+      {
+        action: "add_to_bag",
+        productId: named.id,
+        ...(color ? { color } : {}),
+        ...(size ? { size } : {}),
+      },
+    ],
+    navigate,
+    onOrder,
+  )
 }

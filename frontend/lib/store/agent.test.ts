@@ -2,7 +2,15 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { captureCheckout } from "@/lib/store/actions"
-import { confirmReply, NEW_ORDER_RE, runChatActions, shopperConfirmed, splitActions } from "@/lib/store/agent"
+import {
+  confirmReply,
+  NEW_ORDER_RE,
+  recoverClaimedAdd,
+  runChatActions,
+  shopperConfirmed,
+  splitActions,
+  suggestSimilar,
+} from "@/lib/store/agent"
 import { applyChatIntent } from "@/lib/store/chatIntent"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -37,6 +45,13 @@ describe("splitActions", () => {
 
   test("a partial marker mid-stream is hidden", () => {
     expect(splitActions("Checking<<<ACT").text).toBe("Checking")
+  })
+
+  test("fenced payloads and trailing prose still parse", () => {
+    const fenced = splitActions('Done. <<<ACTIONS>>> ```json\n[{"action":"checkout"}]\n``` Enjoy!')
+    expect(fenced.actions).toEqual([{ action: "checkout" }])
+    const trailing = splitActions('Done. <<<ACTIONS>>>[{"action":"checkout"}] hope you like it')
+    expect(trailing.actions).toEqual([{ action: "checkout" }])
   })
 
   test("unknown action types are dropped", () => {
@@ -181,6 +196,24 @@ describe("runChatActions", () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+
+  test("recoverClaimedAdd bags the product the model named in its prose", () => {
+    const recovered = recoverClaimedAdd(
+      "You're going to love this, I've added the Wool Trouser in black, size M to your bag.",
+      vi.fn(),
+    )
+    expect(recovered?.added[0]).toContain("Wool Trouser")
+    const line = useStorefront.getState().bag.at(-1)
+    expect(line?.productId).toBe("m-wool-trouser")
+    expect(line?.color).toBe("black")
+    expect(line?.size).toBe("M")
+  })
+
+  test("recoverClaimedAdd returns null for a hallucinated product, suggestSimilar offers a real one", () => {
+    expect(recoverClaimedAdd("I've added the Galaxy Hoverboots for you.", vi.fn())).toBeNull()
+    expect(useStorefront.getState().bag).toEqual([])
+    expect(suggestSimilar("I've added the cosmic trousers for you.")).toBe("Straight Trouser")
   })
 
   test("a shopper clicking Pay first cancels the agent's auto-pay (no double capture)", () => {

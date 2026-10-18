@@ -8,6 +8,8 @@ import { applyChatIntent } from "@/lib/store/chatIntent"
 import {
   confirmReply,
   NEW_ORDER_RE,
+  recoverClaimedAdd,
+  suggestSimilar,
   runChatActions,
   shopperConfirmed,
   splitActions,
@@ -218,6 +220,15 @@ export function Concierge() {
         a.action === "checkout" && !confirmed ? { action: "ask_checkout" } : a,
       )
       const result = runChatActions(safe, (path: string) => router.push(path), appendOrderLine)
+      // The model claimed an add but no action landed — recover the product it named
+      // from its own prose and do the add for real. The claim becomes true.
+      if (CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
+        const recovered = recoverClaimedAdd(text, (path: string) => router.push(path), appendOrderLine)
+        if (recovered) {
+          result.added.push(...recovered.added)
+          result.failed.push(...recovered.failed)
+        }
+      }
       // The model sometimes says "checking you out" but forgets the action. When the
       // shopper clearly confirmed and the bag has items, the agent owes them a checkout.
       if (confirmed && !result.checkedOut && useStorefront.getState().bag.length > 0) {
@@ -234,9 +245,19 @@ export function Concierge() {
       // "added" but nothing landed, or "paying" but no session started, say so.
       const notes: string[] = []
       if (result.failed.length) {
-        notes.push(`Couldn't find ${result.failed.join(", ")} in the catalog, want me to pick something similar?`)
+        const hint = result.failed.map(suggestSimilar).find(Boolean)
+        notes.push(
+          hint
+            ? `Could not find ${result.failed.join(", ")} — but we do have the ${hint}, want that instead?`
+            : `Couldn't find ${result.failed.join(", ")} in the catalog, want me to pick something similar?`,
+        )
       } else if (CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
-        notes.push("Hmm, that did not make it into your bag. Tell me the item again and I will grab it!")
+        const hint = suggestSimilar(text)
+        notes.push(
+          hint
+            ? `Hmm, could not find that exact piece — but we do have the ${hint}, want me to grab it?`
+            : "Hmm, that did not make it into your bag. Tell me the item again and I will grab it!",
+        )
       }
       if (CLAIM_PAY_RE.test(text) && !result.checkedOut) {
         notes.push(
