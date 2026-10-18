@@ -98,30 +98,58 @@ export function geminiSchema(schema: unknown = layoutJsonSchema()): unknown {
   return out
 }
 
-export type LlmReply =
-  | { ok: true; layout: unknown; model: string; cached: boolean; ms: number }
-  | { ok: false; error: string }
+/** One line of the /api/llm-layout stream. */
+export type LlmEvent =
+  | { type: "delta"; text: string }
+  | { type: "done"; layout: unknown; model: string; cached: boolean; ms: number }
+  | { type: "error"; error: string }
 
-/** Client side: asks /api/llm-layout for this shopper's layout. Never throws. */
-export async function requestLlmLayout(doc: HomepageDoc, sentence = ""): Promise<LlmReply> {
+export type LlmReply =
+  | { ok: true; layout: unknown; model: string; cached: boolean; ms: number; text: string }
+  | { ok: false; error: string; text: string }
+
+/**
+ * Client side: asks /api/llm-layout for this shopper's layout and calls `onText` with everything the
+ * model has written so far, each time a piece arrives. Never throws.
+ */
+export async function requestLlmLayout(
+  doc: HomepageDoc,
+  sentence = "",
+  onText: (text: string) => void = () => {},
+): Promise<LlmReply> {
+  let text = ""
   try {
     const res = await fetch("/api/llm-layout", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ input: llmInput(doc, sentence) }),
     })
-    const body = (await res.json().catch(() => ({}))) as {
-      layout?: unknown
-      model?: string
-      cached?: boolean
-      ms?: number
-      error?: string
+    if (!res.ok || !res.body) {
+      const body = (await res.json().catch(() => ({}))) as { error?: string }
+      return { ok: false, error: body.error ?? `HTTP ${res.status}`, text }
     }
-    if (!res.ok || body.error || body.layout === undefined) {
-      return { ok: false, error: body.error ?? `HTTP ${res.status}` }
+    const reader = res.body.pipeThrough(new TextDecoderStream()).getReader()
+    let buffer = ""
+    for (;;) {
+      const { done, value } = await reader.read()
+      buffer += value ?? ""
+      const lines = buffer.split("\n")
+      buffer = done ? "" : (lines.pop() ?? "")
+      for (const line of lines) {
+        if (!line.trim()) continue
+        const event = JSON.parse(line) as LlmEvent
+        if (event.type === "delta") {
+          text += event.text
+          onText(text)
+        } else if (event.type === "error") {
+          return { ok: false, error: event.error, text }
+        } else {
+          return { ok: true, layout: event.layout, model: event.model, cached: event.cached, ms: event.ms, text }
+        }
+      }
+      if (done) return { ok: false, error: "the stream ended without a layout", text }
     }
-    return { ok: true, layout: body.layout, model: body.model ?? "llm", cached: !!body.cached, ms: body.ms ?? 0 }
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "network error" }
+    return { ok: false, error: err instanceof Error ? err.message : "network error", text }
   }
 }

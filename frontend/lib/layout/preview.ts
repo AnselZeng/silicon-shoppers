@@ -28,8 +28,8 @@ export interface Preview {
 }
 
 export type BuiltBy =
-  | { kind: "llm"; model: string; cached: boolean; ms: number }
-  | { kind: "rules"; error: string }
+  | { kind: "llm"; model: string; cached: boolean; ms: number; text: string }
+  | { kind: "rules"; error: string; text: string }
 
 export function previewId(fixtureId: string, stage: Exclude<PipelineStage, "default">): string {
   return `${fixtureId}:${stage}`

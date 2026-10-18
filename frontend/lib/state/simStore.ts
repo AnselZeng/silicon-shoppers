@@ -19,6 +19,8 @@ interface SimState {
   liveRevision: number
   /** True while a Run waits for the LLM's layout. */
   llmPending: boolean
+  /** What the LLM has written so far on the current Run, as it streams in. */
+  llmText: string
   setRoute: (route: string) => void
   setViewport: (viewport: ViewportChoice) => void
   setLayoutPreview: (preview: string) => void
@@ -28,6 +30,7 @@ interface SimState {
   setLayoutProgress: (progress: { index: number; total: number } | null) => void
   noteLive: () => void
   setLlmPending: (pending: boolean) => void
+  setLlmText: (text: string) => void
 }
 
 export const useSimStore = create<SimState>((set) => ({
@@ -40,6 +43,7 @@ export const useSimStore = create<SimState>((set) => ({
   layoutProgress: null,
   liveRevision: 0,
   llmPending: false,
+  llmText: "",
   setRoute: (route) => set({ route }),
   setViewport: (viewport) => set({ viewport }),
   setLayoutPreview: (layoutPreview) => set({ layoutPreview }),
@@ -49,4 +53,5 @@ export const useSimStore = create<SimState>((set) => ({
   setLayoutProgress: (layoutProgress) => set({ layoutProgress }),
   noteLive: () => set((state) => ({ liveRevision: state.liveRevision + 1 })),
   setLlmPending: (llmPending) => set({ llmPending }),
+  setLlmText: (llmText) => set({ llmText }),
 }))

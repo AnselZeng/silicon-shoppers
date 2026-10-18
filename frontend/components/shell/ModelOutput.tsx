@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import type { Preview } from "@/lib/layout/preview"
 import type { HomepageDoc } from "@/lib/model/homepage"
 import type { StoreLayoutDoc } from "@/lib/model/storeLayout"
@@ -59,6 +60,27 @@ function StoredOutput({ doc }: { doc: StoreLayoutDoc }) {
   )
 }
 
+/** The LLM's answer as it streams in, kept scrolled to the newest text. */
+export function LlmStream({ text }: { text: string }) {
+  const box = useRef<HTMLPreElement>(null)
+  useEffect(() => {
+    if (box.current) box.current.scrollTop = box.current.scrollHeight
+  }, [text])
+  return (
+    <div className="mt-3 text-[11px]">
+      <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">
+        {text ? "LLM writing" : "Waiting for the LLM"}
+      </p>
+      <pre
+        ref={box}
+        className="mt-1 h-40 overflow-auto bg-black/40 p-2 text-[10px] leading-snug break-all whitespace-pre-wrap text-[#f0abfc]"
+      >
+        {text || "…"}
+      </pre>
+    </div>
+  )
+}
+
 /** Who built the last Run's layout: the LLM, or the model's rules after the LLM failed. */
 function BuiltBy({ preview }: { preview: Preview }) {
   const built = preview.builtBy
@@ -72,6 +94,14 @@ function BuiltBy({ preview }: { preview: Preview }) {
           : "Built by the model's rules"}
         {preview.report.changes.length ? ` · ${preview.report.changes.length} fixes` : ""}
       </p>
+      {built.text ? (
+        <details key={preview.id + built.text.length} className="mt-1" open>
+          <summary className="cursor-pointer text-white/45">Raw LLM output</summary>
+          <pre className="mt-1 max-h-64 overflow-auto bg-black/40 p-2 text-[10px] leading-snug break-all whitespace-pre-wrap text-white/80">
+            {built.text}
+          </pre>
+        </details>
+      ) : null}
       {built.kind === "rules" ? (
         <p className="mt-1 leading-snug text-[#fca5a5]">LLM failed: {built.error}</p>
       ) : (

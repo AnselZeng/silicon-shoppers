@@ -118,7 +118,7 @@ What the store changes for you:
 - **Run** sends the model's output (layout decisions, predicted mix, evidence, with no product tiles or shopper ids) and the optional "Or describe them" sentence to a Next.js server route, `app/api/llm-layout`, which calls Gemini (`gemini-3.5-flash`, override with `GEMINI_MODEL`). The system prompt is the generated design guideline and the response is constrained to the layout JSON Schema (`LlmLayoutSchema`).
 - **The LLM designs inside a box.** Code copies product ids in afterwards, and the validator enforces the model's validated decisions (section and category order), ad rules and copy limits, and drops any reason that cites a number not in the model's output. The sentence steers the design like an unvalidated decision and never overrides a validated one.
 - **If Gemini fails** (no key, API error, invalid or unusable JSON), Run falls back to the model's rules (`modelLayout`) and the error goes to the terminal (`[llm]`), the browser console and the Observability tab.
-- **Same input, same layout:** temperature 0 and a server-side cache, so rerunning a shopper is instant and saves quota. There is no timeout; Run waits for Gemini.
+- **Live every time:** temperature 0, and every Run streams a fresh answer (the side panel shows it as it's written). Set `LLM_CACHE=on` to reuse the answer for the same input instead. There is no timeout; Run waits for the LLM.
 - **A keyword parser returns the same format** if there's no key, the API is slow, or the Wi-Fi drops, so the demo never breaks.
 - **What leaves the app:** the model's aggregate output and the sentence, with no shopper ids. The API key stays on the server.
 

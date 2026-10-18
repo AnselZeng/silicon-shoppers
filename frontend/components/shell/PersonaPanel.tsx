@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { PERSONA_ACCENTS } from "@/config/ui"
-import { ModelOutput } from "@/components/shell/ModelOutput"
+import { LlmStream, ModelOutput } from "@/components/shell/ModelOutput"
 import { PredictedMix } from "@/components/shell/PredictedMix"
 import { Button } from "@/components/ui/button"
 import { DEMO_SHOPPERS, shopperFromSentence } from "@/lib/layout/demoShoppers"
@@ -34,6 +34,8 @@ export function PersonaPanel() {
   const previousPreview = useRef("default")
   const progress = useSimStore((state) => state.layoutProgress)
   const llmPending = useSimStore((state) => state.llmPending)
+  const llmText = useSimStore((state) => state.llmText)
+  const [llmSeconds, setLlmSeconds] = useState(0)
   const preview = useSimStore((state) => state.preview)
   const [modelDoc, setModelDoc] = useState<HomepageDoc | null>(null)
   const [draft, setDraft] = useState<HomepageDoc | null>(null)
@@ -48,6 +50,16 @@ export function PersonaPanel() {
   const stored = live?.state === "live" && live.doc && isStoreLayoutDoc(live.doc) ? live.doc : null
   const showingLive = followLive && stored !== null
   const liveKey = showingLive ? `${live?.updatedAt ?? ""}` : "fixture"
+
+  useEffect(() => {
+    if (!llmPending) return
+    const started = Date.now()
+    const timer = window.setInterval(() => setLlmSeconds((Date.now() - started) / 1000), 100)
+    return () => {
+      window.clearInterval(timer)
+      setLlmSeconds(0)
+    }
+  }, [llmPending])
 
   useEffect(() => {
     let cancel = false
@@ -274,7 +286,7 @@ export function PersonaPanel() {
               ? progress
                 ? `Rebuilding ${progress.index}/${progress.total}…`
                 : llmPending
-                  ? "Asking the LLM…"
+                  ? `Thinking… ${llmSeconds.toFixed(1)}s`
                   : "Running…"
               : "Run"}
           </Button>
@@ -288,6 +300,7 @@ export function PersonaPanel() {
             Stop
           </Button>
         </div>
+        {llmPending ? <LlmStream text={llmText} /> : null}
         {draft ? (
           <ModelOutput
             doc={draft}

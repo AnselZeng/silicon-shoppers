@@ -180,7 +180,17 @@ class ShellRunner {
     const span = useObsStore.getState().startSpan("llm.layout", { label })
     this.llmGeneration = generation
     useSimStore.getState().setLlmPending(true)
-    const reply = await requestLlmLayout(doc, sentence)
+    useSimStore.getState().setLlmText("")
+    const asked = Date.now()
+    let streaming = false
+    const reply = await requestLlmLayout(doc, sentence, (text) => {
+      if (this.llmGeneration !== generation) return
+      if (!streaming) {
+        streaming = true
+        logs.push("llm", `writing · first text after ${((Date.now() - asked) / 1000).toFixed(1)}s`)
+      }
+      useSimStore.getState().setLlmText(text)
+    })
     if (this.llmGeneration === generation) useSimStore.getState().setLlmPending(false)
     if (generation !== this.generation) {
       useObsStore.getState().endSpan(span, "ok")
@@ -190,8 +200,11 @@ class ShellRunner {
     let builtBy: BuiltBy
     if (reply.ok && result && !result.report.fellBack) {
       useObsStore.getState().endSpan(span, "ok")
-      builtBy = { kind: "llm", model: reply.model, cached: reply.cached, ms: reply.ms }
-      logs.push("llm", `${reply.model} · ${reply.cached ? "cached" : `${(reply.ms / 1000).toFixed(1)}s`}`)
+      builtBy = { kind: "llm", model: reply.model, cached: reply.cached, ms: reply.ms, text: reply.text }
+      logs.push(
+        "llm",
+        `done · ${reply.model} · ${reply.text.length.toLocaleString("en-US")} chars · ${reply.cached ? "cached" : `${(reply.ms / 1000).toFixed(1)}s`}`,
+      )
     } else {
       const error = reply.ok ? `layout failed validation: ${result?.report.error ?? "invalid"}` : reply.error
       useObsStore.getState().endSpan(span, "error")
@@ -199,7 +212,7 @@ class ShellRunner {
       console.error("LLM layout failed, using the model's rules", error)
       logs.push("llm", `error · ${error}`)
       logs.push("llm", "falling back to the model's rules")
-      builtBy = { kind: "rules", error }
+      builtBy = { kind: "rules", error, text: reply.text }
       result = validateLayout(modelLayout(doc).layout, { model })
     }
     useSimStore.getState().setPreview({
