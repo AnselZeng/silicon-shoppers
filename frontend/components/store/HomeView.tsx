@@ -1,13 +1,17 @@
 "use client"
 
 import Link from "next/link"
+import { AdBanner } from "@/components/store/ads/AdBanner"
+import { GarmentImage } from "@/components/store/GarmentImage"
 import { Hero } from "@/components/store/Hero"
 import { ProductGrid } from "@/components/store/ProductGrid"
+import { adContent } from "@/lib/ads/placement"
 import { resolveHome } from "@/lib/layout/home"
-import { categoryHref } from "@/lib/layout/links"
-import { FILTER_LABEL, type ColorMerchandising, type ProductSource } from "@/lib/layout/types"
+import { categoryHref, collectionHref, departmentPath } from "@/lib/layout/links"
+import { FILTER_LABEL, type ColorMerchandising, type LayoutConfig, type ProductSource } from "@/lib/layout/types"
+import { PRODUCTS } from "@/lib/store/catalog"
 import { useStorefront } from "@/lib/store/storeState"
-import { CATEGORY_LABEL } from "@/lib/store/types"
+import { CATEGORY_LABEL, type CollectionName } from "@/lib/store/types"
 
 const SORT_LINE = {
   relevance: "Sorted by relevance",
@@ -22,6 +26,13 @@ const MERCH_LINE: Record<ColorMerchandising, string> = {
   hover_preview: "Hover the piece to preview color",
   split_colors: "Each color shown as its own piece",
   color_locked: "One colorway per piece",
+}
+
+const TILE_COLS: Record<number, string> = {
+  3: "lg:grid-cols-3",
+  4: "lg:grid-cols-4",
+  5: "lg:grid-cols-5",
+  6: "lg:grid-cols-6",
 }
 
 function rowTitle(source: ProductSource): string {
@@ -45,11 +56,46 @@ function rowTitle(source: ProductSource): string {
   }
 }
 
-function rowHref(source: ProductSource): string | null {
-  if (source.kind === "new_in") return "/store/new-in"
-  if (source.kind === "sale") return "/store/sale"
-  if (source.kind === "bestsellers") return "/store/women?sort=bestsellers"
-  return null
+function rowHref(source: ProductSource, layout: LayoutConfig): string | null {
+  switch (source.kind) {
+    case "for_you":
+      return "/store/for-you"
+    case "new_in":
+      return "/store/new-in"
+    case "sale":
+      return layout.nav.department ? `${departmentPath(layout)}?sale=1` : "/store/sale"
+    case "bestsellers":
+      return `${departmentPath(layout)}?sort=bestsellers`
+    case "category":
+      return categoryHref(layout, source.category)
+    case "collection":
+      return collectionHref(layout, source.collection)
+    case "under_price":
+    case "buy_again":
+      return null
+  }
+}
+
+function CollectionSpotlight({ layout, collection }: { layout: LayoutConfig; collection: CollectionName }) {
+  const department = layout.nav.department
+  const pieces = PRODUCTS.filter((p) => p.collection === collection && (!department || p.department === department))
+  const lead = [...pieces].sort((a, b) => b.popularity - a.popularity)[0]
+  return (
+    <section className="mx-6 my-10 grid items-center gap-8 bg-[#efeae2] p-8 md:grid-cols-[1fr_auto]">
+      <div>
+        <p className="text-[10px] tracking-[0.28em] text-neutral-500 uppercase">Collection</p>
+        <h2 className="mt-2 font-serif text-4xl tracking-tight">{collection}</h2>
+        <p className="mt-3 text-sm text-neutral-600">{pieces.length} pieces</p>
+        <Link
+          href={collectionHref(layout, collection)}
+          className="mt-5 inline-block border border-[#141414] px-4 py-2 text-[11px] tracking-[0.18em] uppercase"
+        >
+          Shop {collection}
+        </Link>
+      </div>
+      {lead ? <GarmentImage type={lead.garmentType} color={lead.colors[0] ?? "black"} className="h-56 w-44" /> : null}
+    </section>
+  )
 }
 
 export function HomeView() {
@@ -72,9 +118,9 @@ export function HomeView() {
             </div>
           )
         }
-        if ("products" in entry && entry.block.type === "product_row") {
+        if ("products" in entry) {
           if (entry.products.length === 0) return null
-          const href = rowHref(entry.block.source)
+          const href = rowHref(entry.block.source, layout)
           return (
             <section key={key} className="px-6 py-10">
               <div className="mb-6 flex items-baseline justify-between">
@@ -85,7 +131,7 @@ export function HomeView() {
                   </Link>
                 ) : null}
               </div>
-              <ProductGrid products={entry.products} />
+              <ProductGrid products={entry.products} columns={4} />
             </section>
           )
         }
@@ -93,7 +139,7 @@ export function HomeView() {
           return (
             <section key={key} className="px-6 py-10">
               <h2 className="mb-6 text-[11px] tracking-[0.22em] uppercase">Shop by category</h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <div className={`grid grid-cols-2 gap-4 md:grid-cols-3 ${TILE_COLS[block.categories.length] ?? "lg:grid-cols-6"}`}>
                 {block.categories.map((category) => (
                   <Link
                     key={category}
@@ -106,6 +152,27 @@ export function HomeView() {
               </div>
             </section>
           )
+        }
+        if (block.type === "collection_spotlight") {
+          return <CollectionSpotlight key={key} layout={layout} collection={block.collection} />
+        }
+        if (block.type === "editorial_text") {
+          const text = layout.copy[block.copyKey]
+          if (!text) return null
+          return (
+            <section key={key} className="px-6 py-12">
+              <p
+                className={`mx-auto max-w-2xl text-center font-serif tracking-tight ${
+                  block.copyKey === "intro" ? "text-2xl" : "text-lg leading-relaxed text-neutral-700"
+                }`}
+              >
+                {text}
+              </p>
+            </section>
+          )
+        }
+        if (block.type === "ad_banner") {
+          return <AdBanner key={key} ad={adContent(layout, block.adId)} slot="home_block" className="mx-6 my-6" />
         }
         return null
       })}

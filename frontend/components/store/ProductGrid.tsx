@@ -5,9 +5,10 @@ import { merchandisedCards } from "@/lib/layout/merchandising"
 import { useStorefront } from "@/lib/store/storeState"
 import type { Product } from "@/lib/store/types"
 
-export function ProductGrid({ products }: { products: Product[] }) {
+/** columns overrides the layout's grid density (home rows hold 4 or 8 products, so they use 4). */
+export function ProductGrid({ products, columns }: { products: Product[]; columns?: 2 | 3 | 4 }) {
   const layout = useStorefront((state) => state.layout)
-  const density = layout.listing.gridDensity
+  const density = columns ?? layout.listing.gridDensity
   const cols =
     density === 2 ? "grid-cols-2" : density === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2 md:grid-cols-3"
   const cards = merchandisedCards(products, layout.listing.colorMerchandising)
