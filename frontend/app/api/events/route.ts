@@ -28,18 +28,20 @@ export async function POST(req: Request) {
 
   const binds: unknown[] = [];
   const values: string[] = [];
+  const insertedAt = new Date().toISOString().replace("T", " ").replace("Z", "");
   for (const e of events) {
     const p = e.properties ?? {};
     const pid = p.productId ?? p.product_id ?? null;
     const ts = new Date(Math.min(e.timestamp, Date.now())).toISOString().replace("T", " ").replace("Z", "");
-    values.push("(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    values.push("(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     binds.push(crypto.randomUUID(), userId, sessionId ?? null, e.type, ts, (e.route ?? "").slice(0, 300),
-               pid === null ? null : String(pid), typeof p.color === "string" ? p.color : null, JSON.stringify(p));
+               pid === null ? null : String(pid), typeof p.color === "string" ? p.color : null, JSON.stringify(p),
+               insertedAt);
   }
   try {
     await sql(
-      `INSERT INTO EVENTS (EVENT_ID, USER_ID, SESSION_ID, TYPE, TS, ROUTE, PRODUCT_ID, COLOR, PROPERTIES)
-       SELECT column1, column2, column3, column4, TO_TIMESTAMP_NTZ(column5), column6, column7, column8, PARSE_JSON(column9)
+      `INSERT INTO EVENTS (EVENT_ID, USER_ID, SESSION_ID, TYPE, TS, ROUTE, PRODUCT_ID, COLOR, PROPERTIES, INSERTED_AT)
+       SELECT column1, column2, column3, column4, TO_TIMESTAMP_NTZ(column5), column6, column7, column8, PARSE_JSON(column9), TO_TIMESTAMP_NTZ(column10)
        FROM VALUES ${values.join(", ")}`,
       binds,
     );
