@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "guideline": "tsx scripts/write-guideline.ts",
+    "fixtures": "tsx scripts/make-fixtures.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
