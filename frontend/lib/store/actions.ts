@@ -81,6 +81,9 @@ export function captureCheckout() {
   const captured = captureMockSession(session, { awardLoyalty: state.layout.checkout.loyaltyPrompt })
   state.setOrder(captured)
   state.setCheckoutPhase("paid")
+  state.setVisaSession(null)
+  // The bag is now an order — empty it so the next shop starts clean.
+  useStorefront.setState({ bag: [], bagOpen: false })
   emitStoreEvent("payment_completed", {
     orderId: captured.orderId,
     amount: captured.amount,

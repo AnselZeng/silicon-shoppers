@@ -181,6 +181,102 @@ async function streamGemini(model: string, prompt: string, onDelta: OnDelta): Pr
   return { text, finish }
 }
 
+// ---------------------------------------------------------------- concierge chat
+//
+// Same providers, but plain text (not JSON mode) with a shopping-only system prompt.
+// The client sends the shopper's context (persona, decision reasons, bag, catalog) so
+// "why am I seeing this" answers quote the real reasons instead of guessing.
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatReply {
+  text: string;
+  model: string;
+  ms: number;
+}
+
+async function chatNebius(model: string, system: string, messages: ChatMessage[], onDelta: OnDelta): Promise<string> {
+  const res = await fetch("https://api.tokenfactory.nebius.com/v1/chat/completions", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${process.env.NEBIUS_API_KEY ?? ""}` },
+    body: JSON.stringify({
+      model,
+      temperature: 0.4,
+      max_tokens: 1024,
+      stream: true,
+      chat_template_kwargs: { thinking: false },
+      messages: [{ role: "system", content: system }, ...messages],
+    }),
+  })
+  if (!res.ok) throw new Error(`Nebius ${res.status}: ${await errorMessage(res)}`)
+  let text = ""
+  let finish: string | undefined
+  for await (const data of sseData(res)) {
+    const chunk = data as ChatChunk
+    if (chunk.error) throw new Error(`Nebius: ${typeof chunk.error === "string" ? chunk.error : chunk.error.message}`)
+    const choice = chunk.choices?.[0]
+    const piece = choice?.delta?.content ?? ""
+    if (piece) {
+      text += piece
+      onDelta(piece)
+    }
+    if (choice?.finish_reason) finish = choice.finish_reason
+  }
+  if (!text) throw new Error(`Nebius returned no text (finish reason ${finish ?? "unknown"})`)
+  return text
+}
+
+async function chatGemini(model: string, system: string, messages: ChatMessage[], onDelta: OnDelta): Promise<string> {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY ?? "" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: system }] },
+        contents: messages.map((m) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
+        generationConfig: { temperature: 0.4, maxOutputTokens: 1024 },
+      }),
+    },
+  )
+  if (!res.ok) throw new Error(`Gemini ${res.status}: ${await errorMessage(res)}`)
+  let text = ""
+  let finish: string | undefined
+  for await (const data of sseData(res)) {
+    const chunk = data as GenerateChunk
+    if (chunk.error) throw new Error(`Gemini: ${typeof chunk.error === "string" ? chunk.error : chunk.error.message}`)
+    if (chunk.promptFeedback?.blockReason) throw new Error(`Gemini blocked the prompt: ${chunk.promptFeedback.blockReason}`)
+    const candidate = chunk.candidates?.[0]
+    for (const part of candidate?.content?.parts ?? []) {
+      if (part.thought || !part.text) continue
+      text += part.text
+      onDelta(part.text)
+    }
+    if (candidate?.finishReason) finish = candidate.finishReason
+  }
+  if (!text) throw new Error(`Gemini returned no text (finish reason ${finish ?? "unknown"})`)
+  return text
+}
+
+/**
+ * Streams a concierge reply to `onDelta`. `system` is the shopping-scope prompt and context block
+ * built by the route. Throws with a readable message on any failure.
+ */
+export async function chat(system: string, messages: ChatMessage[], onDelta: OnDelta = () => {}): Promise<ChatReply> {
+  const provider = llmProvider()
+  if (!provider) throw new Error(missingKeyMessage())
+  const model = llmModel(provider)
+  const started = Date.now()
+  const text =
+    provider === "nebius"
+      ? await chatNebius(model, system, messages, onDelta)
+      : await chatGemini(model, system, messages, onDelta)
+  return { text, model, ms: Date.now() - started }
+}
+
 /**
  * Asks the configured LLM for a layout, streaming its text to `onDelta` as it's written.
  * Throws with a readable message on any failure. No timeout: it waits.

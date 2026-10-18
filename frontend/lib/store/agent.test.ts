@@ -1,0 +1,275 @@
+import { beforeEach, describe, expect, test, vi } from "vitest"
+import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
+import { PRODUCTS } from "@/lib/store/catalog"
+import { captureCheckout } from "@/lib/store/actions"
+import {
+  BUY_INTENT_RE,
+  confirmReply,
+  NEW_ORDER_RE,
+  recoverClaimedAdd,
+  runChatActions,
+  shopperConfirmed,
+  splitActions,
+  suggestSimilar,
+} from "@/lib/store/agent"
+import { applyChatIntent } from "@/lib/store/chatIntent"
+import { useStorefront } from "@/lib/store/storeState"
+
+describe("splitActions", () => {
+  test("plain text passes through untouched", () => {
+    const { text, actions } = splitActions("The rib tee is $22.")
+    expect(text).toBe("The rib tee is $22.")
+    expect(actions).toEqual([])
+  })
+
+  test("parses the canonical marker and strips it from the text", () => {
+    const { text, actions } = splitActions(
+      'Added it! <<<ACTIONS>>>[{"action":"add_to_bag","productId":"m-navy-tee","color":"navy"}]',
+    )
+    expect(text).toBe("Added it!")
+    expect(actions).toEqual([{ action: "add_to_bag", productId: "m-navy-tee", color: "navy" }])
+  })
+
+  test("tolerates loose markers (<ACTIONS>, <ACTIONS>>>)", () => {
+    for (const marker of ["<ACTIONS>", "<ACTIONS>>>", "<<<<ACTIONS>>>>", "< ACTIONS >>>"]) {
+      const { text, actions } = splitActions(`Done. ${marker}[{"action":"checkout"}]`)
+      expect(text).toBe("Done.")
+      expect(actions).toEqual([{ action: "checkout" }])
+    }
+  })
+
+  test("malformed actions JSON still yields clean text and no actions", () => {
+    const { text, actions } = splitActions("Done. <<<ACTIONS>>>[{not json")
+    expect(text).toBe("Done.")
+    expect(actions).toEqual([])
+  })
+
+  test("a partial marker mid-stream is hidden", () => {
+    expect(splitActions("Checking<<<ACT").text).toBe("Checking")
+  })
+
+  test("fenced payloads and trailing prose still parse", () => {
+    const fenced = splitActions('Done. <<<ACTIONS>>> ```json\n[{"action":"checkout"}]\n``` Enjoy!')
+    expect(fenced.actions).toEqual([{ action: "checkout" }])
+    const trailing = splitActions('Done. <<<ACTIONS>>>[{"action":"checkout"}] hope you like it')
+    expect(trailing.actions).toEqual([{ action: "checkout" }])
+  })
+
+  test("unknown action types are dropped", () => {
+    const { actions } = splitActions('x <<<ACTIONS>>>[{"action":"delete_store"},{"action":"checkout"}]')
+    expect(actions).toEqual([{ action: "checkout" }])
+  })
+})
+
+describe("confirmReply / shopperConfirmed", () => {
+  test("affirmatives and negatives classify to yes/no", () => {
+    for (const m of ["yes", "yeah im done", "I'm done", "that's all", "check me out", "let's pay", "nothing else", "all set"]) {
+      expect(confirmReply(m)).toBe("yes")
+    }
+    for (const m of ["no", "nope", "nah", "not yet", "keep shopping", "more"]) {
+      expect(confirmReply(m)).toBe("no")
+    }
+    expect(confirmReply("can you also find me a belt")).toBeNull()
+    expect(confirmReply("purchase navy blue medium tshirt")).toBeNull()
+  })
+
+  test("new-order phrases match, product requests starting with 'next' do not", () => {
+    for (const m of ["next order", "new order", "another one", "another order please", "start over", "fresh start"]) {
+      expect(NEW_ORDER_RE.test(m)).toBe(true)
+    }
+    expect(NEW_ORDER_RE.test("next loafers medium navy blue")).toBe(false)
+    expect(NEW_ORDER_RE.test("next")).toBe(false)
+  })
+
+  test("buy intent separates 'buy me the X' from browsing asks", () => {
+    for (const m of ["buy a black pant medium size", "add the navy tee", "i'll take the coat", "get me the loafers", "can you order that for me"]) {
+      expect(BUY_INTENT_RE.test(m)).toBe(true)
+    }
+    for (const m of ["i need more men sale products", "show me navy shoes", "what do you have under $50", "why am i seeing this"]) {
+      expect(BUY_INTENT_RE.test(m)).toBe(false)
+    }
+  })
+
+  test("shopping requests never count as a checkout confirmation", () => {
+    expect(shopperConfirmed("yeah im done")).toBe(true)
+    expect(shopperConfirmed("add that and check me out")).toBe(true)
+    expect(shopperConfirmed("purchase navy blue medium tshirt")).toBe(false)
+    expect(shopperConfirmed("nope")).toBe(false)
+    expect(shopperConfirmed("why am i seeing this shirt")).toBe(false)
+  })
+})
+
+describe("applyChatIntent", () => {
+  test("men + navy: switches department, nav order and color highlight", () => {
+    const applied = applyChatIntent("make it more men friendly and focus on navy", cloneLayout(DEFAULT_LAYOUT))
+    expect(applied).not.toBeNull()
+    expect(applied!.layout.nav.department).toBe("men")
+    expect(applied!.layout.nav.order[0]).toBe("men")
+    expect(applied!.layout.listing.colorHighlight).toEqual(["navy"])
+  })
+
+  test("budget talk sorts by price and emphasizes sale", () => {
+    const applied = applyChatIntent("only show me stuff under $50", cloneLayout(DEFAULT_LAYOUT))
+    expect(applied!.layout.listing.defaultSort).toBe("price_asc")
+    expect(applied!.layout.listing.card.priceStyle).toBe("sale_emphasis")
+  })
+
+  test("'expensive' sorts high-to-low, drops sale emphasis, collections forward", () => {
+    const layout = cloneLayout(DEFAULT_LAYOUT)
+    layout.listing.card.priceStyle = "sale_emphasis"
+    layout.listing.expandedFilters = ["sale", "price"]
+    const applied = applyChatIntent("ok how about women which are really expensive", layout)
+    expect(applied).not.toBeNull()
+    expect(applied!.layout.listing.defaultSort).toBe("price_desc")
+    expect(applied!.layout.listing.card.priceStyle).toBe("plain")
+    expect(applied!.layout.nav.order[0]).toBe("collections")
+    expect(applied!.layout.nav.department).toBe("women")
+    expect(applied!.layout.ads.placements.find((p) => p.slot === "hero")?.adIds[0]).toBe("collection_women")
+  })
+
+  test("'not sale' suppresses the sale intent that 'sale' would normally trigger", () => {
+    const layout = cloneLayout(DEFAULT_LAYOUT)
+    layout.listing.card.priceStyle = "sale_emphasis"
+    layout.listing.expandedFilters = ["sale", "price"]
+    layout.listing.defaultSort = "price_asc"
+    const applied = applyChatIntent("nono not sale but expensive", layout)
+    expect(applied).not.toBeNull()
+    expect(applied!.layout.listing.defaultSort).toBe("price_desc")
+    expect(applied!.layout.listing.card.priceStyle).toBe("plain")
+    expect(applied!.layout.listing.expandedFilters).not.toContain("sale")
+    expect(applied!.layout.ads.placements.find((p) => p.slot === "hero")?.adIds[0]).not.toMatch(/^sale_/)
+  })
+
+  test("'not too expensive' still means budget, not premium", () => {
+    const applied = applyChatIntent("nothing too expensive please", cloneLayout(DEFAULT_LAYOUT))
+    expect(applied).not.toBeNull()
+    expect(applied!.layout.listing.defaultSort).not.toBe("price_desc")
+  })
+
+  test("a plain question changes nothing", () => {
+    expect(applyChatIntent("why am i seeing this shirt?", cloneLayout(DEFAULT_LAYOUT))).toBeNull()
+  })
+})
+
+describe("runChatActions", () => {
+  beforeEach(() => {
+    useStorefront.setState({ bag: [], bagOpen: false, checkoutPhase: "idle", visaSession: null, agentAutoPay: true })
+  })
+
+  const tee = PRODUCTS.find((p) => p.id === "m-navy-tee") ?? PRODUCTS[0]
+
+  test("adds a catalog product by id, honoring color and size", () => {
+    const result = runChatActions([{ action: "add_to_bag", productId: tee.id, color: tee.colors[0], size: tee.sizes[0] }], vi.fn())
+    expect(result.done[0]).toContain(tee.name)
+    const line = useStorefront.getState().bag[0]
+    expect(line.productId).toBe(tee.id)
+    expect(line.color).toBe(tee.colors[0])
+    expect(line.size).toBe(tee.sizes[0])
+  })
+
+  test("accepts a product name when the model sends one instead of an id", () => {
+    const result = runChatActions([{ action: "add_to_bag", productId: tee.name }], vi.fn())
+    expect(result.done[0]).toContain(tee.name)
+    expect(useStorefront.getState().bag[0].productId).toBe(tee.id)
+  })
+
+  test("a hallucinated product reports failed instead of silently dropping", () => {
+    const result = runChatActions([{ action: "add_to_bag", productId: "p-999-imaginary" }], vi.fn())
+    expect(result.done).toEqual([])
+    expect(result.failed[0]).toContain("p-999-imaginary")
+    expect(useStorefront.getState().bag).toEqual([])
+  })
+
+  test("checkout on an empty bag is skipped, not paid", () => {
+    const result = runChatActions([{ action: "checkout" }], vi.fn())
+    expect(useStorefront.getState().checkoutPhase).toBe("idle")
+    expect(result.checkedOut).toBe(false)
+    expect(result.checkoutSkipped).toBe(true)
+    expect(result.done).toEqual([])
+  })
+
+  test("successful add and checkout report through added/checkedOut", () => {
+    vi.useFakeTimers()
+    try {
+      const result = runChatActions([{ action: "add_to_bag", productId: tee.id }], vi.fn())
+      expect(result.added).toHaveLength(1)
+      expect(result.added[0]).toContain(tee.name)
+      const out = runChatActions([{ action: "checkout" }], vi.fn())
+      expect(out.checkedOut).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test("post-purchase: same conversation can add and check out again", () => {
+    vi.useFakeTimers()
+    try {
+      runChatActions([{ action: "add_to_bag", productId: tee.id }, { action: "checkout" }], vi.fn())
+      vi.advanceTimersByTime(2000)
+      const first = useStorefront.getState().order
+      expect(useStorefront.getState().bag).toEqual([])
+      // Second round in the same chat.
+      const other = PRODUCTS.find((p) => p.id !== tee.id)!
+      const result = runChatActions(
+        [{ action: "add_to_bag", productId: other.id }, { action: "checkout" }],
+        vi.fn(),
+      )
+      expect(result.checkedOut).toBe(true)
+      vi.advanceTimersByTime(2000)
+      const second = useStorefront.getState().order
+      expect(second).not.toBeNull()
+      expect(second!.orderId).not.toBe(first!.orderId)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test("add then checkout in one batch sees the fresh bag", () => {
+    vi.useFakeTimers()
+    try {
+      runChatActions(
+        [{ action: "add_to_bag", productId: tee.id }, { action: "checkout" }],
+        vi.fn(),
+      )
+      expect(useStorefront.getState().checkoutPhase).toBe("session")
+      vi.advanceTimersByTime(2000)
+      expect(useStorefront.getState().checkoutPhase).toBe("paid")
+      expect(useStorefront.getState().bag).toEqual([])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test("recoverClaimedAdd bags the product the model named in its prose", () => {
+    const recovered = recoverClaimedAdd(
+      "You're going to love this, I've added the Wool Trouser in black, size M to your bag.",
+      vi.fn(),
+    )
+    expect(recovered?.added[0]).toContain("Wool Trouser")
+    const line = useStorefront.getState().bag.at(-1)
+    expect(line?.productId).toBe("m-wool-trouser")
+    expect(line?.color).toBe("black")
+    expect(line?.size).toBe("M")
+  })
+
+  test("recoverClaimedAdd returns null for a hallucinated product, suggestSimilar offers a real one", () => {
+    expect(recoverClaimedAdd("I've added the Galaxy Hoverboots for you.", vi.fn())).toBeNull()
+    expect(useStorefront.getState().bag).toEqual([])
+    expect(suggestSimilar("I've added the cosmic trousers for you.")).toBe("Straight Trouser")
+  })
+
+  test("a shopper clicking Pay first cancels the agent's auto-pay (no double capture)", () => {
+    vi.useFakeTimers()
+    try {
+      runChatActions([{ action: "add_to_bag", productId: tee.id }, { action: "checkout" }], vi.fn())
+      // Shopper beats the agent to the button.
+      const first = captureCheckout()
+      vi.advanceTimersByTime(2000)
+      expect(first).not.toBeNull()
+      // The agent's timer must not mint a second order.
+      expect(useStorefront.getState().order?.orderId).toBe(first!.orderId)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})

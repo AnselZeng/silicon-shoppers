@@ -22,7 +22,8 @@ describe("design guideline", () => {
   })
 
   test("docs/design-guideline.md is up to date (npm run guideline)", () => {
-    const doc = readFileSync(join(__dirname, "../../../docs/design-guideline.md"), "utf8")
+    // .gitattributes may check the doc out as CRLF on Windows; compare normalized.
+    const doc = readFileSync(join(__dirname, "../../../docs/design-guideline.md"), "utf8").replace(/\r\n/g, "\n")
     expect(doc).toBe(text)
   })
 })

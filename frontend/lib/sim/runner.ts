@@ -135,7 +135,23 @@ class ShellRunner {
 
   private onStoreEvent(event: StoreEvent) {
     const logs = useLogStore.getState()
-    logs.push("tracker", describeStoreEvent(event))
+    if (event.type === "concierge_query") {
+      logs.push("llm", `shopper asked · "${String(event.properties.q ?? "")}"`)
+    } else if (event.type === "concierge_reply") {
+      logs.push(
+        "llm",
+        `answered · ${String(event.properties.model ?? "llm")} · ${String(event.properties.ms ?? "?")}ms · ${String(event.properties.chars ?? "?")} chars`,
+      )
+    } else if (event.type === "concierge_error") {
+      logs.push("llm", `chat failed · ${String(event.properties.error ?? "unknown")} · scripted fallback`)
+    } else if (event.type === "concierge_layout") {
+      logs.push("llm", `store rearranged · ${String(event.properties.summary ?? "shopper request")}`)
+    } else if (event.type === "concierge_action") {
+      const detail = event.properties.detail ? ` · ${String(event.properties.detail)}` : ""
+      logs.push("llm", `agent · ${String(event.properties.action ?? "action")}${detail}`)
+    } else {
+      logs.push("tracker", describeStoreEvent(event))
+    }
     if (event.type === "page_view") useSimStore.getState().setRoute(event.route)
     if (event.type === "checkout_started") {
       logs.push("visa", `session ${String(event.properties.sessionId)} · $${String(event.properties.amount)}`)

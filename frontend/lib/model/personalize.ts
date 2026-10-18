@@ -37,6 +37,11 @@ export function getDecisionLog(): DecisionLogEntry[] {
   return lastLog;
 }
 
+/** The document currently applied to this shopper, or null when Snowflake has none. */
+export function getShopperDoc(): HomepageDoc | StoreLayoutDoc | null {
+  return home;
+}
+
 function report(status: {
   state: "disabled" | "waiting" | "applied";
   persona?: string;
