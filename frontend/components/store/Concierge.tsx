@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react"
 import type { ConciergeTone } from "@/lib/layout/types"
 import { buildChatContext } from "@/lib/store/chatContext"
 import { applyChatIntent } from "@/lib/store/chatIntent"
-import { runChatActions, splitActions, type ChatAction } from "@/lib/store/agent"
+import { confirmReply, runChatActions, shopperConfirmed, splitActions, type ChatAction } from "@/lib/store/agent"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -75,17 +75,11 @@ interface Msg {
   content: string
 }
 
-// A message that IS the checkout confirmation — short affirmatives only. Anything
-// longer ("purchase a navy tee", "buy it and also...") is a shopping request and
-// must still route through the Yes/No buttons.
-const CONFIRM_RE =
-  /^\s*(yes|yeah|yep|yup|sure|ok(ay)?|done|i'?m done|that'?s (all|it)|all set|check ?out( me)?|let'?s (check ?out|pay|wrap( it)? up|go)|pay( now| it| me out)?|wrap( it)? up|finish(ed)?( up)?|nothing else|no( |,)that'?s (all|it))\s*[.!]?\s*$/i
-// Checkout intent embedded in a longer message.
-const CHECKOUT_WORDS_RE =
-  /\b(check me out|check ?out (now|please|for me)|proceed to (check ?out|payment)|go (ahead and|to) (pay|check ?out)|take me to (check ?out|payment)|ready to (pay|check ?out))\b/i
 // The model's prose claims an add or a payment — verified against what really ran.
-const CLAIM_ADD_RE = /\b(added|adding|in your (bag|cart)|to your (bag|cart)|into your (bag|cart)|bagged)\b/i
-const CLAIM_PAY_RE = /\b(checking you out|taking you to (check ?out|payment)|paying (for you|now)|order (is |has been |)(placed|confirmed)|you'?re all set)\b/i
+const CLAIM_ADD_RE =
+  /\b(added|adding|i'?ll (add|grab|bag|toss)|let me (add|grab|bag)|in your (bag|cart)|to your (bag|cart)|into your (bag|cart)|bagged)\b/i
+const CLAIM_PAY_RE =
+  /\b(take|taking|check|checking|bring|bringing|head|heading)( you)?( over| right)? to (check ?out|payment)|pay(ing|ment) (for you|now|complete)|order (is |has been |)(placed|confirmed)|you'?re all set|process(ed|ing) (your |the |)payment/i
 
 export function Concierge() {
   const router = useRouter()
@@ -129,7 +123,16 @@ export function Concierge() {
     setBusy(true)
     setDraft("")
     emitStoreEvent("concierge_query", { tone, q: message })
+    // While the "done shopping?" question is pending, a short typed reply IS the
+    // answer — handle it locally like the buttons so the model can never fake it.
+    const pendingReply = pendingCheckout ? confirmReply(message) : null
     setPendingCheckout(false)
+    if (pendingReply) {
+      setMessages((prev) => [...prev, { role: "user", content: message }])
+      confirmCheckout(pendingReply === "yes")
+      setBusy(false)
+      return
+    }
     // A stated preference the store can act on is applied right away — the shopper asked
     // out loud, so no confidence gate. The reply below is then told what changed.
     const applied = applyChatIntent(message, useStorefront.getState().layout)
@@ -186,17 +189,17 @@ export function Concierge() {
       }
       const { text, actions } = splitActions(reply)
       if (!text) throw new Error("empty reply")
-      // The shopper's own words gate real payment. A pure confirmation ("yeah im done",
-      // "check me out") allows a model checkout; anything else downgrades it to the
-      // Yes/No prompt so a "purchase X" request can never skip the ask.
-      const shopperConfirmed = CONFIRM_RE.test(message) || CHECKOUT_WORDS_RE.test(message)
+      // The shopper's own words gate real payment. A pure confirmation ("yeah im
+      // done", "check me out") allows a model checkout; anything else downgrades it
+      // to the Yes/No prompt so a "purchase X" request can never skip the ask.
+      const confirmed = shopperConfirmed(message)
       const safe = actions.map((a): ChatAction =>
-        a.action === "checkout" && !shopperConfirmed ? { action: "ask_checkout" } : a,
+        a.action === "checkout" && !confirmed ? { action: "ask_checkout" } : a,
       )
       const result = runChatActions(safe, (path: string) => router.push(path), appendOrderLine)
       // The model sometimes says "checking you out" but forgets the action. When the
       // shopper clearly confirmed and the bag has items, the agent owes them a checkout.
-      if (CONFIRM_RE.test(message) && !result.checkedOut && useStorefront.getState().bag.length > 0) {
+      if (confirmed && !result.checkedOut && useStorefront.getState().bag.length > 0) {
         const retry = runChatActions([{ action: "checkout" }], (path: string) => router.push(path), appendOrderLine)
         result.checkedOut = retry.checkedOut
         result.checkoutSkipped = retry.checkoutSkipped

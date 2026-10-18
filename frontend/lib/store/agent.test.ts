@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { captureCheckout } from "@/lib/store/actions"
-import { runChatActions, splitActions } from "@/lib/store/agent"
+import { confirmReply, runChatActions, shopperConfirmed, splitActions } from "@/lib/store/agent"
 import { applyChatIntent } from "@/lib/store/chatIntent"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -42,6 +42,27 @@ describe("splitActions", () => {
   test("unknown action types are dropped", () => {
     const { actions } = splitActions('x <<<ACTIONS>>>[{"action":"delete_store"},{"action":"checkout"}]')
     expect(actions).toEqual([{ action: "checkout" }])
+  })
+})
+
+describe("confirmReply / shopperConfirmed", () => {
+  test("affirmatives and negatives classify to yes/no", () => {
+    for (const m of ["yes", "yeah im done", "I'm done", "that's all", "check me out", "let's pay", "nothing else", "all set"]) {
+      expect(confirmReply(m)).toBe("yes")
+    }
+    for (const m of ["no", "nope", "nah", "not yet", "keep shopping", "more"]) {
+      expect(confirmReply(m)).toBe("no")
+    }
+    expect(confirmReply("can you also find me a belt")).toBeNull()
+    expect(confirmReply("purchase navy blue medium tshirt")).toBeNull()
+  })
+
+  test("shopping requests never count as a checkout confirmation", () => {
+    expect(shopperConfirmed("yeah im done")).toBe(true)
+    expect(shopperConfirmed("add that and check me out")).toBe(true)
+    expect(shopperConfirmed("purchase navy blue medium tshirt")).toBe(false)
+    expect(shopperConfirmed("nope")).toBe(false)
+    expect(shopperConfirmed("why am i seeing this shirt")).toBe(false)
   })
 })
 

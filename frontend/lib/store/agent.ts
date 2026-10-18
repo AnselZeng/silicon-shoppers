@@ -15,6 +15,29 @@ import { useStorefront } from "@/lib/store/storeState"
 
 export const ACTIONS_MARKER = "<<<ACTIONS>>>"
 
+// A message that IS the answer to the pending "are you done shopping?" question —
+// short affirmatives and negatives only. Handled locally like the Yes/No buttons so
+// a flaky model reply can never fake a payment.
+export const SHORT_YES_RE =
+  /^\s*(?:(?:yes|yeah|yep|yup|sure|ok(?:ay)?|alright|absolutely|go ahead)[,!\s]+)?(yes|yeah|yep|yup|sure|ok(?:ay)?|alright|done|i'?m done|that'?s (all|it)|all set|check ?out|check me out|check ?out me|let'?s (check ?out|pay|wrap( it)? up|go)|pay( now| it| me out)?|wrap( it)? up|finish(ed)?( up)?|nothing else|no( |,)that'?s (all|it)|i'?m good|no more|go ahead)\s*(please)?\s*[.!]?\s*$/i
+export const SHORT_NO_RE =
+  /^\s*(no|nope|nah|not yet|not done|not now|keep (going|shopping)|more|wait|hold on|still shopping|not really|actually)\s*[.!]?\s*$/i
+// Checkout intent embedded in a longer shopper message ("add that and check me out").
+export const CHECKOUT_WORDS_RE =
+  /\b(check me out|check ?out (now|please|for me)|proceed to (check ?out|payment)|go (ahead and|to) (pay|check ?out)|take me to (check ?out|payment)|ready to (pay|check ?out)|let'?s (pay|check ?out|wrap( it)? up))\b/i
+
+/** Classifies a short typed reply while the done-shopping prompt is pending. */
+export function confirmReply(message: string): "yes" | "no" | null {
+  if (SHORT_YES_RE.test(message)) return "yes"
+  if (SHORT_NO_RE.test(message)) return "no"
+  return null
+}
+
+/** Whether the shopper's own words authorize a real checkout right now. */
+export function shopperConfirmed(message: string): boolean {
+  return SHORT_YES_RE.test(message) || CHECKOUT_WORDS_RE.test(message)
+}
+
 export interface ChatAction {
   /** ask_checkout renders Yes/No buttons in the chat instead of acting directly. */
   action: "add_to_bag" | "checkout" | "ask_checkout"
