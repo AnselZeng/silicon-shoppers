@@ -253,6 +253,7 @@ export function PersonaPanel() {
           <textarea
             value={sentence}
             onChange={(event) => setSentence(event.target.value)}
+            suppressHydrationWarning
             rows={2}
             placeholder="Buys menswear on sale and skips popups"
             className="mt-1 w-full resize-none border border-white/15 bg-transparent px-2 py-2 text-[12px] tracking-normal text-white normal-case outline-none placeholder:text-white/30"

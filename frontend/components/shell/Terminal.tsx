@@ -40,6 +40,7 @@ export function Terminal() {
         <input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
+          suppressHydrationWarning
           className="min-w-0 flex-1 bg-transparent py-1 text-white outline-none"
           aria-label="Shell command"
         />
