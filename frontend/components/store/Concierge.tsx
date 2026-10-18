@@ -14,6 +14,8 @@ import {
 } from "@/lib/store/agent"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { captureCheckout } from "@/lib/store/actions"
+import { playLayout } from "@/lib/store/layoutMotion"
+import { postSimMessage, type StorePayload } from "@/lib/sim/protocol"
 import { useStorefront } from "@/lib/store/storeState"
 
 // Suggested starters per concierge tone — also the offline fallback answers when no LLM
@@ -81,12 +83,6 @@ interface Msg {
   role: "user" | "assistant"
   content: string
 }
-
-// The model's prose claims an add or a payment — verified against what really ran.
-const CLAIM_ADD_RE =
-  /\b(added|adding|i'?ll (add|grab|bag|toss)|let me (add|grab|bag)|in your (bag|cart)|to your (bag|cart)|into your (bag|cart)|bagged)\b/i
-const CLAIM_PAY_RE =
-  /\b(take|taking|check|checking|bring|bringing|head|heading)( you)?( over| right)? to (check ?out|payment)|pay(ing|ment) (for you|now|complete)|order (is |has been |)(placed|confirmed)|you'?re all set|process(ed|ing) (your |the |)payment/i
 
 export function Concierge() {
   const router = useRouter()
@@ -185,10 +181,17 @@ export function Concierge() {
       return
     }
     // A stated preference the store can act on is applied right away — the shopper asked
-    // out loud, so no confidence gate. The reply below is then told what changed.
+    // out loud, so no confidence gate. It plays through the same staged animation as a
+    // model-driven layout: each changed region scrolls, flashes and swaps on its own.
     const applied = applyChatIntent(message, useStorefront.getState().layout)
     if (applied) {
-      useStorefront.getState().setLayout(applied.layout, { presetName: applied.summary })
+      const post = (payload: StorePayload) => {
+        if (window.parent !== window) postSimMessage(window.parent, payload)
+      }
+      playLayout(applied.layout, { presetName: applied.summary }, {
+        onStep: (index, total, label) => post({ type: "layout_step", index, total, label }),
+        onSettled: () => post({ type: "layout_settled" }),
+      })
       emitStoreEvent("concierge_layout", { tone, summary: applied.summary })
     }
     setMessages((prev) => [...prev, { role: "user", content: message }])
