@@ -85,8 +85,11 @@ export function DemoScreen() {
             {view.label}
           </button>
         ))}
-        <span className="ml-auto tabular-nums tracking-normal text-white/45">
-          {frame.width} × {frame.height}
+        <span
+          className="ml-auto tabular-nums tracking-normal text-white/45"
+          title={`The store renders at ${frame.width} × ${frame.height} and is scaled to fit`}
+        >
+          {Math.round(frame.width * scale)} × {Math.round(frame.height * scale)} · {Math.round(scale * 100)}%
         </span>
       </div>
       <div ref={stageRef} className="flex min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-hidden px-6 py-5">

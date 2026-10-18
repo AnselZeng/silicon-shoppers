@@ -202,7 +202,7 @@ export function PersonaPanel() {
       </div>
       <ScrollArea className="mt-3 min-h-0 flex-1 px-4">
         <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">Shopper</p>
-        <div className="mt-2 grid grid-cols-5 gap-1.5">
+        <div className="mt-2 flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {DEMO_SHOPPERS.map((shopper) => {
             const accent = PERSONA_ACCENTS[shopper.id]
             const picked = !custom && shopper.id === selected.id && !fromSentence
@@ -218,14 +218,18 @@ export function PersonaPanel() {
                   setCustom(false)
                   select(shopper.id)
                 }}
-                className="min-h-[4.25rem] border px-1.5 py-2 text-left"
+                className="min-h-[4.25rem] min-w-min flex-1 basis-0 border px-2 py-2 text-left"
                 style={{
                   borderColor: picked ? accent : "rgba(255,255,255,0.12)",
                   background: picked ? `${accent}22` : "transparent",
                 }}
               >
                 <span className="block text-[10px] leading-tight tracking-[0.08em] uppercase" style={{ color: accent }}>
-                  {shopper.title}
+                  {shopper.title.split(" ").map((word) => (
+                    <span key={word} className="block">
+                      {word}
+                    </span>
+                  ))}
                 </span>
                 <span className="mt-1 block text-[10px] leading-tight text-white/45 normal-case tracking-normal">
                   {members ? `${Math.round(members / 1000)}k` : "\u00a0"}
@@ -234,7 +238,7 @@ export function PersonaPanel() {
             )
           })}
           <div
-            className="min-h-[4.25rem] border px-1.5 py-2"
+            className="min-h-[4.25rem] min-w-min flex-1 basis-0 border px-2 py-2"
             style={{
               borderColor: custom && !fromSentence ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.12)",
               background: custom && !fromSentence ? "rgba(255,255,255,0.06)" : "transparent",
