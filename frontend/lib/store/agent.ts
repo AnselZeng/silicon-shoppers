@@ -16,18 +16,20 @@ import { useStorefront } from "@/lib/store/storeState"
 export const ACTIONS_MARKER = "<<<ACTIONS>>>"
 
 export interface ChatAction {
-  action: "add_to_bag" | "checkout"
+  /** ask_checkout renders Yes/No buttons in the chat instead of acting directly. */
+  action: "add_to_bag" | "checkout" | "ask_checkout"
   productId?: string
   color?: string
   size?: string
 }
 
-/** Splits a streamed reply into visible text + action payload. */
+/** Splits a streamed reply into visible text + action payload. Tolerates <ACTIONS>, <<<ACTIONS>>> etc. */
 export function splitActions(full: string): { text: string; actions: ChatAction[] } {
-  const at = full.indexOf("<<<")
+  const marker = /<+\s*ACTIONS\s*>+/i.exec(full)
+  const at = marker ? marker.index : -1
   const text = (at === -1 ? full : full.slice(0, at)).replace(/<+$/, "").trimEnd()
   if (at === -1) return { text, actions: [] }
-  const json = full.slice(at).replace(/^<+ACTIONS>+/, "")
+  const json = full.slice(at).replace(/^<+\s*ACTIONS\s*>+/, "")
   try {
     const parsed = JSON.parse(json) as unknown
     if (!Array.isArray(parsed)) return { text, actions: [] }
@@ -35,7 +37,11 @@ export function splitActions(full: string): { text: string; actions: ChatAction[
       text,
       actions: parsed.filter(
         (a): a is ChatAction =>
-          !!a && typeof a === "object" && ((a as ChatAction).action === "add_to_bag" || (a as ChatAction).action === "checkout"),
+          !!a &&
+          typeof a === "object" &&
+          ((a as ChatAction).action === "add_to_bag" ||
+            (a as ChatAction).action === "checkout" ||
+            (a as ChatAction).action === "ask_checkout"),
       ),
     }
   } catch {
@@ -47,11 +53,12 @@ export function splitActions(full: string): { text: string; actions: ChatAction[
  * Runs the actions the model requested. Returns what was done for the caller to log.
  * `checkout` pays for real (demo Visa flow) and hands back the order for navigation.
  */
-export function runChatActions(actions: ChatAction[], navigate: (path: string) => void): { done: string[] } {
+export function runChatActions(actions: ChatAction[], navigate: (path: string) => void): { done: string[]; asksCheckout: boolean } {
   const done: string[] = []
   const store = useStorefront.getState()
 
   for (const a of actions) {
+    if (a.action === "ask_checkout") continue
     if (a.action === "add_to_bag") {
       const product = a.productId ? getProduct(a.productId) : undefined
       if (!product) continue
@@ -68,7 +75,8 @@ export function runChatActions(actions: ChatAction[], navigate: (path: string) =
       startCheckout()
       done.push("started checkout")
       emitStoreEvent("concierge_action", { action: "checkout" })
-      // Let the Visa sheet be visible for a beat, then pay on the shopper's behalf.
+      // Auto-pay on: the agent clicks Pay too. Off: stop on the Visa sheet, shopper clicks.
+      if (!useStorefront.getState().agentAutoPay) continue
       window.setTimeout(() => {
         const captured = captureCheckout()
         if (captured) {
@@ -78,5 +86,5 @@ export function runChatActions(actions: ChatAction[], navigate: (path: string) =
       }, 1600)
     }
   }
-  return { done }
+  return { done, asksCheckout: actions.some((a) => a.action === "ask_checkout") }
 }

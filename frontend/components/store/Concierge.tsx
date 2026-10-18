@@ -82,7 +82,10 @@ export function Concierge() {
   const open = useStorefront((state) => state.conciergeOpen)
   const footer = useStorefront((state) => state.stickyFooterOpen)
   const setOpen = useStorefront((state) => state.setConciergeOpen)
+  const autoPay = useStorefront((state) => state.agentAutoPay)
+  const setAutoPay = useStorefront((state) => state.setAgentAutoPay)
   const [messages, setMessages] = useState<Msg[]>([])
+  const [pendingCheckout, setPendingCheckout] = useState(false)
   const [draft, setDraft] = useState("")
   const [busy, setBusy] = useState(false)
   const [offline, setOffline] = useState(false)
@@ -159,7 +162,7 @@ export function Concierge() {
       }
       const { text, actions } = splitActions(reply)
       if (!text) throw new Error("empty reply")
-      if (actions.length) runChatActions(actions, router.push)
+      if (actions.length) setPendingCheckout(runChatActions(actions, router.push).asksCheckout)
       history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: text }].slice(-12)
     } catch (error) {
       emitStoreEvent("concierge_error", { tone, error: error instanceof Error ? error.message : "failed" })
@@ -179,13 +182,38 @@ export function Concierge() {
     setBusy(false)
   }
 
+  function confirmCheckout(yes: boolean) {
+    setPendingCheckout(false)
+    emitStoreEvent("concierge_action", { action: "checkout_confirm", detail: yes ? "yes" : "no" })
+    if (yes) {
+      runChatActions([{ action: "checkout" }], router.push)
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant" as const, content: autoPay ? "On it! Paying now, you're all set." : "Taking you to payment, one click left!" },
+      ])
+    } else {
+      setMessages((prev) => [...prev, { role: "assistant" as const, content: "No rush! What else can I find for you?" }])
+    }
+  }
+
   return (
     <div className={`fixed right-4 z-40 w-72 ${footer ? "bottom-20" : "bottom-4"}`}>
       {open ? (
         <div className="mb-2 flex h-80 flex-col border border-[#141414] bg-[#f6f3ee] shadow-lg">
-          <p className="border-b border-[#141414]/15 px-3 py-2 text-[10px] tracking-[0.2em] uppercase">
-            Concierge · {tone}{offline ? " · offline" : ""}
-          </p>
+          <div className="flex items-center justify-between border-b border-[#141414]/15 px-3 py-2">
+            <p className="text-[10px] tracking-[0.2em] uppercase">
+              Concierge · {tone}{offline ? " · offline" : ""}
+            </p>
+            <label className="flex items-center gap-1 text-[9px] tracking-[0.12em] uppercase text-black/50">
+              <input
+                type="checkbox"
+                checked={autoPay}
+                onChange={(event) => setAutoPay(event.target.checked)}
+                suppressHydrationWarning
+              />
+              auto-pay
+            </label>
+          </div>
           <div ref={scrollRef} className="flex-1 space-y-2 overflow-y-auto px-3 py-2">
             {messages.length === 0 ? (
               <div className="flex flex-col gap-1 pt-1">
@@ -214,6 +242,24 @@ export function Concierge() {
                 </p>
               ))
             )}
+            {pendingCheckout && !busy ? (
+              <div className="mr-8 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => confirmCheckout(true)}
+                  className="bg-[#141414] px-3 py-1.5 text-[11px] text-white"
+                >
+                  Yes, check me out
+                </button>
+                <button
+                  type="button"
+                  onClick={() => confirmCheckout(false)}
+                  className="border border-[#141414]/30 px-3 py-1.5 text-[11px]"
+                >
+                  Not yet
+                </button>
+              </div>
+            ) : null}
             {busy ? <p className="mr-8 text-[11px] text-black/40">typing…</p> : null}
           </div>
           <form

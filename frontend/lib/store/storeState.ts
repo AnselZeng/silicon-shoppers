@@ -56,6 +56,8 @@ interface StorefrontState {
   order: MockCapture | null
   conciergeOpen: boolean
   conciergeAnswer: string | null
+  /** When true the concierge pays too; when false it stops on the Visa sheet for the shopper's click. */
+  agentAutoPay: boolean
   selectedColor: Record<string, string>
   selectedSize: Record<string, string>
   sessionNonce: number
@@ -81,6 +83,7 @@ interface StorefrontState {
   setOrder: (order: MockCapture | null) => void
   setConciergeOpen: (open: boolean) => void
   setConciergeAnswer: (answer: string | null) => void
+  setAgentAutoPay: (on: boolean) => void
   selectColor: (productId: string, color: string) => void
   selectSize: (productId: string, size: string) => void
   resetStorefront: () => void
@@ -123,6 +126,7 @@ export const useStorefront = create<StorefrontState>((set) => ({
   order: null,
   conciergeOpen: false,
   conciergeAnswer: null,
+  agentAutoPay: true,
   selectedColor: {},
   selectedSize: {},
   sessionNonce: 0,
@@ -212,6 +216,7 @@ export const useStorefront = create<StorefrontState>((set) => ({
   setOrder: (order) => set({ order }),
   setConciergeOpen: (open) => set({ conciergeOpen: open }),
   setConciergeAnswer: (answer) => set({ conciergeAnswer: answer }),
+  setAgentAutoPay: (on) => set({ agentAutoPay: on }),
   selectColor: (productId, color) =>
     set((state) => ({ selectedColor: { ...state.selectedColor, [productId]: color } })),
   selectSize: (productId, size) =>
