@@ -115,6 +115,7 @@ export function PredictedMix({ doc, onChange }: { doc: HomepageDoc; onChange: (d
       </Group>
       <Group title="Colors">
         <p className="text-[11px] text-white/75">{colors.length > 0 ? colors.join(", ") : "No highlight"}</p>
+        <p className="text-[10px] text-white/40">Comes from what they buy. It is not a slider.</p>
       </Group>
       <Group title="Browsing">
         <SliderRow label="Exploring" share={doc.browsing.exploration} onChange={(next) => setBrowsing("exploration", next)} />

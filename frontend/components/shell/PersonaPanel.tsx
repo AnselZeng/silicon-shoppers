@@ -38,6 +38,7 @@ export function PersonaPanel() {
   const [modelDoc, setModelDoc] = useState<HomepageDoc | null>(null)
   const [draft, setDraft] = useState<HomepageDoc | null>(null)
   const [basket, setBasket] = useState<string[]>([])
+  const [custom, setCustom] = useState(false)
 
   const selected = DEMO_SHOPPERS.find((shopper) => shopper.id === selectedId) ?? DEMO_SHOPPERS[0]
   const fromSentence = shopperFromSentence(sentence)
@@ -84,6 +85,7 @@ export function PersonaPanel() {
       setModelDoc(next)
       setDraft(next)
       setBasket(entry.basket)
+      setCustom(false)
     })
     return () => {
       cancel = true
@@ -104,7 +106,8 @@ export function PersonaPanel() {
     const token = ++runToken.current
     previousPreview.current = useSimStore.getState().layoutPreview || "default"
     setBusy(true)
-    if (persona) select(persona.id)
+    const edited = custom && !fromSentence
+    if (persona && !edited) select(persona.id)
     const doc = draft ?? modelDoc
     const liveMix = stored?.model_meta?.predicted_mix as HomepageDoc["predicted_mix"] | undefined
     const untouched = Boolean(showingLive && stored && doc && liveMix && sameMix(doc.predicted_mix, liveMix))
@@ -117,10 +120,21 @@ export function PersonaPanel() {
       useLogStore.getState().push("sim", `running ${label}`)
       await runner.previewStored(stored, label)
     } else if (doc) {
-      useLogStore.getState().push("sim", `running ${active.title}`)
-      await runner.previewDocument(doc, basket, active.title, sentence)
+      const label = edited ? "Custom" : active.title
+      useLogStore.getState().push("sim", `running ${label}`)
+      await runner.previewDocument(doc, basket, label, sentence)
     }
     if (runToken.current === token) setBusy(false)
+  }
+
+  function onMix(next: HomepageDoc) {
+    setDraft(next)
+    const same =
+      modelDoc !== null &&
+      sameMix(next.predicted_mix, modelDoc.predicted_mix) &&
+      next.browsing.exploration === modelDoc.browsing.exploration &&
+      next.browsing.multi_visit_research === modelDoc.browsing.multi_visit_research
+    setCustom(!same)
   }
 
   function stop() {
@@ -135,18 +149,30 @@ export function PersonaPanel() {
       <div className="px-4 pt-4 pb-3">
         <p className="text-[10px] tracking-[0.22em] text-white/40 uppercase">Silicon Shoppers</p>
         <h1 className="mt-1 text-sm font-medium">Refit the store for one shopper</h1>
-        <p className="mt-2 text-[11px] leading-snug text-white/55">
-          {showingLive
-            ? `${stored?.shopper.persona?.name ?? "This shopper"} · ${stored?.shopper.confidence ?? "low"} confidence. ${stored?.shopper.persona_reason ?? "Run applies the stored layout."}`
-            : stored
-              ? "Showing an example. This browser also has a stored layout."
-              : "Every shopper is assigned to one of these four. Pick one and Run to rebuild the store."}
+        <p className="mt-2 truncate text-[11px] leading-snug text-white/55">
+          {custom && !fromSentence ? (
+            `Custom, edited from ${active.title}. Run uses the sliders.`
+          ) : showingLive ? (
+            `${stored?.shopper.persona?.name ?? "This shopper"} · ${stored?.shopper.confidence ?? "low"} confidence. ${stored?.shopper.persona_reason ?? "Run applies the stored layout."}`
+          ) : stored ? (
+            <>
+              Example mix.{" "}
+              <button
+                type="button"
+                className="text-white underline"
+                onClick={() => {
+                  setCustom(false)
+                  setSentence("")
+                  setFollowLive(true)
+                }}
+              >
+                Back to {stored.shopper.persona?.name ?? "this browser"}
+              </button>
+            </>
+          ) : (
+            "Pick a type, or drag a slider, then Run."
+          )}
         </p>
-        {stored && !followLive ? (
-          <button type="button" className="mt-1 text-[11px] text-white underline" onClick={() => setFollowLive(true)}>
-            Show this browser&apos;s stored layout
-          </button>
-        ) : null}
       </div>
       <div className="px-4">
         <button
@@ -163,11 +189,11 @@ export function PersonaPanel() {
         </button>
       </div>
       <ScrollArea className="mt-3 min-h-0 flex-1 px-4">
-        <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">Four types</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
+        <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">Shopper</p>
+        <div className="mt-2 grid grid-cols-5 gap-1.5">
           {DEMO_SHOPPERS.map((shopper) => {
             const accent = PERSONA_ACCENTS[shopper.id]
-            const picked = shopper.id === selected.id && !fromSentence
+            const picked = !custom && shopper.id === selected.id && !fromSentence
             const members = cohort?.personas.find((persona) => persona.id === shopper.id)?.members
             return (
               <button
@@ -175,36 +201,51 @@ export function PersonaPanel() {
                 type="button"
                 onClick={() => {
                   setFollowLive(false)
-                  select(shopper.id)
                   setSentence("")
+                  if (shopper.id === selected.id && modelDoc) setDraft(modelDoc)
+                  setCustom(false)
+                  select(shopper.id)
                 }}
-                className="border px-2 py-2 text-left"
+                className="min-h-[4.25rem] border px-1.5 py-2 text-left"
                 style={{
                   borderColor: picked ? accent : "rgba(255,255,255,0.12)",
                   background: picked ? `${accent}22` : "transparent",
                 }}
               >
-                <span className="block text-[10px] tracking-[0.14em] uppercase" style={{ color: accent }}>
+                <span className="block text-[10px] leading-tight tracking-[0.08em] uppercase" style={{ color: accent }}>
                   {shopper.title}
                 </span>
-                {members ? (
-                  <span className="mt-0.5 block text-[10px] text-white/45 normal-case tracking-normal">
-                    {members.toLocaleString("en-US")} shoppers
-                  </span>
-                ) : null}
+                <span className="mt-1 block text-[10px] leading-tight text-white/45 normal-case tracking-normal">
+                  {members ? `${Math.round(members / 1000)}k` : "\u00a0"}
+                </span>
               </button>
             )
           })}
+          <div
+            className="min-h-[4.25rem] border px-1.5 py-2"
+            style={{
+              borderColor: custom && !fromSentence ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.12)",
+              background: custom && !fromSentence ? "rgba(255,255,255,0.06)" : "transparent",
+            }}
+          >
+            <span className="block text-[10px] leading-tight tracking-[0.08em] text-white/70 uppercase">Custom</span>
+            <span className="mt-1 block text-[10px] leading-tight text-white/45 normal-case tracking-normal">
+              {custom && !fromSentence ? "Edited" : "Drag"}
+            </span>
+          </div>
         </div>
-        <ul className="mt-3 space-y-1 text-[12px] leading-snug text-white/75">
-          {active.lines.map((line) => (
+        <ul className="mt-3 min-h-[2.5rem] space-y-1 text-[12px] leading-snug text-white/75">
+          {(custom && !fromSentence
+            ? [`Edited from ${active.title}.`, "Click a type to put that mix back."]
+            : active.lines
+          ).map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>
         {draft ? (
           <div className="mt-3">
             <p className="mb-2 text-[10px] tracking-[0.14em] text-white/40 uppercase">Shopping mix</p>
-            <PredictedMix doc={draft} onChange={setDraft} />
+            <PredictedMix doc={draft} onChange={onMix} />
           </div>
         ) : null}
         <label className="mt-4 block text-[10px] tracking-[0.14em] text-white/40 uppercase">
@@ -250,8 +291,8 @@ export function PersonaPanel() {
           <ModelOutput
             doc={draft}
             basket={basket}
-            stored={showingLive ? stored : null}
-            exampleName={active.title}
+            stored={showingLive && !custom ? stored : null}
+            exampleName={custom && !fromSentence ? "Custom" : active.title}
             built={preview?.id === `shopper:${draft.demo_id ?? draft.user_id ?? "custom"}` ? preview : null}
           />
         ) : null}
