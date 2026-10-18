@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { UI_CONFIG } from "@/config/ui"
 import { BrowserChrome } from "@/components/shell/BrowserChrome"
+import { PipelineLog } from "@/components/shell/PipelineLog"
 import { useSimStore, type ViewportChoice } from "@/lib/state/simStore"
 
 const VIEWS: { id: ViewportChoice; label: string }[] = [
@@ -77,6 +78,9 @@ export function DemoScreen() {
             </div>
           </div>
         )}
+      </div>
+      <div className="h-[220px] shrink-0 overflow-hidden border-t border-white/10">
+        <PipelineLog />
       </div>
     </div>
   )

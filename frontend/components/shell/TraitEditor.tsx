@@ -1,8 +1,6 @@
 "use client"
 
-import { useRef } from "react"
 import { COLOR_HEX, STORE_COLORS, type StoreColor } from "@/config/ui"
-import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -11,7 +9,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
-import { useLogStore } from "@/lib/state/logStore"
 import { usePersonaStore } from "@/lib/state/personaStore"
 import type { DepartmentPref, Persona, PersonaTraits } from "@/lib/personas/schema"
 
@@ -48,63 +45,11 @@ function SliderRow({
 
 export function TraitEditor({ persona }: { persona: Persona }) {
   const updateTraits = usePersonaStore((state) => state.updateTraits)
-  const duplicate = usePersonaStore((state) => state.duplicate)
-  const resetOne = usePersonaStore((state) => state.resetOne)
-  const exportPersona = usePersonaStore((state) => state.exportPersona)
-  const importPersona = usePersonaStore((state) => state.importPersona)
-  const fileRef = useRef<HTMLInputElement>(null)
   const traits = persona.traits
   const patch = (next: Partial<PersonaTraits>) => updateTraits(persona.id, next)
 
-  function download() {
-    const blob = new Blob([exportPersona(persona.id)], { type: "application/json" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = `${persona.id}.json`
-    link.click()
-    URL.revokeObjectURL(url)
-  }
-
   return (
     <div className="flex flex-col gap-3 pb-4">
-      <div className="flex flex-wrap gap-1">
-        <Button type="button" size="xs" variant="outline" className="text-foreground" onClick={() => duplicate(persona.id)}>
-          Duplicate
-        </Button>
-        <Button type="button" size="xs" variant="outline" className="text-foreground" onClick={download}>
-          Export
-        </Button>
-        <Button
-          type="button"
-          size="xs"
-          variant="outline"
-          className="text-foreground"
-          onClick={() => fileRef.current?.click()}
-        >
-          Import
-        </Button>
-        <Button type="button" size="xs" variant="outline" className="text-foreground" onClick={() => resetOne(persona.id)}>
-          Reset
-        </Button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json"
-          className="hidden"
-          onChange={(event) => {
-            const file = event.target.files?.[0]
-            if (!file) return
-            const reader = new FileReader()
-            reader.onload = () => {
-              const result = importPersona(String(reader.result ?? ""))
-              useLogStore.getState().push("sim", result.ok ? `imported ${result.id}` : result.error)
-            }
-            reader.readAsText(file)
-            event.target.value = ""
-          }}
-        />
-      </div>
       <Field label="Department">
         <EnumSelect
           value={traits.preferredDepartment}

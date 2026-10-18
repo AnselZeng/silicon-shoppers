@@ -60,7 +60,7 @@ export function Header() {
         </Link>
         <nav className="hidden items-center gap-5 text-[11px] tracking-[0.18em] uppercase sm:flex">
           {links.map((link) => (
-            <Link key={link.id} href={link.href} className={link.className}>
+            <Link key={link.id} href={link.href} className={link.className} style={{ viewTransitionName: `nav-${link.id}` }}>
               {link.label}
             </Link>
           ))}

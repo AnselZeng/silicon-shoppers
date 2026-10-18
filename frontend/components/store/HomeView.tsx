@@ -8,7 +8,7 @@ import { ProductGrid } from "@/components/store/ProductGrid"
 import { adContent } from "@/lib/ads/placement"
 import { resolveHome } from "@/lib/layout/home"
 import { categoryHref, collectionHref, departmentPath } from "@/lib/layout/links"
-import { FILTER_LABEL, type ColorMerchandising, type LayoutConfig, type ProductSource } from "@/lib/layout/types"
+import { FILTER_LABEL, type ColorMerchandising, type HomeBlock, type LayoutConfig, type ProductSource } from "@/lib/layout/types"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { useStorefront } from "@/lib/store/storeState"
 import { CATEGORY_LABEL, type CollectionName } from "@/lib/store/types"
@@ -54,6 +54,21 @@ function rowTitle(source: ProductSource): string {
     case "collection":
       return source.collection
   }
+}
+
+function transitionName(block: HomeBlock): string {
+  if (block.type === "product_row") {
+    const source = block.source
+    if (source.kind === "category") return `row-cat-${source.category}`
+    if (source.kind === "collection") return `row-col-${source.collection.replace(/\s+/g, "-")}`
+    if (source.kind === "under_price") return `row-under-${source.max}`
+    return `row-${source.kind}`
+  }
+  if (block.type === "collection_spotlight") return `spot-${block.collection.replace(/\s+/g, "-")}`
+  if (block.type === "ad_banner") return `ad-${block.adId}`
+  if (block.type === "editorial_text") return `copy-${block.copyKey}`
+  if (block.type === "category_tiles") return "tiles"
+  return "hero"
 }
 
 function rowHref(source: ProductSource, layout: LayoutConfig): string | null {
@@ -104,12 +119,13 @@ export function HomeView() {
 
   return (
     <div>
-      {blocks.map((entry, index) => {
+      {blocks.map((entry) => {
         const block = entry.block
-        const key = `${index}-${block.type}`
+        const name = transitionName(block)
+        const lead = blocks.find((item) => item.block.type === "product_row")?.block === block
         if (block.type === "hero") {
           return (
-            <div key={key}>
+            <div key={name} style={{ viewTransitionName: name }}>
               <AdSlot slot="hero" />
               <p className="px-6 pt-4 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
                 {SORT_LINE[layout.listing.defaultSort]} · Filters lead with{" "}
@@ -122,9 +138,11 @@ export function HomeView() {
           if (entry.products.length === 0) return null
           const href = rowHref(entry.block.source, layout)
           return (
-            <section key={key} className="px-6 py-10">
+            <section key={name} style={{ viewTransitionName: name }} className="px-6 py-10">
               <div className="mb-6 flex items-baseline justify-between">
-                <h2 className="text-[11px] tracking-[0.22em] uppercase">{entry.block.title ?? rowTitle(entry.block.source)}</h2>
+                <h2 className={lead ? "font-serif text-4xl tracking-tight" : "text-[11px] tracking-[0.22em] uppercase"}>
+                  {entry.block.title ?? rowTitle(entry.block.source)}
+                </h2>
                 {href ? (
                   <Link href={href} className="text-[10px] tracking-[0.18em] uppercase">
                     View all
@@ -137,7 +155,7 @@ export function HomeView() {
         }
         if (block.type === "category_tiles") {
           return (
-            <section key={key} className="px-6 py-10">
+            <section key={name} style={{ viewTransitionName: name }} className="px-6 py-10">
               <h2 className="mb-6 text-[11px] tracking-[0.22em] uppercase">Shop by category</h2>
               <div className={`grid grid-cols-2 gap-4 md:grid-cols-3 ${TILE_COLS[block.categories.length] ?? "lg:grid-cols-6"}`}>
                 {block.categories.map((category) => (
@@ -154,13 +172,17 @@ export function HomeView() {
           )
         }
         if (block.type === "collection_spotlight") {
-          return <CollectionSpotlight key={key} layout={layout} collection={block.collection} />
+          return (
+            <div key={name} style={{ viewTransitionName: name }}>
+              <CollectionSpotlight layout={layout} collection={block.collection} />
+            </div>
+          )
         }
         if (block.type === "editorial_text") {
           const text = layout.copy[block.copyKey]
           if (!text) return null
           return (
-            <section key={key} className="px-6 py-12">
+            <section key={name} style={{ viewTransitionName: name }} className="px-6 py-12">
               <p
                 className={`mx-auto max-w-2xl text-center font-serif tracking-tight ${
                   block.copyKey === "intro" ? "text-2xl" : "text-lg leading-relaxed text-neutral-700"
@@ -172,7 +194,11 @@ export function HomeView() {
           )
         }
         if (block.type === "ad_banner") {
-          return <AdBanner key={key} ad={adContent(layout, block.adId)} slot="home_block" className="mx-6 my-6" />
+          return (
+            <div key={name} style={{ viewTransitionName: name }}>
+              <AdBanner ad={adContent(layout, block.adId)} slot="home_block" className="mx-6 my-6" />
+            </div>
+          )
         }
         return null
       })}

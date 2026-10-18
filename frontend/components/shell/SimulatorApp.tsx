@@ -4,7 +4,6 @@ import { useEffect } from "react"
 import { UI_CONFIG } from "@/config/ui"
 import { DemoScreen } from "@/components/shell/DemoScreen"
 import { PersonaPanel } from "@/components/shell/PersonaPanel"
-import { PipelineLog } from "@/components/shell/PipelineLog"
 import { runner } from "@/lib/sim/runner"
 
 export function SimulatorApp() {
@@ -30,13 +29,8 @@ export function SimulatorApp() {
         </div>
       </div>
       <div className="dark hidden h-screen min-w-[1280px] bg-[#0c0c0d] text-white min-[1280px]:flex">
-        <div className="flex h-full w-[35%] min-w-0 flex-col border-r border-white/10">
-          <div className="h-[55%] min-h-0 overflow-hidden">
-            <PersonaPanel />
-          </div>
-          <div className="h-[45%] min-h-0 overflow-hidden border-t border-white/10">
-            <PipelineLog />
-          </div>
+        <div className="h-full w-[35%] min-w-0 overflow-hidden border-r border-white/10">
+          <PersonaPanel />
         </div>
         <div className="h-full w-[65%] min-w-0">
           <DemoScreen />

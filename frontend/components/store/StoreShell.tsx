@@ -68,7 +68,11 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
         return
       }
       if (payload.type === "set_layout") {
-        useStorefront.getState().setLayout(payload.layout, { model: payload.model, presetName: payload.presetName })
+        const apply = () =>
+          useStorefront.getState().setLayout(payload.layout, { model: payload.model, presetName: payload.presetName })
+        const start = document.startViewTransition?.bind(document)
+        if (start) start(apply)
+        else apply()
       }
     }
     window.addEventListener("message", onMessage)

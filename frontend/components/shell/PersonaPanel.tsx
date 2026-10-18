@@ -1,11 +1,13 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { PERSONA_ACCENTS } from "@/config/ui"
 import { ModelOutput } from "@/components/shell/ModelOutput"
 import { TraitEditor } from "@/components/shell/TraitEditor"
-import { intrusiveCount } from "@/lib/ads/placement"
-import { previewId } from "@/lib/layout/preview"
-import { PERSONA_LABEL } from "@/lib/personas/schema"
+import { Button } from "@/components/ui/button"
+import { DEMO_SHOPPERS, shopperFromSentence } from "@/lib/layout/demoShoppers"
+import { loadFixture } from "@/lib/model/fixtures"
+import type { HomepageDoc } from "@/lib/model/homepage"
 import { runner } from "@/lib/sim/runner"
 import { usePersonaStore } from "@/lib/state/personaStore"
 import { useSimStore } from "@/lib/state/simStore"
@@ -16,108 +18,118 @@ export function PersonaPanel() {
   const selectedId = usePersonaStore((state) => state.selectedId)
   const select = usePersonaStore((state) => state.select)
   const layoutPreview = useSimStore((state) => state.layoutPreview)
-  const fixtures = useSimStore((state) => state.fixtures)
   const preview = useSimStore((state) => state.preview)
-  const selected = personas.find((persona) => persona.id === selectedId) ?? personas[0]
+  const fixtures = useSimStore((state) => state.fixtures)
+  const [sentence, setSentence] = useState("")
+  const [busy, setBusy] = useState(false)
+  const [modelDoc, setModelDoc] = useState<HomepageDoc | null>(null)
+  const [basket, setBasket] = useState<string[]>([])
+
+  const selected = DEMO_SHOPPERS.find((shopper) => shopper.id === selectedId) ?? DEMO_SHOPPERS[0]
+  const fromSentence = shopperFromSentence(sentence)
+  const active = fromSentence ?? selected
+  const persona = personas.find((item) => item.id === active.id) ?? personas[0]
+  const onDefault = layoutPreview === "default" || layoutPreview === ""
+
+  useEffect(() => {
+    const entry = fixtures.find((item) => item.id === active.fixtureId)
+    if (!entry) return
+    let cancel = false
+    void loadFixture(entry).then((fixture) => {
+      if (cancel || !fixture) return
+      setModelDoc(fixture.doc)
+      setBasket(entry.basket)
+    })
+    return () => {
+      cancel = true
+    }
+  }, [active.fixtureId, fixtures])
+
+  async function run() {
+    if (fixtures.length === 0 || busy) return
+    setBusy(true)
+    const persona = personas.find((item) => item.id === active.id)
+    if (persona) select(persona.id)
+    runner.preview(`shopper:${active.fixtureId}`)
+    window.setTimeout(() => setBusy(false), 700)
+  }
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-baseline justify-between px-4 pt-4 pb-2">
-        <div>
-          <p className="text-[10px] tracking-[0.22em] text-white/40 uppercase">Silicon Shoppers</p>
-          <h1 className="text-sm font-medium">Layout preview</h1>
-          <p className="text-[10px] text-white/40">Model output is JSON for the LLM; only the LLM layout changes the store</p>
-        </div>
+      <div className="px-4 pt-4 pb-3">
+        <p className="text-[10px] tracking-[0.22em] text-white/40 uppercase">Silicon Shoppers</p>
+        <h1 className="mt-1 text-sm font-medium">Refit the store for one shopper</h1>
       </div>
-      <div className="px-4 pb-2">
+      <div className="px-4">
         <button
           type="button"
           onClick={() => runner.preview("default")}
-          className="w-full border px-2 py-2 text-left"
+          className="w-full border px-3 py-2 text-left"
           style={{
-            borderColor: layoutPreview === "default" ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.12)",
-            background: layoutPreview === "default" ? "rgba(255,255,255,0.06)" : "transparent",
+            borderColor: onDefault ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.12)",
+            background: onDefault ? "rgba(255,255,255,0.06)" : "transparent",
           }}
         >
-          <span className="block text-[10px] tracking-[0.14em] text-white/50 uppercase">House default</span>
-          <span className="block text-sm">One storefront for everyone</span>
+          <span className="block text-[10px] tracking-[0.14em] text-white/50 uppercase">Default website</span>
+          <span className="block text-sm">The store everyone gets</span>
         </button>
       </div>
-      <ScrollArea className="min-h-0 flex-1 px-4 pb-3">
-        <p className="pt-1 text-[10px] tracking-[0.14em] text-white/40 uppercase">Model output fixtures</p>
-        <div className="mt-1 flex flex-col gap-1">
-          {fixtures.map((fixture) => (
-            <div key={fixture.id} className="flex items-center gap-2 border border-white/12 px-2 py-1.5">
-              <div className="min-w-0 flex-1">
-                <span className="block truncate text-sm">{fixture.label}</span>
-                <span className="block truncate text-[10px] text-white/45">{fixture.description}</span>
-              </div>
-              {(["model", "llm"] as const).map((stage) => {
-                const id = previewId(fixture.id, stage)
-                return (
-                  <button
-                    key={stage}
-                    type="button"
-                    disabled={stage === "llm" && !fixture.llm}
-                    onClick={() => runner.preview(id)}
-                    className={`border px-2 py-1 text-[10px] tracking-[0.12em] uppercase disabled:opacity-30 ${
-                      layoutPreview === id ? "border-white bg-white text-black" : "border-white/20 text-white/80"
-                    }`}
-                  >
-                    {stage === "llm" ? "LLM" : "Model"}
-                  </button>
-                )
-              })}
-            </div>
-          ))}
+      <ScrollArea className="mt-3 min-h-0 flex-1 px-4">
+        <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">Who’s shopping</p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          {DEMO_SHOPPERS.map((shopper) => {
+            const accent = PERSONA_ACCENTS[shopper.id]
+            const picked = shopper.id === selected.id && !fromSentence
+            return (
+              <button
+                key={shopper.id}
+                type="button"
+                onClick={() => {
+                  select(shopper.id)
+                  setSentence("")
+                }}
+                className="border px-2 py-2 text-left"
+                style={{
+                  borderColor: picked ? accent : "rgba(255,255,255,0.12)",
+                  background: picked ? `${accent}22` : "transparent",
+                }}
+              >
+                <span className="block text-[10px] tracking-[0.14em] uppercase" style={{ color: accent }}>
+                  {shopper.title}
+                </span>
+              </button>
+            )
+          })}
         </div>
-        {preview?.stage === "model" && preview.doc ? (
-          <ModelOutput doc={preview.doc} basket={preview.basket} />
-        ) : preview ? (
+        <ul className="mt-3 space-y-1 text-[12px] leading-snug text-white/75">
+          {active.lines.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+        {persona ? (
           <div className="mt-3">
-            <p className="text-[10px] tracking-[0.14em] text-white/40 uppercase">
-              {preview.label} · {intrusiveCount(preview.layout)} intrusive ads
-              {preview.report.changes.length > 0 ? ` · ${preview.report.changes.length} validator fixes` : ""}
-              {preview.report.fellBack ? " · fell back" : ""}
-            </p>
-            <ul className="mt-1 flex flex-col gap-1 text-[11px]">
-              {preview.layout.reasons.map((reason) => (
-                <li key={reason.field} className="leading-snug">
-                  <span className="text-white/45">{reason.field}</span>{" "}
-                  <span className={reason.source === "llm" ? "text-[#fde047]" : "text-[#c4b5fd]"}>
-                    {reason.source === "llm" ? "LLM" : reason.class ?? "model"}
-                  </span>{" "}
-                  <span className="text-white/85">{reason.text}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="mb-2 text-[10px] tracking-[0.14em] text-white/40 uppercase">Preferences</p>
+            <TraitEditor persona={persona} />
           </div>
         ) : null}
-      <p className="pt-4 text-[10px] tracking-[0.14em] text-white/40 uppercase">Personas</p>
-      <div className="grid grid-cols-2 gap-2 pt-1">
-        {personas.map((persona) => {
-          const accent = PERSONA_ACCENTS[persona.baseId]
-          const active = persona.id === selected?.id
-          return (
-            <button
-              key={persona.id}
-              type="button"
-              onClick={() => select(persona.id)}
-              className="border px-2 py-2 text-left"
-              style={{
-                borderColor: active ? accent : "rgba(255,255,255,0.12)",
-                background: active ? `${accent}22` : "transparent",
-              }}
-            >
-              <span className="block text-[10px] tracking-[0.14em] uppercase" style={{ color: accent }}>
-                {persona.isCustom ? "Custom" : PERSONA_LABEL[persona.baseId]}
-              </span>
-              <span className="block truncate text-sm">{persona.name}</span>
-            </button>
-          )
-        })}
-      </div>
-        <div className="mt-2">{selected ? <TraitEditor persona={selected} /> : null}</div>
+        <label className="mt-4 block text-[10px] tracking-[0.14em] text-white/40 uppercase">
+          Or describe them
+          <textarea
+            value={sentence}
+            onChange={(event) => setSentence(event.target.value)}
+            rows={2}
+            placeholder="Buys menswear on sale and skips popups"
+            className="mt-1 w-full resize-none border border-white/15 bg-transparent px-2 py-2 text-[12px] tracking-normal text-white normal-case outline-none placeholder:text-white/30"
+          />
+        </label>
+        {fromSentence ? (
+          <p className="mt-1 text-[11px] text-white/55">Closest shopper: {fromSentence.title}</p>
+        ) : null}
+        <Button type="button" className="mt-3 w-full text-foreground" disabled={fixtures.length === 0 || busy} onClick={() => void run()}>
+          {busy ? "Refitting…" : "Run"}
+        </Button>
+        {modelDoc ? <ModelOutput doc={preview?.doc ?? modelDoc} basket={preview?.basket ?? basket} /> : null}
+        <div className="h-4" />
       </ScrollArea>
     </div>
   )
