@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
+import { LayoutFlash } from "@/components/store/LayoutFlash"
 import { NAV_LABEL, navHref } from "@/lib/layout/links"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
@@ -58,7 +59,8 @@ export function Header() {
         >
           Atelier Nine
         </Link>
-        <nav className="hidden items-center gap-5 text-[11px] tracking-[0.18em] uppercase sm:flex">
+        <nav className="relative hidden items-center gap-5 text-[11px] tracking-[0.18em] uppercase sm:flex">
+          <LayoutFlash name="nav" className="-inset-x-3 -inset-y-2" tagBelow />
           {links.map((link) => (
             <Link key={link.id} href={link.href} className={link.className} style={{ viewTransitionName: `nav-${link.id}` }}>
               {link.label}

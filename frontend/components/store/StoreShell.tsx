@@ -13,63 +13,18 @@ import { QuickView } from "@/components/store/QuickView"
 import { VisaCheckout } from "@/components/store/VisaCheckout"
 import { WishlistDrawer } from "@/components/store/WishlistDrawer"
 import { initPersonalization } from "@/lib/model/personalize"
-import { isParentPayload, postSimMessage, readEnvelope } from "@/lib/sim/protocol"
+import { isParentPayload, postSimMessage, readEnvelope, type StorePayload } from "@/lib/sim/protocol"
+import { applyLayoutNow, cancelLayoutMotion, playLayout } from "@/lib/store/layoutMotion"
 import { emitStoreEvent, resetEmitDedupe, takeScrollMark } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
 
-function publishReady() {
+function postToShell(payload: StorePayload) {
   if (typeof window === "undefined" || window.parent === window) return
-  postSimMessage(window.parent, { type: "store_ready" })
+  postSimMessage(window.parent, payload)
 }
 
-let layoutMotion: Promise<void> | null = null
-let queuedLayout: (() => void) | null = null
-let activeTransition: ViewTransition | null = null
-let motionEpoch = 0
-
-function isSkippedTransition(error: unknown): boolean {
-  return error instanceof DOMException && error.name === "AbortError"
-}
-
-/** Animates a layout swap. A second swap waits, so the first one is not aborted mid-flight. */
-function applyWithMotion(apply: () => void, immediate = false) {
-  if (immediate) {
-    motionEpoch += 1
-    queuedLayout = null
-    activeTransition?.skipTransition()
-    activeTransition = null
-    layoutMotion = null
-    apply()
-    return
-  }
-  const start = document.startViewTransition?.bind(document)
-  if (!start) {
-    apply()
-    return
-  }
-  if (layoutMotion) {
-    queuedLayout = apply
-    return
-  }
-  const epoch = motionEpoch
-  const transition = start(apply)
-  activeTransition = transition
-  transition.ready.catch((error: unknown) => {
-    if (!isSkippedTransition(error)) console.error(error)
-  })
-  layoutMotion = transition.finished.then(
-    () => undefined,
-    (error: unknown) => {
-      if (!isSkippedTransition(error)) console.error(error)
-    },
-  ).then(() => {
-    if (epoch !== motionEpoch) return
-    layoutMotion = null
-    activeTransition = null
-    const next = queuedLayout
-    queuedLayout = null
-    if (next) applyWithMotion(next)
-  })
+function publishReady() {
+  postToShell({ type: "store_ready" })
 }
 
 export function StoreShell({ children }: { children: React.ReactNode }) {
@@ -111,6 +66,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       if (!parsed || !isParentPayload(parsed.payload)) return
       const payload = parsed.payload
       if (payload.type === "reset") {
+        cancelLayoutMotion()
         resetEmitDedupe()
         useStorefront.getState().resetStorefront()
         routerRef.current.push("/store")
@@ -118,10 +74,15 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
         return
       }
       if (payload.type === "set_layout") {
-        applyWithMotion(
-          () => useStorefront.getState().setLayout(payload.layout, { model: payload.model, presetName: payload.presetName }),
-          payload.immediate === true,
-        )
+        const options = { model: payload.model, presetName: payload.presetName }
+        if (payload.immediate === true) {
+          applyLayoutNow(payload.layout, options)
+          return
+        }
+        playLayout(payload.layout, options, {
+          onStep: (index, total, label) => postToShell({ type: "layout_step", index, total, label }),
+          onSettled: () => postToShell({ type: "layout_settled" }),
+        })
       }
     }
     window.addEventListener("message", onMessage)

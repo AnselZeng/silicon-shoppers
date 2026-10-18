@@ -25,7 +25,7 @@ export function PersonaPanel() {
   const [busy, setBusy] = useState(false)
   const runToken = useRef(0)
   const previousPreview = useRef("default")
-  const finishTimer = useRef<number | null>(null)
+  const progress = useSimStore((state) => state.layoutProgress)
   const [modelDoc, setModelDoc] = useState<HomepageDoc | null>(null)
   const [draft, setDraft] = useState<HomepageDoc | null>(null)
   const [basket, setBasket] = useState<string[]>([])
@@ -57,7 +57,6 @@ export function PersonaPanel() {
     const token = ++runToken.current
     previousPreview.current = useSimStore.getState().layoutPreview || "default"
     setBusy(true)
-    const started = Date.now()
     if (persona) select(persona.id)
     const doc = draft ?? modelDoc
     if (!doc) {
@@ -65,18 +64,13 @@ export function PersonaPanel() {
       return
     }
     useLogStore.getState().push("sim", `running ${active.title}`)
-    runner.previewDocument(doc, basket, active.title)
-    if (runToken.current !== token) return
-    const remaining = 1600 - (Date.now() - started)
-    finishTimer.current = window.setTimeout(() => {
-      if (runToken.current === token) setBusy(false)
-    }, Math.max(0, remaining))
+    await runner.previewDocument(doc, basket, active.title)
+    if (runToken.current === token) setBusy(false)
   }
 
   function stop() {
     if (!busy) return
     runToken.current += 1
-    if (finishTimer.current !== null) window.clearTimeout(finishTimer.current)
     setBusy(false)
     void runner.stop(previousPreview.current)
   }
@@ -160,7 +154,7 @@ export function PersonaPanel() {
             aria-busy={busy}
             onClick={() => void run()}
           >
-            {busy ? "Running…" : "Run"}
+            {busy ? (progress ? `Rebuilding ${progress.index}/${progress.total}…` : "Running…") : "Run"}
           </Button>
           <Button
             type="button"

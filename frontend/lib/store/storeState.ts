@@ -31,6 +31,8 @@ interface StorefrontState {
   layoutPresetName: string | null
   layoutToast: string | null
   layoutReport: ValidationReport | null
+  /** What the last layout step changed, keyed by view-transition name. nonce restarts the highlight. */
+  layoutFlash: { nonce: number; names: Record<string, string> }
   /** Ads already shown or dismissed this session, keyed "slot:adId". Survives setLayout; cleared on reset. */
   adCaps: Record<string, "shown" | "dismissed">
   /** Page views this session (page_count trigger). */
@@ -55,6 +57,12 @@ interface StorefrontState {
   selectedSize: Record<string, string>
   sessionNonce: number
   setLayout: (raw: unknown, options?: { model?: ModelContext | null; presetName?: string | null }) => void
+  /** Shows one already-validated stage of a layout swap. The final stage also records the report and toast. */
+  showLayoutStep: (
+    layout: LayoutConfig,
+    flash: Record<string, string>,
+    final?: { report: ValidationReport; presetName: string | null },
+  ) => void
   markAd: (key: string, state: "shown" | "dismissed") => void
   notePage: (path: string) => void
   setInterstitialOpen: (open: boolean) => void
@@ -94,6 +102,7 @@ export const useStorefront = create<StorefrontState>((set) => ({
   layoutPresetName: null,
   layoutToast: null,
   layoutReport: null,
+  layoutFlash: { nonce: 0, names: {} },
   adCaps: {},
   pagesViewed: 0,
   transitions: 0,
@@ -122,8 +131,21 @@ export const useStorefront = create<StorefrontState>((set) => ({
       layoutReport: report,
       layoutPresetName: presetName,
       layoutToast: presetName ? `Layout personalized for: ${presetName}` : null,
+      layoutFlash: { nonce: 0, names: {} },
     })
   },
+  showLayoutStep: (layout, flash, final) =>
+    set((current) => ({
+      layout,
+      layoutFlash: { nonce: current.layoutFlash.nonce + 1, names: flash },
+      ...(final
+        ? {
+            layoutReport: final.report,
+            layoutPresetName: final.presetName,
+            layoutToast: final.presetName ? `Layout personalized for: ${final.presetName}` : null,
+          }
+        : {}),
+    })),
   markAd: (key, state) => set((current) => ({ adCaps: { ...current.adCaps, [key]: state } })),
   notePage: (path) =>
     set((current) => {
@@ -196,6 +218,7 @@ export const useStorefront = create<StorefrontState>((set) => ({
       layoutPresetName: null,
       layoutToast: null,
       layoutReport: null,
+      layoutFlash: { nonce: 0, names: {} },
       adCaps: {},
       pagesViewed: 0,
       transitions: 0,

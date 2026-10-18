@@ -55,3 +55,19 @@ export function resolveHome(layout: LayoutConfig): ResolvedBlock[] {
     return { block, products }
   })
 }
+
+/** Stable view-transition name for a home block; also keys the change highlight. */
+export function blockName(block: HomeBlock): string {
+  if (block.type === "product_row") {
+    const source = block.source
+    if (source.kind === "category") return `row-cat-${source.category}`
+    if (source.kind === "collection") return `row-col-${source.collection.replace(/\s+/g, "-")}`
+    if (source.kind === "under_price") return `row-under-${source.max}`
+    return `row-${source.kind}`
+  }
+  if (block.type === "collection_spotlight") return `spot-${block.collection.replace(/\s+/g, "-")}`
+  if (block.type === "ad_banner") return `ad-${block.adId}`
+  if (block.type === "editorial_text") return `copy-${block.copyKey}`
+  if (block.type === "category_tiles") return "tiles"
+  return "hero"
+}

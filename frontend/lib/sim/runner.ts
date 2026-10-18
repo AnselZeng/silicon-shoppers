@@ -1,3 +1,4 @@
+import { LAYOUT_MOTION } from "@/config/ui"
 import { validateLayout } from "@/lib/layout/validate"
 import { buildPreview } from "@/lib/layout/preview"
 import { modelLayout } from "@/lib/model/adapter"
@@ -19,6 +20,7 @@ import { useSimStore } from "@/lib/state/simStore"
 /** Parent side of the iframe: pushes layouts into the store and logs what the shopper does there. */
 class ShellRunner {
   private generation = 0
+  private settleWaiters: (() => void)[] = []
   handleMessage(event: MessageEvent) {
     if (event.origin !== window.location.origin) return
     const parsed = readEnvelope(event.data)
@@ -26,6 +28,15 @@ class ShellRunner {
     const payload = parsed.payload
     if (payload.type === "store_ready") {
       void this.pushPreview()
+      return
+    }
+    if (payload.type === "layout_step") {
+      useSimStore.getState().setLayoutProgress({ index: payload.index, total: payload.total })
+      useLogStore.getState().push("layout", `step ${payload.index}/${payload.total} · ${payload.label}`)
+      return
+    }
+    if (payload.type === "layout_settled") {
+      this.settle()
       return
     }
     this.onStoreEvent(payload.event)
@@ -73,6 +84,24 @@ class ShellRunner {
     })
   }
 
+  /** Resolves when the store finishes playing the layout swap, or after a fallback timeout. */
+  private waitForSettle(): Promise<void> {
+    return new Promise((resolve) => {
+      const timer = window.setTimeout(() => this.settle(), LAYOUT_MOTION.totalMs + 6000)
+      this.settleWaiters.push(() => {
+        window.clearTimeout(timer)
+        resolve()
+      })
+    })
+  }
+
+  private settle() {
+    useSimStore.getState().setLayoutProgress(null)
+    const waiters = this.settleWaiters
+    this.settleWaiters = []
+    for (const done of waiters) done()
+  }
+
   private send(payload: ParentPayload) {
     const iframe = useSimStore.getState().iframe
     if (!iframe?.contentWindow) {
@@ -111,14 +140,17 @@ class ShellRunner {
     return this.pushPreview(generation)
   }
 
-  /** Run from the sliders: the edited mix is already written into the document's layout decisions. */
-  previewDocument(doc: HomepageDoc, basket: string[], label: string) {
+  /**
+   * Run from the sliders: the edited mix is already written into the document's layout decisions.
+   * Resolves once the store has finished playing the swap.
+   */
+  previewDocument(doc: HomepageDoc, basket: string[], label: string): Promise<void> {
     const generation = ++this.generation
     const id = `shopper:${doc.demo_id ?? doc.user_id ?? "custom"}`
     useSimStore.getState().setLayoutPreview(id)
     const model: ModelContext = { doc, basketIds: basket }
     const result = validateLayout(modelLayout(doc).layout, { model })
-    if (generation !== this.generation) return
+    if (generation !== this.generation) return Promise.resolve()
     useSimStore.getState().setPreview({
       id,
       stage: "llm",
@@ -138,12 +170,14 @@ class ShellRunner {
     if (result.report.fellBack) logs.push("layout", `validator fell back: ${result.report.error ?? "invalid"}`)
     for (const change of result.report.changes) logs.push("layout", `fixed · ${change}`)
     withSpan("layout.apply", () => id)
+    const settled = this.waitForSettle()
     this.send({
       type: "set_layout",
       layout: result.layout,
       model,
       presetName: label,
     })
+    return settled
   }
 
   /** Drops an in-flight run and puts the store back to the layout that was showing. */
@@ -152,6 +186,7 @@ class ShellRunner {
     const id = fallbackId || "default"
     useSimStore.getState().setLayoutPreview(id)
     useLogStore.getState().push("sim", "stopped")
+    this.settle()
     return this.pushPreview(generation, true)
   }
 

@@ -15,6 +15,20 @@ export const UI_CONFIG = {
   loyalistCollection: "Essentials",
 } as const
 
+/**
+ * Pacing of a layout swap in the store: stages share totalMs, each capped at maxStepMs.
+ * A stage whose change is off-screen first scrolls there, adding up to scrollMs.
+ */
+export const LAYOUT_MOTION = {
+  totalMs: 5000,
+  maxStepMs: 1100,
+  maxAnimMs: 850,
+  flashMs: 2000,
+  scrollMs: 650,
+  /** Clearance under the sticky header when a block is scrolled into view. */
+  scrollOffsetPx: 96,
+} as const
+
 export type ViewportKey = keyof typeof UI_CONFIG.demoViewports
 
 export const PERSONA_ACCENTS = {
