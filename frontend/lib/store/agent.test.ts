@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest"
 import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { captureCheckout } from "@/lib/store/actions"
-import { confirmReply, runChatActions, shopperConfirmed, splitActions } from "@/lib/store/agent"
+import { confirmReply, NEW_ORDER_RE, runChatActions, shopperConfirmed, splitActions } from "@/lib/store/agent"
 import { applyChatIntent } from "@/lib/store/chatIntent"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -55,6 +55,14 @@ describe("confirmReply / shopperConfirmed", () => {
     }
     expect(confirmReply("can you also find me a belt")).toBeNull()
     expect(confirmReply("purchase navy blue medium tshirt")).toBeNull()
+  })
+
+  test("new-order phrases match, product requests starting with 'next' do not", () => {
+    for (const m of ["next order", "new order", "another one", "another order please", "start over", "fresh start"]) {
+      expect(NEW_ORDER_RE.test(m)).toBe(true)
+    }
+    expect(NEW_ORDER_RE.test("next loafers medium navy blue")).toBe(false)
+    expect(NEW_ORDER_RE.test("next")).toBe(false)
   })
 
   test("shopping requests never count as a checkout confirmation", () => {

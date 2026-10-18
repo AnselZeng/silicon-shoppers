@@ -5,7 +5,14 @@ import { useEffect, useRef, useState } from "react"
 import type { ConciergeTone } from "@/lib/layout/types"
 import { buildChatContext } from "@/lib/store/chatContext"
 import { applyChatIntent } from "@/lib/store/chatIntent"
-import { confirmReply, runChatActions, shopperConfirmed, splitActions, type ChatAction } from "@/lib/store/agent"
+import {
+  confirmReply,
+  NEW_ORDER_RE,
+  runChatActions,
+  shopperConfirmed,
+  splitActions,
+  type ChatAction,
+} from "@/lib/store/agent"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -130,6 +137,20 @@ export function Concierge() {
     if (pendingReply) {
       setMessages((prev) => [...prev, { role: "user", content: message }])
       confirmCheckout(pendingReply === "yes")
+      setBusy(false)
+      return
+    }
+    // "next order" / "another one" — the shopper wants a fresh bag. Deterministic:
+    // empty bag gets a prompt for the next item, non-empty gets the checkout buttons.
+    if (NEW_ORDER_RE.test(message)) {
+      const items = useStorefront.getState().bag.length
+      const reply =
+        items === 0
+          ? "Fresh start! What should I grab for you this time?"
+          : `You still have ${items} item${items === 1 ? "" : "s"} in this order. Shall I check you out first?`
+      setPendingCheckout(items > 0)
+      setMessages((prev) => [...prev, { role: "user", content: message }, { role: "assistant" as const, content: reply }])
+      history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: reply }].slice(-12)
       setBusy(false)
       return
     }

@@ -38,6 +38,11 @@ export function shopperConfirmed(message: string): boolean {
   return SHORT_YES_RE.test(message) || CHECKOUT_WORDS_RE.test(message)
 }
 
+// "next order" / "another one" — start a fresh bag. Whole-message only, so
+// "next loafers medium navy" (a product request) never trips it.
+export const NEW_ORDER_RE =
+  /^\s*(?:next|new|another) (?:order|one)\s*(?:please)?\s*[.!]?\s*$|^\s*(?:start over|fresh start|reset(?: the)? (?:order|bag)|order again|same again|new round)\s*[.!]?\s*$/i
+
 export interface ChatAction {
   /** ask_checkout renders Yes/No buttons in the chat instead of acting directly. */
   action: "add_to_bag" | "checkout" | "ask_checkout"
