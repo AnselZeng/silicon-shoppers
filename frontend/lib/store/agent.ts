@@ -83,6 +83,8 @@ export function runChatActions(actions: ChatAction[], navigate: (path: string) =
       if (!useStorefront.getState().agentAutoPay) continue
       window.setTimeout(() => {
         try {
+          // The shopper may have clicked Pay themselves in the meantime — never double-charge.
+          if (useStorefront.getState().checkoutPhase !== "session") return
           const captured = captureCheckout()
           if (captured) {
             emitStoreEvent("concierge_action", { action: "paid", detail: `order ${captured.orderId} · $${captured.amount}` })
@@ -93,7 +95,7 @@ export function runChatActions(actions: ChatAction[], navigate: (path: string) =
         } catch (err) {
           emitStoreEvent("concierge_action", { action: "pay_failed", detail: String(err) })
         }
-      }, 1600)
+      }, 900)
     }
   }
   return { done, asksCheckout: actions.some((a) => a.action === "ask_checkout") }
