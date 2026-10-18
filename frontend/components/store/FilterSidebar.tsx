@@ -30,6 +30,8 @@ export function FilterSidebar({
 }) {
   const layout = useStorefront((state) => state.layout)
   const signature = layout.listing.expandedFilters.join("|")
+  const highlight = layout.listing.colorHighlight
+  const colorOrder = [...highlight, ...STORE_COLORS.filter((c) => !highlight.includes(c))]
   const [toggled, setToggled] = useState<{ signature: string; open: FilterSectionId[] }>({
     signature,
     open: layout.listing.expandedFilters,
@@ -125,7 +127,7 @@ export function FilterSidebar({
                     : null}
                   {section === "color" ? (
                     <div className="flex flex-wrap gap-2 px-1 py-1">
-                      {STORE_COLORS.map((color) => {
+                      {colorOrder.map((color) => {
                         const active = query.colors.includes(color)
                         return (
                           <button

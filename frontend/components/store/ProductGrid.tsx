@@ -24,7 +24,7 @@ export function ProductGrid({
   const density = columns ?? layout.listing.gridDensity
   const cols =
     density === 2 ? "grid-cols-2" : density === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2 md:grid-cols-3"
-  const cards = merchandisedCards(products, layout.listing.colorMerchandising)
+  const cards = merchandisedCards(products, layout.listing.colorMerchandising, layout.listing.colorHighlight)
   if (cards.length === 0) {
     return <p className="py-16 text-sm tracking-[0.16em] text-neutral-500 uppercase">Nothing in this edit.</p>
   }

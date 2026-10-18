@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { intrusiveCount, placementFor, tilePositions } from "@/lib/ads/placement"
+import { adContent, intrusiveCount, placementFor, tilePositions } from "@/lib/ads/placement"
 import { resolveHome } from "@/lib/layout/home"
 import { llmStage, modelStage, withModelData } from "@/lib/layout/pipeline"
 import { LlmLayoutSchema } from "@/lib/layout/schema"
@@ -57,6 +57,12 @@ describe("hand-written LLM output through the pipeline", () => {
     const model = fixtureModel("fixture-women-new")
     expect(llmStage(fixtureLlm("fixture-women-new"), model).layout).not.toEqual(modelStage(model).layout)
   })
+})
+
+test("copy overrides replace the ad's catalog text", () => {
+  const { layout } = llmStage(fixtureLlm("fixture-men-sale"), fixtureModel("fixture-men-sale"))
+  expect(adContent(layout, "sale_men")).toMatchObject({ headline: "Men's sale, picked for you", cta: "Shop the sale" })
+  expect(adContent(layout, "offer_men").headline).toBe("Sale prices on men's pieces")
 })
 
 describe("grid tile positions", () => {
