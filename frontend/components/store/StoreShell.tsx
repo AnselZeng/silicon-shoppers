@@ -2,8 +2,8 @@
 
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef } from "react"
-import { UI_CONFIG } from "@/config/ui"
 import { AdSlot } from "@/components/store/ads/AdSlot"
+import { IntrusiveAds } from "@/components/store/ads/IntrusiveAds"
 import { BagDrawer } from "@/components/store/BagDrawer"
 import { ClientOnly } from "@/components/store/ClientOnly"
 import { Concierge } from "@/components/store/Concierge"
@@ -12,7 +12,6 @@ import { LayoutToast } from "@/components/store/LayoutToast"
 import { QuickView } from "@/components/store/QuickView"
 import { VisaCheckout } from "@/components/store/VisaCheckout"
 import { WishlistDrawer } from "@/components/store/WishlistDrawer"
-import { capKey, placementFor } from "@/lib/ads/placement"
 import { isParentPayload, postSimMessage, readEnvelope } from "@/lib/sim/protocol"
 import { emitStoreEvent, resetEmitDedupe, takeScrollMark } from "@/lib/store/emit"
 import { useStorefront } from "@/lib/store/storeState"
@@ -26,8 +25,6 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const routerRef = useRef(router)
-  const layout = useStorefront((state) => state.layout)
-  const sessionNonce = useStorefront((state) => state.sessionNonce)
 
   useEffect(() => {
     routerRef.current = router
@@ -35,23 +32,8 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     emitStoreEvent("page_view", { path: pathname })
+    useStorefront.getState().notePage(pathname)
   }, [pathname])
-
-  const popup = placementFor(layout, "popup")
-  const popupAd = popup?.adIds[0]
-  const popupCapped = useStorefront((state) => (popupAd ? Boolean(state.adCaps[capKey("popup", popupAd)]) : true))
-
-  useEffect(() => {
-    if (!popupAd || popupCapped) return
-    const timer = window.setTimeout(() => {
-      const state = useStorefront.getState()
-      if (state.adCaps[capKey("popup", popupAd)]) return
-      state.markAd(capKey("popup", popupAd), "shown")
-      state.setPopupOpen(true)
-      emitStoreEvent("ad_shown", { slot: "popup", adId: popupAd })
-    }, popup?.triggerValue ?? UI_CONFIG.popupDelayMs)
-    return () => window.clearTimeout(timer)
-  }, [popupAd, popupCapped, popup?.triggerValue, sessionNonce])
 
   useEffect(() => {
     const onScroll = () => {
@@ -96,6 +78,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <main>{children}</main>
       <ClientOnly>
         <AdSlot slot="popup" />
+        <IntrusiveAds />
         <QuickView />
         <BagDrawer />
         <WishlistDrawer />

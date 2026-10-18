@@ -51,6 +51,8 @@ Expand the schema with navigation, house ads and home composition, and generate 
 
 ### 2. Persona builder
 
+Details: [persona-builder-plan.md](persona-builder-plan.md).
+
 - Sliders: menswear/womenswear share, sale share, new-arrival share, price level, favourite colours, basket size.
 - A deterministic generator turns slider values into a basket from the 84-product catalog (same values give the same basket).
 - An editable basket: add or remove products by hand.

@@ -68,6 +68,7 @@ export function Concierge() {
   const enabled = useStorefront((state) => state.layout.concierge.enabled)
   const tone = useStorefront((state) => state.layout.concierge.tone)
   const open = useStorefront((state) => state.conciergeOpen)
+  const footer = useStorefront((state) => state.stickyFooterOpen)
   const setOpen = useStorefront((state) => state.setConciergeOpen)
   const answer = useStorefront((state) => state.conciergeAnswer)
   const setAnswer = useStorefront((state) => state.setConciergeAnswer)
@@ -75,7 +76,7 @@ export function Concierge() {
   if (!enabled) return null
   const script = SCRIPTS[tone]
   return (
-    <div className="fixed right-4 bottom-4 z-40 w-72">
+    <div className={`fixed right-4 z-40 w-72 ${footer ? "bottom-20" : "bottom-4"}`}>
       {open ? (
         <div className="mb-2 border border-[#141414] bg-[#f6f3ee] p-3 shadow-lg">
           <p className="text-[10px] tracking-[0.2em] uppercase">Concierge · {tone}</p>

@@ -21,7 +21,7 @@ function trimTo(text: string, max: number): string {
  * Brand voice and safety for any text the LLM writes: strip markup and URLs, no exclamation marks,
  * no prices or percentages the catalog doesn't have, trimmed to the limit. Returns "" when nothing is left.
  */
-export function cleanCopy(raw: string, max: number): string {
+export function cleanCopy(raw: string, max: number, options: { keepFigures?: boolean } = {}): string {
   let text = raw
     .replace(/<[^>]*>/g, " ")
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
@@ -29,12 +29,14 @@ export function cleanCopy(raw: string, max: number): string {
     .replace(/\b\S+\.(?:com|net|org|io|shop)\S*/gi, " ")
     .replace(/[*_`#]/g, "")
     .replace(/!+/g, ".")
-  text = text.replace(/(?:up to\s+|save\s+)?\$\s?(\d+(?:\.\d+)?)/gi, (match, n: string) =>
-    PRICES.has(Number(n)) ? match : " ",
-  )
-  text = text.replace(/(?:up to\s+|save\s+)?(\d+(?:\.\d+)?)\s?%(?:\s+off)?/gi, (match, n: string) =>
-    PERCENTS.has(Number(n)) ? match : " ",
-  )
+  if (!options.keepFigures) {
+    text = text.replace(/(?:up to\s+|save\s+)?\$\s?(\d+(?:\.\d+)?)/gi, (match, n: string) =>
+      PRICES.has(Number(n)) ? match : " ",
+    )
+    text = text.replace(/(?:up to\s+|save\s+)?(\d+(?:\.\d+)?)\s?%(?:\s+off)?/gi, (match, n: string) =>
+      PERCENTS.has(Number(n)) ? match : " ",
+    )
+  }
   text = text.replace(/\s+([.,;:])/g, "$1").replace(/\.{2,}/g, ".").replace(/\s+/g, " ").trim()
   if (/^[.,;:\s]*$/.test(text)) return ""
   return trimTo(text, max)

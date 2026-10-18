@@ -33,6 +33,13 @@ interface StorefrontState {
   layoutReport: ValidationReport | null
   /** Ads already shown or dismissed this session, keyed "slot:adId". Survives setLayout; cleared on reset. */
   adCaps: Record<string, "shown" | "dismissed">
+  /** Page views this session (page_count trigger). */
+  pagesViewed: number
+  /** Listing <-> product page moves this session (interstitial trigger). */
+  transitions: number
+  lastPath: string | null
+  interstitialOpen: boolean
+  stickyFooterOpen: boolean
   bag: BagLine[]
   wishlist: WishlistItem[]
   popupOpen: boolean
@@ -49,6 +56,9 @@ interface StorefrontState {
   sessionNonce: number
   setLayout: (raw: unknown, options?: { model?: ModelContext | null; presetName?: string | null }) => void
   markAd: (key: string, state: "shown" | "dismissed") => void
+  notePage: (path: string) => void
+  setInterstitialOpen: (open: boolean) => void
+  setStickyFooterOpen: (open: boolean) => void
   dismissToast: () => void
   setPopupOpen: (open: boolean) => void
   dismissPopup: () => void
@@ -69,12 +79,27 @@ interface StorefrontState {
 
 let lineSeq = 1
 
+function isProductPath(path: string): boolean {
+  return path.startsWith("/store/product/")
+}
+
+const LISTING_PATHS = ["/store/women", "/store/men", "/store/new-in", "/store/sale", "/store/search", "/store/for-you"]
+
+function isListingPath(path: string): boolean {
+  return LISTING_PATHS.includes(path)
+}
+
 export const useStorefront = create<StorefrontState>((set) => ({
   layout: cloneLayout(DEFAULT_LAYOUT),
   layoutPresetName: null,
   layoutToast: null,
   layoutReport: null,
   adCaps: {},
+  pagesViewed: 0,
+  transitions: 0,
+  lastPath: null,
+  interstitialOpen: false,
+  stickyFooterOpen: false,
   bag: [],
   wishlist: [],
   popupOpen: false,
@@ -100,6 +125,20 @@ export const useStorefront = create<StorefrontState>((set) => ({
     })
   },
   markAd: (key, state) => set((current) => ({ adCaps: { ...current.adCaps, [key]: state } })),
+  notePage: (path) =>
+    set((current) => {
+      if (current.lastPath === path) return current
+      const prev = current.lastPath
+      const moved =
+        prev !== null && ((isListingPath(prev) && isProductPath(path)) || (isProductPath(prev) && isListingPath(path)))
+      return {
+        lastPath: path,
+        pagesViewed: current.pagesViewed + 1,
+        transitions: current.transitions + (moved ? 1 : 0),
+      }
+    }),
+  setInterstitialOpen: (open) => set({ interstitialOpen: open }),
+  setStickyFooterOpen: (open) => set({ stickyFooterOpen: open }),
   dismissToast: () => set({ layoutToast: null }),
   setPopupOpen: (open) => set({ popupOpen: open }),
   dismissPopup: () => set({ popupOpen: false }),
@@ -158,6 +197,11 @@ export const useStorefront = create<StorefrontState>((set) => ({
       layoutToast: null,
       layoutReport: null,
       adCaps: {},
+      pagesViewed: 0,
+      transitions: 0,
+      lastPath: null,
+      interstitialOpen: false,
+      stickyFooterOpen: false,
       bag: [],
       wishlist: [],
       popupOpen: false,

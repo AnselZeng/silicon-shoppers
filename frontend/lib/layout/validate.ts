@@ -468,7 +468,8 @@ function fixReasons(cfg: LayoutConfig, ctx: ValidateContext, changes: string[]) 
       const model = modelReason(doc, reason.modelDecision)
       out.push({ ...reason, text: model.text, class: model.class })
     } else {
-      const text = cleanCopy(reason.text, COPY_LIMITS.reason)
+      // Reasons may quote model figures; every number is checked against the model output below.
+      const text = cleanCopy(reason.text, COPY_LIMITS.reason, { keepFigures: true })
       const numbers = reason.text.match(NUMBER) ?? []
       if (!text || numbers.some((n) => !grounded.has(n))) {
         changes.push(`reasons: LLM reason for ${reason.field} removed, ${text ? "it cites a number not in the model output" : "empty"}`)

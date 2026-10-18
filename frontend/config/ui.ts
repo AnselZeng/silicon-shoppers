@@ -11,7 +11,6 @@ export const UI_CONFIG = {
   defaultViewport: "web",
   terminalMaxLines: 1000,
   listingPageSize: 12,
-  popupDelayMs: 2200,
   loyalistCollection: "Essentials",
 } as const
 

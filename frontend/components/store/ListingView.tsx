@@ -80,7 +80,7 @@ export function ListingView({ mode }: { mode: ListingMode }) {
         <FilterSidebar query={query} onQuery={onQuery} />
         <div className="min-w-0 flex-1">
           <AdSlot slot="listing_banner" />
-          <ProductGrid products={products.slice(0, visible)} />
+          <ProductGrid products={products.slice(0, visible)} withAds />
           {visible < products.length ? (
             <button
               type="button"
