@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Hero } from "@/components/store/Hero"
 import { ProductGrid } from "@/components/store/ProductGrid"
 import { resolveHome } from "@/lib/layout/home"
+import { categoryHref } from "@/lib/layout/links"
 import { FILTER_LABEL, type ColorMerchandising, type ProductSource } from "@/lib/layout/types"
 import { useStorefront } from "@/lib/store/storeState"
 import { CATEGORY_LABEL } from "@/lib/store/types"
@@ -96,7 +97,7 @@ export function HomeView() {
                 {block.categories.map((category) => (
                   <Link
                     key={category}
-                    href={`/store/women?category=${category}`}
+                    href={categoryHref(layout, category)}
                     className="flex min-h-36 items-end bg-[#141414] p-4 text-[#f6f3ee]"
                   >
                     <span className="text-[12px] tracking-[0.18em] uppercase">{CATEGORY_LABEL[category]}</span>

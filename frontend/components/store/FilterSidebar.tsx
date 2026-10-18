@@ -7,7 +7,6 @@ import { useStorefront } from "@/lib/store/storeState"
 import { toggleValue } from "@/lib/store/filtering"
 import {
   APPAREL_SIZES,
-  CATEGORIES,
   CATEGORY_LABEL,
   COLLECTIONS,
   type Category,
@@ -151,7 +150,7 @@ export function FilterSidebar({
                     </div>
                   ) : null}
                   {section === "category"
-                    ? CATEGORIES.map((category) => {
+                    ? layout.listing.categoryOrder.map((category) => {
                         const active = query.categories.includes(category)
                         return (
                           <button
