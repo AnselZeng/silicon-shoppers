@@ -1,126 +1,58 @@
 import type { LayoutConfig } from "@/lib/layout/types"
-import type { PersonaId } from "@/lib/personas/schema"
+import { CATEGORIES } from "@/lib/store/types"
 
 /**
  * House rulebook: stone, black, and the garment palette only.
- * A persona may change structure — hero, section order, sort, filters,
+ * A layout may change structure — nav, hero, home blocks, ads, sort, filters,
  * grid, checkout, and how a colorway is merchandised — not the brand colors.
+ *
+ * The house default is the v1 default migrated to v2 (see v1.test.ts).
  */
 
 export const DEFAULT_LAYOUT: LayoutConfig = {
-  defaultSort: "relevance",
-  filterOrder: ["category", "size", "color", "price", "collection", "sale"],
-  expandedFilters: ["category"],
-  heroVariant: "editorial",
-  popupEnabled: true,
-  popupVariant: "newsletter",
-  gridDensity: 3,
-  homeSectionOrder: ["new_in", "bestsellers", "sale_picks", "collections"],
-  showSaleBadgesProminently: false,
-  quickViewEmphasis: false,
-  searchEmphasized: false,
-  heroMinimized: false,
-  checkoutVariant: "click_to_pay",
-  expressCheckout: false,
-  showTrustBadges: false,
-  conciergeEnabled: false,
-  conciergeTone: "drops",
-  loyaltyPrompt: false,
-  colorMerchandising: "swatches",
-}
-
-export const PERSONA_LAYOUTS: Record<PersonaId, LayoutConfig> = {
-  price_hunter: {
-    defaultSort: "price_asc",
-    filterOrder: ["sale", "price", "category", "size", "color", "collection"],
-    expandedFilters: ["sale", "price"],
-    heroVariant: "discount_banner",
-    popupEnabled: false,
-    popupVariant: "newsletter",
-    gridDensity: 3,
-    homeSectionOrder: ["sale_picks", "new_in", "bestsellers", "collections"],
-    showSaleBadgesProminently: true,
-    quickViewEmphasis: false,
+  version: 2,
+  nav: {
+    order: ["women", "men", "new_in", "sale", "collections"],
+    highlight: null,
+    department: null,
     searchEmphasized: false,
-    heroMinimized: false,
-    checkoutVariant: "guest_fast",
-    expressCheckout: true,
-    showTrustBadges: true,
-    conciergeEnabled: true,
-    conciergeTone: "deals",
-    loyaltyPrompt: false,
-    colorMerchandising: "color_locked",
   },
-  trend_seeker: {
-    defaultSort: "newest",
-    filterOrder: ["color", "category", "collection", "size", "price", "sale"],
-    expandedFilters: ["color", "category"],
-    heroVariant: "new_drop_banner",
-    popupEnabled: true,
-    popupVariant: "new_drop",
-    gridDensity: 3,
-    homeSectionOrder: ["new_in", "collections", "bestsellers", "sale_picks"],
-    showSaleBadgesProminently: false,
-    quickViewEmphasis: true,
-    searchEmphasized: false,
-    heroMinimized: false,
-    checkoutVariant: "click_to_pay",
-    expressCheckout: false,
-    showTrustBadges: false,
-    conciergeEnabled: true,
-    conciergeTone: "drops",
-    loyaltyPrompt: false,
-    colorMerchandising: "hover_preview",
+  home: {
+    blocks: [
+      { type: "hero" },
+      { type: "product_row", source: { kind: "new_in" }, limit: 8 },
+      { type: "product_row", source: { kind: "bestsellers" }, limit: 8 },
+      { type: "product_row", source: { kind: "sale" }, limit: 8 },
+      { type: "category_tiles", categories: CATEGORIES.slice(0, 4) },
+    ],
+    heroSize: "full",
+    forYouIds: [],
+    basketIds: [],
   },
-  mission_shopper: {
+  listing: {
     defaultSort: "relevance",
-    filterOrder: ["size", "category", "color", "price", "collection", "sale"],
-    expandedFilters: ["size", "category"],
-    heroVariant: "editorial",
-    popupEnabled: false,
-    popupVariant: "newsletter",
-    gridDensity: 4,
-    homeSectionOrder: ["bestsellers", "new_in", "sale_picks", "collections"],
-    showSaleBadgesProminently: false,
-    quickViewEmphasis: false,
-    searchEmphasized: true,
-    heroMinimized: true,
-    checkoutVariant: "guest_fast",
-    expressCheckout: true,
-    showTrustBadges: false,
-    conciergeEnabled: true,
-    conciergeTone: "mission",
-    loyaltyPrompt: false,
-    colorMerchandising: "color_locked",
-  },
-  brand_loyalist: {
-    defaultSort: "bestsellers",
-    filterOrder: ["collection", "category", "color", "size", "price", "sale"],
-    expandedFilters: ["collection"],
-    heroVariant: "collection_banner",
-    popupEnabled: true,
-    popupVariant: "newsletter",
+    filterOrder: ["category", "size", "color", "price", "collection", "sale"],
+    expandedFilters: ["category"],
     gridDensity: 3,
-    homeSectionOrder: ["collections", "bestsellers", "new_in", "sale_picks"],
-    showSaleBadgesProminently: false,
-    quickViewEmphasis: false,
-    searchEmphasized: false,
-    heroMinimized: false,
-    checkoutVariant: "loyalty_pay",
-    expressCheckout: false,
-    showTrustBadges: true,
-    conciergeEnabled: true,
-    conciergeTone: "loyalty",
-    loyaltyPrompt: true,
-    colorMerchandising: "split_colors",
+    colorMerchandising: "swatches",
+    colorHighlight: [],
+    categoryOrder: [...CATEGORIES],
+    card: { priceStyle: "plain", showRating: false, badges: ["new", "sale"], quickView: "button" },
   },
+  ads: {
+    placements: [
+      { slot: "top_strip", adIds: ["shipping"] },
+      { slot: "hero", adIds: ["collection_women"] },
+      { slot: "listing_banner", adIds: ["collection_women"] },
+      { slot: "popup", adIds: ["newsletter"], trigger: "delay", triggerValue: 2200 },
+    ],
+  },
+  copy: {},
+  checkout: { variant: "click_to_pay", expressCheckout: false, showTrustBadges: false, loyaltyPrompt: false },
+  concierge: { enabled: false, tone: "drops" },
+  reasons: [],
 }
 
 export function cloneLayout(layout: LayoutConfig): LayoutConfig {
-  return {
-    ...layout,
-    filterOrder: [...layout.filterOrder],
-    expandedFilters: [...layout.expandedFilters],
-    homeSectionOrder: [...layout.homeSectionOrder],
-  }
+  return structuredClone(layout)
 }

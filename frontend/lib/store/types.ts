@@ -72,7 +72,7 @@ export interface ListingQuery {
   q?: string
 }
 
-export type ListingMode = "women" | "men" | "new-in" | "sale" | "search"
+export type ListingMode = "women" | "men" | "new-in" | "sale" | "search" | "for-you"
 
 export function modePath(mode: ListingMode): string {
   switch (mode) {
@@ -86,6 +86,8 @@ export function modePath(mode: ListingMode): string {
       return "/store/sale"
     case "search":
       return "/store/search"
+    case "for-you":
+      return "/store/for-you"
   }
 }
 

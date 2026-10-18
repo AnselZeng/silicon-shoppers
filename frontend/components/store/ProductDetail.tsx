@@ -36,19 +36,10 @@ export function ProductDetail({ id }: { id: string }) {
   const color = selectedColor ?? product.colors[0] ?? "black"
   const size = selectedSize ?? (product.sizes.includes("M") ? "M" : product.sizes[0] ?? "OS")
   const reviews = reviewsFor(product.id)
-  const price = effectivePrice(product)
 
   return (
     <div
       className="grid gap-10 px-6 py-10 lg:grid-cols-[1.1fr_0.9fr]"
-      data-agent-id="pdp-root"
-      data-product-id={product.id}
-      data-price={price}
-      data-color={color}
-      data-is-new={product.isNew ? "1" : "0"}
-      data-on-sale={product.salePrice !== undefined ? "1" : "0"}
-      data-collection={product.collection}
-      data-name={product.name}
     >
       <div>
         <GarmentImage type={product.garmentType} color={color} className="w-full bg-[#ebe6dc]" />
@@ -57,7 +48,6 @@ export function ProductDetail({ id }: { id: string }) {
             <button
               key={swatch}
               type="button"
-              data-agent-id={`gallery-color-${swatch}`}
               onClick={() => selectColor(product.id, swatch)}
               className={`h-16 w-14 border ${swatch === color ? "border-[#141414]" : "border-transparent"}`}
             >
@@ -85,7 +75,6 @@ export function ProductDetail({ id }: { id: string }) {
             <button
               key={swatch}
               type="button"
-              data-agent-id={`swatch-${swatch}`}
               aria-label={swatch}
               onClick={() => selectColor(product.id, swatch)}
               className={`size-7 rounded-full border ${swatch === color ? "ring-2 ring-[#141414] ring-offset-2" : "border-black/10"}`}
@@ -98,7 +87,6 @@ export function ProductDetail({ id }: { id: string }) {
             <button
               key={option}
               type="button"
-              data-agent-id={`size-${option}`}
               onClick={() => selectSize(product.id, option)}
               className={`min-w-10 border px-3 py-2 text-xs ${option === size ? "border-[#141414] bg-[#141414] text-white" : "border-[#d9d3c8]"}`}
             >
@@ -109,7 +97,6 @@ export function ProductDetail({ id }: { id: string }) {
         <div className="mt-6 flex gap-3">
           <button
             type="button"
-            data-agent-id="add-to-bag"
             onClick={() => addProductToBag(product)}
             className="bg-[#141414] px-6 py-3 text-[11px] tracking-[0.18em] text-white uppercase"
           >
@@ -117,7 +104,6 @@ export function ProductDetail({ id }: { id: string }) {
           </button>
           <button
             type="button"
-            data-agent-id="add-to-wishlist"
             onClick={() => addProductToWishlist(product)}
             className="border border-[#141414] px-6 py-3 text-[11px] tracking-[0.18em] uppercase"
           >
@@ -127,7 +113,7 @@ export function ProductDetail({ id }: { id: string }) {
         <p className="mt-6 text-xs text-neutral-500">
           {product.rating.toFixed(1)} · {product.reviewCount} reviews
         </p>
-        <section data-agent-id="reviews-section" className="mt-8 border-t border-[#e4dfd6] pt-6">
+        <section className="mt-8 border-t border-[#e4dfd6] pt-6">
           <h2 className="text-[11px] tracking-[0.2em] uppercase">Reviews</h2>
           <ul className="mt-4 flex flex-col gap-4">
             {reviews.map((review) => (

@@ -1,345 +1,463 @@
-// Turns the two models into the store's own types:
-//   H&M homepage document (who the shopper is, from purchase history)  -> starting LayoutConfig
-//   live session decisions (how they browse right now, from OTTO-trained model) -> adjustments as they click
-// plus helpers to order the demo catalog by the shopper's predicted mix and to feed store events to the tracker.
+// Store-side helpers for the H&M model's homepage document.
+// Product ranking (forYouIds, rankCatalog) feeds the v2 layout pipeline.
+// modelLayout() turns the same document, plus live session decisions, into a v2 layout
+// the store can apply when Snowflake returns a shopper.
 
-import type { FilterSectionId, HeroVariant, HomeSectionId, LayoutConfig } from "@/lib/layout/types";
-import { DEFAULT_LAYOUT } from "@/lib/layout/presets";
-import type { SortOption } from "@/lib/personas/schema";
-import type { StoreColor } from "@/config/ui";
-import type { StoreEvent } from "@/lib/sim/protocol";
-import { CATEGORIES, type Category, type Department, type Product } from "@/lib/store/types";
-import type { HMCategory, HMDepartment, HomepageDoc } from "./homepage";
-import type { SessionDecisions, SessionEvent } from "./sessionStyle";
-import { toLayoutConfig, type StoreLayoutDoc } from "./storeLayout";
-
-// ---------- vocabulary bridges (H&M data -> demo store) ----------
-
-/** Demo-store categories that belong to each H&M product group. */
-export const HM_TO_APP_CATEGORIES: Record<HMCategory, Category[]> = {
-  cat_garment_upper_body: ["tshirts", "shirts", "knitwear", "jackets", "coats"],
-  cat_garment_lower_body: ["jeans", "trousers", "skirts"],
-  cat_garment_full_body: ["dresses"],
-  cat_shoes: ["shoes"],
-  cat_accessories: ["bags"],
-  cat_swimwear: [],
-  cat_underwear: [],
-  cat_other: [],
-};
-
-const APP_TO_HM_CATEGORY = Object.fromEntries(
-  (Object.entries(HM_TO_APP_CATEGORIES) as [HMCategory, Category[]][]).flatMap(([hm, cats]) => cats.map((c) => [c, hm])),
-) as Record<Category, HMCategory>;
-
-/** H&M master colors that have a demo-store equivalent. */
-export const HM_TO_APP_COLOR: Record<string, StoreColor> = {
-  Black: "black",
-  White: "white",
-  Beige: "beige",
-  Blue: "navy",
-  Grey: "grey",
-  "Khaki green": "olive",
-  Red: "burgundy",
-  Brown: "brown",
-  Mole: "brown",
-};
-
-export const HM_TO_APP_DEPARTMENT: Partial<Record<HMDepartment, Department>> = {
-  dept_ladieswear: "women",
-  dept_divided: "women",
-  dept_menswear: "men",
-};
-
-// ---------- layout ----------
-
-const FILTER_MAP: Record<string, FilterSectionId> = {
-  category: "category",
-  size: "size",
-  color: "color",
-  price: "price",
-  sale: "sale",
-  collection: "collection",
-};
-
-const SECTION_MAP: Record<string, HomeSectionId | null> = {
-  new_in: "new_in",
-  sale: "sale_picks",
-  bestsellers: "bestsellers",
-  buy_again: null, // the demo store has no Buy Again row
-};
-
-const HERO_MAP: Record<string, HeroVariant> = {
-  editorial: "editorial",
-  discount: "discount_banner",
-  new_drop: "new_drop_banner",
-  category: "collection_banner",
-};
-
-export interface DecisionLogEntry {
-  key: string;
-  value: string;
-  reason: string;
-  source: "H&M model" | "AI shopper" | "Live session" | "You said" | "Your settings" | "Default" |
-          "Store default";
-  /** Tested = beat the store default on held-out purchases; Estimated = browsing-based */
-  evidence: string;
-}
-
-export interface ModelLayout {
-  layout: LayoutConfig;
-  /** Demo-store categories in predicted order (unmapped categories keep their default position at the end). */
-  categoryOrder: Category[];
-  landingDepartment: Department;
-  highlightColors: StoreColor[];
-  comparePanel: boolean;
-  recentlyViewedProminent: boolean;
-  cartReminder: boolean;
-  productPage: "compact" | "standard" | "detailed";
-  /** One line per decision for the Terminal / explanation panel. */
-  log: DecisionLogEntry[];
-}
+import type { StoreColor } from "@/config/ui"
+import { FOR_YOU_MAX, type NavItemId } from "@/lib/layout/enums"
+import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
+import type { FilterSectionId, HomeBlock, LayoutConfig } from "@/lib/layout/types"
+import type { HMCategory, HMDepartment, HMFilter, HMHero, HMSection, HomepageDoc } from "@/lib/model/homepage"
+import { APP_TO_HM_CATEGORY, HM_TO_APP_CATEGORIES, HM_TO_APP_COLOR, HM_TO_APP_DEPARTMENT } from "@/lib/model/mapping"
+import { heroAdFor, modelCategoryOrder, modelDepartment, modelHeroAd } from "@/lib/model/policy"
+import type { StoreLayoutDoc } from "@/lib/model/storeLayout"
+import type { SessionDecisions, SessionEvent } from "@/lib/model/sessionStyle"
+import type { StoreEvent } from "@/lib/sim/protocol"
+import { PRODUCTS } from "@/lib/store/catalog"
+import { CATEGORIES, type Category, type Product } from "@/lib/store/types"
 
 function uniq<T>(xs: T[]): T[] {
-  return xs.filter((x, i) => xs.indexOf(x) === i);
+  return xs.filter((x, i) => xs.indexOf(x) === i)
 }
 
-/**
- * Starting layout from the H&M homepage document, adjusted by live session decisions once they are active.
- * Session decisions only override browsing-based ("Estimated") fields; tested purchase-based decisions stay.
- */
-/**
- * Live decisions from this visit win once active; until then, decisions the refresh job stored from the
- * shopper's earlier visits (home.session.decisions) apply, so a returning shopper starts where they left off.
- */
-export function mergeSessionDecisions(live?: SessionDecisions, stored?: Partial<SessionDecisions> | null): SessionDecisions | undefined {
-  if (!live && !stored) return undefined;
-  const keys = ["grid_columns", "compare_panel", "recently_viewed", "quick_add", "cart_reminder", "product_page"] as const;
-  const out = {} as Record<(typeof keys)[number], unknown>;
-  for (const k of keys) {
-    const l = live?.[k];
-    const s = stored?.[k];
-    out[k] = l?.active ? l : s?.active ? { ...s, reason: `${s.reason} (from your last visits)` } : l ?? s ??
-      { value: "default", active: false, reason: "Store default" };
-  }
-  return out as unknown as SessionDecisions;
+export { HM_TO_APP_CATEGORIES, HM_TO_APP_COLOR, HM_TO_APP_DEPARTMENT } from "@/lib/model/mapping"
+
+/** Store products for the For You row and page: the model's ranking, else rankCatalog. Basket items left out. */
+export function forYouIds(doc: HomepageDoc, basketIds: string[] = []): string[] {
+  const basket = new Set(basketIds)
+  const known = new Set(PRODUCTS.map((p) => p.id))
+  const picked = (doc.store_products ?? []).map((p) => p.product_id).filter((id) => known.has(id) && !basket.has(id))
+  if (picked.length > 0) return uniq(picked).slice(0, FOR_YOU_MAX)
+  return rankCatalog(PRODUCTS, doc)
+    .filter((p) => !basket.has(p.id))
+    .slice(0, FOR_YOU_MAX)
+    .map((p) => p.id)
 }
-
-/** The stored document is v1 (atelier.store_layout.v1) since the personas change; older docs were HomepageDoc. */
-export function isStoreLayoutDoc(home: unknown): home is StoreLayoutDoc {
-  return (home as { format?: string } | null | undefined)?.format === "atelier.store_layout.v1";
-}
-
-/** model_meta carries what the v1 spec lets the UI ignore: the internals the store still needs. */
-function meta(home: HomepageDoc | StoreLayoutDoc): Partial<HomepageDoc> {
-  return isStoreLayoutDoc(home) ? ((home.model_meta ?? {}) as unknown as Partial<HomepageDoc>) : home;
-}
-
-/** v1 documents: toLayoutConfig covers the LayoutConfig fields; this adds ordering, colors and the log. */
-export function modelLayoutV1(home: StoreLayoutDoc, liveSession?: SessionDecisions): ModelLayout {
-  const L = home.layout;
-  const m = meta(home);
-  const session = mergeSessionDecisions(liveSession, m.session?.decisions);
-  const log: DecisionLogEntry[] = (Object.keys(L) as (keyof typeof L)[])
-    .filter((k) => L[k].changed)
-    .map((k) => ({ key: k, value: JSON.stringify(L[k].value), reason: L[k].reason,
-                  source: L[k].source, evidence: "stored decision" }));
-  const s = (key: string, value: unknown, reason: string) =>
-    log.push({ key, value: String(value), reason, source: "Live session", evidence: "Estimated from your clicks" });
-
-  const categoryOrder = uniq<Category>([
-    ...L.category_order.value.flatMap((c) => HM_TO_APP_CATEGORIES[c as HMCategory] ?? []),
-    ...CATEGORIES,
-  ]);
-
-  let gridDensity: 2 | 3 | 4 = L.grid_columns.value;
-  let comparePanel = L.compare_panel.value === "on";
-  let recentlyViewed = L.recently_viewed.value === "prominent";
-  let cartReminder = L.cart_reminder.value === "on";
-  let productPage: ModelLayout["productPage"] = L.product_page.value;
-  let heroMinimized = L.hero.minimized;
-  if (session) {
-    if (session.grid_columns.active) { gridDensity = session.grid_columns.value; s("gridDensity", gridDensity, session.grid_columns.reason); }
-    if (session.quick_add.active) s("quickViewEmphasis", true, session.quick_add.reason);
-    if (session.compare_panel.active) { comparePanel = true; s("comparePanel", "on", session.compare_panel.reason); }
-    if (session.recently_viewed.active) { recentlyViewed = true; s("recentlyViewed", "prominent", session.recently_viewed.reason); }
-    if (session.cart_reminder.active) { cartReminder = true; s("cartReminder", "on", session.cart_reminder.reason); }
-    if (session.product_page.active) {
-      productPage = session.product_page.value;
-      heroMinimized = heroMinimized || productPage === "compact";
-      s("productPage", productPage, session.product_page.reason);
-    }
-  }
-
-  const base = toLayoutConfig(home);
-  return {
-    layout: {
-      ...DEFAULT_LAYOUT,
-      ...base,
-      gridDensity,
-      heroMinimized,
-      quickViewEmphasis: Boolean(session?.quick_add.active) || base.quickViewEmphasis === true,
-    },
-    categoryOrder,
-    landingDepartment: HM_TO_APP_DEPARTMENT[L.landing_department.value as HMDepartment] ?? "women",
-    highlightColors: uniq([
-      ...((m.preferences?.color_filters ?? []) as StoreColor[]),
-      ...L.color_highlight.value.map((c) => HM_TO_APP_COLOR[c]).filter((c): c is StoreColor => !!c),
-    ]).slice(0, 3),
-    comparePanel,
-    recentlyViewedProminent: recentlyViewed,
-    cartReminder,
-    productPage,
-    log,
-  };
-}
-
-export function modelLayout(home: HomepageDoc, liveSession?: SessionDecisions): ModelLayout {
-  const L = home.layout;
-  const session = mergeSessionDecisions(liveSession, home.session?.decisions);
-  const log: DecisionLogEntry[] = [];
-  const h = (key: string, value: unknown, d: { reason: string; class: string; validated: boolean | null }) =>
-    log.push({ key, value: String(value), reason: d.reason,
-               source: d.class === "Based on your settings" ? "Your settings" : "H&M model",
-               evidence: d.validated ? `${d.class}, beat store default` : d.class });
-  const s = (key: string, value: unknown, reason: string) =>
-    log.push({ key, value: String(value), reason, source: "Live session", evidence: "Estimated from your clicks" });
-
-  const filterOrder = uniq<FilterSectionId>([
-    ...L.filter_order.value.map((f) => FILTER_MAP[f]).filter(Boolean),
-    ...DEFAULT_LAYOUT.filterOrder,
-  ]);
-  const expandedFilters: FilterSectionId[] = L.price_filter_first.value
-    ? ["price", "sale"]
-    : L.color_highlight.value.length
-      ? ["color"]
-      : [...DEFAULT_LAYOUT.expandedFilters];
-  const homeSectionOrder = uniq<HomeSectionId>([
-    ...L.section_order.value.map((x) => SECTION_MAP[x]).filter((x): x is HomeSectionId => x !== null),
-    ...DEFAULT_LAYOUT.homeSectionOrder,
-  ]);
-  const heroVariant = HERO_MAP[L.hero.value] ?? DEFAULT_LAYOUT.heroVariant;
-
-  let gridDensity: 2 | 3 | 4 = L.grid_columns.value;
-  let quickView = false;
-  let heroMinimized = false;
-  let comparePanel = false;
-  let recentlyViewed = L.recently_viewed.value === "prominent";
-  let cartReminder = false;
-  let productPage: ModelLayout["productPage"] = "standard";
-
-  h("defaultSort", L.default_sort.value, L.default_sort);
-  h("homeSectionOrder", homeSectionOrder.join(" > "), L.section_order);
-  h("categoryOrder", L.category_order.value[0], L.category_order);
-  h("highlightColors", L.color_highlight.value.join(", ") || "none", L.color_highlight);
-  h("heroVariant", heroVariant, L.hero);
-  h("filterOrder", filterOrder.join(" > "), L.filter_order);
-  h("popup", L.popups.value, L.popups);
-
-  if (session) {
-    if (session.grid_columns.active) { gridDensity = session.grid_columns.value; s("gridDensity", gridDensity, session.grid_columns.reason); }
-    if (session.quick_add.active) { quickView = true; s("quickViewEmphasis", true, session.quick_add.reason); }
-    if (session.compare_panel.active) { comparePanel = true; s("comparePanel", "on", session.compare_panel.reason); }
-    if (session.recently_viewed.active) { recentlyViewed = true; s("recentlyViewed", "prominent", session.recently_viewed.reason); }
-    if (session.cart_reminder.active) { cartReminder = true; s("cartReminder", "on", session.cart_reminder.reason); }
-    if (session.product_page.active) {
-      productPage = session.product_page.value;
-      heroMinimized = productPage === "compact";
-      s("productPage", productPage, session.product_page.reason);
-    }
-  }
-  if (!session?.grid_columns.active) h("gridDensity", gridDensity, L.grid_columns);
-
-  const categoryOrder = uniq<Category>([
-    ...L.category_order.value.flatMap((c) => HM_TO_APP_CATEGORIES[c] ?? []),
-    ...CATEGORIES,
-  ]);
-
-  return {
-    layout: {
-      ...DEFAULT_LAYOUT,
-      defaultSort: L.default_sort.value as SortOption,
-      filterOrder,
-      expandedFilters,
-      heroVariant,
-      popupEnabled: L.popups.value === "on",
-      popupVariant: L.hero.value === "new_drop" ? "new_drop" : "newsletter",
-      gridDensity,
-      homeSectionOrder,
-      showSaleBadgesProminently: L.section_order.value[0] === "sale" || L.price_filter_first.value,
-      quickViewEmphasis: quickView,
-      searchEmphasized: false,
-      heroMinimized,
-    },
-    categoryOrder,
-    landingDepartment: HM_TO_APP_DEPARTMENT[L.landing_department.value] ?? "women",
-    highlightColors: uniq([
-      ...((home.preferences?.color_filters ?? []) as StoreColor[]),
-      ...L.color_highlight.value.map((c) => HM_TO_APP_COLOR[c]).filter((c): c is StoreColor => !!c),
-    ]).slice(0, 3),
-    comparePanel,
-    recentlyViewedProminent: recentlyViewed,
-    cartReminder,
-    productPage,
-    log,
-  };
-}
-
-// ---------- catalog ordering ----------
 
 /**
  * Orders demo-store products by how well they fit the shopper's predicted next purchases:
  * predicted share of the product's H&M group x department fit, boosted for highlighted colors,
- * with popularity as a tie-breaker. Products in groups the model can't map keep a small base score.
+ * with popularity as a tie-breaker. The model's own store_products ranking comes first when present.
  */
-export function rankCatalog(products: Product[], home: HomepageDoc | StoreLayoutDoc): Product[] {
-  const m = meta(home);
-  const colorsHm = home.layout.color_highlight.value;
-  if (m.store_products?.length) {
-    // refresh job's ranking (predicted mix + what they viewed + trending; bagged items left out), rest after
-    const pos = new Map(m.store_products.map((p, i) => [p.product_id, i]));
-    const ranked = products.filter((p) => pos.has(p.id)).sort((a, b) => pos.get(a.id)! - pos.get(b.id)!);
-    return [...ranked, ...rankCatalogFromMix(products.filter((p) => !pos.has(p.id)), m, colorsHm)];
+export function rankCatalog(products: Product[], doc: HomepageDoc): Product[] {
+  if (doc.store_products?.length) {
+    const pos = new Map(doc.store_products.map((p, i) => [p.product_id, i]))
+    const ranked = products.filter((p) => pos.has(p.id)).sort((a, b) => (pos.get(a.id) ?? 0) - (pos.get(b.id) ?? 0))
+    return [...ranked, ...rankCatalogFromMix(products.filter((p) => !pos.has(p.id)), doc)]
   }
-  return rankCatalogFromMix(products, m, colorsHm);
+  return rankCatalogFromMix(products, doc)
 }
 
-function rankCatalogFromMix(products: Product[], m: Partial<HomepageDoc>, colorsHm: string[]): Product[] {
-  const cat: Record<string, number> = m.predicted_mix?.category ?? {};
-  const dept: Record<string, number> = m.predicted_mix?.department ?? {};
-  const women = (dept.dept_ladieswear ?? 0) + (dept.dept_divided ?? 0);
-  const men = dept.dept_menswear ?? 0;
-  const colors = new Set(colorsHm.map((c) => HM_TO_APP_COLOR[c]).filter(Boolean));
-  const groupSize: Partial<Record<HMCategory, number>> = {};
-  for (const [hm, cats] of Object.entries(HM_TO_APP_CATEGORIES) as [HMCategory, Category[]][]) groupSize[hm] = cats.length;
+function rankCatalogFromMix(products: Product[], doc: HomepageDoc): Product[] {
+  const cat = doc.predicted_mix.category
+  const dept = doc.predicted_mix.department
+  const women = (dept.dept_ladieswear ?? 0) + (dept.dept_divided ?? 0)
+  const men = dept.dept_menswear ?? 0
+  const colors = new Set(doc.layout.color_highlight.value.map((c) => HM_TO_APP_COLOR[c]).filter(Boolean))
+  const groupSize: Partial<Record<HMCategory, number>> = {}
+  for (const [hm, cats] of Object.entries(HM_TO_APP_CATEGORIES) as [HMCategory, Category[]][]) groupSize[hm] = cats.length
   const score = (p: Product) => {
-    const hm = APP_TO_HM_CATEGORY[p.category];
-    const share = hm ? (cat[hm] ?? 0) / (groupSize[hm] || 1) : 0.01;
-    const deptFit = p.department === "men" ? men : women;
-    const colorBoost = p.colors.some((c) => colors.has(c)) ? 1.5 : 1;
-    return share * (0.2 + deptFit) * colorBoost + 1e-4 * p.popularity;
-  };
-  return [...products].sort((a, b) => score(b) - score(a));
+    const hm = APP_TO_HM_CATEGORY[p.category]
+    const share = hm ? (cat[hm] ?? 0) / (groupSize[hm] || 1) : 0.01
+    const deptFit = p.department === "men" ? men : women
+    const colorBoost = p.colors.some((c) => colors.has(c)) ? 1.5 : 1
+    return share * (0.2 + deptFit) * colorBoost + 1e-4 * p.popularity
+  }
+  return [...products].sort((a, b) => score(b) - score(a))
 }
 
-// ---------- events ----------
+export interface DecisionLogEntry {
+  key: string
+  value: string
+  reason: string
+  source: string
+  evidence: string
+}
+
+export interface ModelLayout {
+  layout: LayoutConfig
+  categoryOrder: Category[]
+  landingDepartment: "women" | "men"
+  highlightColors: StoreColor[]
+  comparePanel: boolean
+  recentlyViewedProminent: boolean
+  cartReminder: boolean
+  productPage: "compact" | "standard" | "detailed"
+  log: DecisionLogEntry[]
+}
+
+const FILTER_IDS = new Set<string>(DEFAULT_LAYOUT.listing.filterOrder)
+
+function asFilter(id: HMFilter): FilterSectionId | null {
+  return FILTER_IDS.has(id) ? (id as FilterSectionId) : null
+}
+
+/**
+ * Live decisions from this visit win once active. Until then, decisions the refresh job stored from
+ * earlier visits apply, so a returning shopper starts where they left off.
+ */
+export function mergeSessionDecisions(
+  live?: SessionDecisions,
+  stored?: Partial<SessionDecisions> | null,
+): SessionDecisions | undefined {
+  if (!live && !stored) return undefined
+  const keys = ["grid_columns", "compare_panel", "recently_viewed", "quick_add", "cart_reminder", "product_page"] as const
+  const out = {} as Record<(typeof keys)[number], unknown>
+  for (const key of keys) {
+    const current = live?.[key]
+    const previous = stored?.[key]
+    out[key] = current?.active
+      ? current
+      : previous?.active
+        ? { ...previous, reason: `${previous.reason} (from your last visits)` }
+        : (current ?? previous ?? { value: "default", active: false, reason: "Store default" })
+  }
+  return out as unknown as SessionDecisions
+}
+
+function homeBlocks(sections: HMSection[]): HomeBlock[] {
+  const rows: HomeBlock[] = sections.map((section) => ({
+    type: "product_row",
+    source: { kind: section },
+    limit: 8,
+  }))
+  const blocks: HomeBlock[] = [{ type: "hero" }, ...rows]
+  if (blocks.length < 3) blocks.push({ type: "category_tiles", categories: CATEGORIES.slice(0, 4) })
+  return blocks.slice(0, 8)
+}
+
+/**
+ * Starting v2 layout from the H&M homepage document, adjusted by live session decisions once they are active.
+ * Session decisions only override browsing fields. Tested purchase-based decisions stay.
+ */
+export function modelLayout(home: HomepageDoc, liveSession?: SessionDecisions): ModelLayout {
+  const decisions = home.layout
+  const session = mergeSessionDecisions(liveSession, home.session?.decisions)
+  const log: DecisionLogEntry[] = []
+  const note = (key: string, value: unknown, decision: { reason: string; class: string; validated: boolean | null }) =>
+    log.push({
+      key,
+      value: String(value),
+      reason: decision.reason,
+      source: decision.class === "Based on your settings" ? "Your settings" : "H&M model",
+      evidence: decision.validated ? `${decision.class}, beat store default` : decision.class,
+    })
+  const live = (key: string, value: unknown, reason: string) =>
+    log.push({ key, value: String(value), reason, source: "Live session", evidence: "Estimated from your clicks" })
+
+  const department = modelDepartment(home)
+  const landing = department ?? "women"
+  const navOrder: NavItemId[] = department
+    ? [department, ...DEFAULT_LAYOUT.nav.order.filter((id) => id !== department)]
+    : [...DEFAULT_LAYOUT.nav.order]
+  const filterOrder = uniq<FilterSectionId>([
+    ...decisions.filter_order.value.map(asFilter).filter((id): id is FilterSectionId => id !== null),
+    ...DEFAULT_LAYOUT.listing.filterOrder,
+  ])
+  const expandedFilters: FilterSectionId[] = decisions.price_filter_first.value
+    ? ["price", "sale"]
+    : decisions.color_highlight.value.length
+      ? ["color"]
+      : [...DEFAULT_LAYOUT.listing.expandedFilters]
+  const sections = uniq(decisions.section_order.value)
+  const highlightColors = uniq(
+    [
+      ...((home.preferences?.color_filters ?? []) as StoreColor[]),
+      ...decisions.color_highlight.value.map((color) => HM_TO_APP_COLOR[color]).filter((color): color is StoreColor => !!color),
+    ],
+  ).slice(0, 3)
+
+  let gridDensity: 2 | 3 | 4 = decisions.grid_columns.value
+  let quickView = false
+  let heroSize: "full" | "compact" = "full"
+  let comparePanel = false
+  let recentlyViewed = decisions.recently_viewed.value === "prominent"
+  let cartReminder = false
+  let productPage: ModelLayout["productPage"] = "standard"
+
+  note("defaultSort", decisions.default_sort.value, decisions.default_sort)
+  note("sectionOrder", sections.join(" > "), decisions.section_order)
+  note("categoryOrder", decisions.category_order.value[0], decisions.category_order)
+  note("highlightColors", highlightColors.join(", ") || "none", decisions.color_highlight)
+  note("hero", decisions.hero.value, decisions.hero)
+  note("filterOrder", filterOrder.join(" > "), decisions.filter_order)
+  note("popup", decisions.popups.value, decisions.popups)
+
+  if (session) {
+    if (session.grid_columns.active) {
+      gridDensity = session.grid_columns.value
+      live("gridDensity", gridDensity, session.grid_columns.reason)
+    }
+    if (session.quick_add.active) {
+      quickView = true
+      live("quickView", true, session.quick_add.reason)
+    }
+    if (session.compare_panel.active) {
+      comparePanel = true
+      live("comparePanel", "on", session.compare_panel.reason)
+    }
+    if (session.recently_viewed.active) {
+      recentlyViewed = true
+      live("recentlyViewed", "prominent", session.recently_viewed.reason)
+    }
+    if (session.cart_reminder.active) {
+      cartReminder = true
+      live("cartReminder", "on", session.cart_reminder.reason)
+    }
+    if (session.product_page.active) {
+      productPage = session.product_page.value
+      heroSize = productPage === "compact" ? "compact" : "full"
+      live("productPage", productPage, session.product_page.reason)
+    }
+  }
+  if (!session?.grid_columns.active) note("gridDensity", gridDensity, decisions.grid_columns)
+
+  const layout = cloneLayout(DEFAULT_LAYOUT)
+  const heroAd = modelHeroAd(home, department)
+  layout.nav = {
+    order: navOrder,
+    highlight: department,
+    department,
+    searchEmphasized: false,
+  }
+  layout.home = {
+    ...layout.home,
+    blocks: homeBlocks(sections),
+    heroSize,
+    forYouIds: forYouIds(home),
+    basketIds: [],
+  }
+  layout.listing = {
+    ...layout.listing,
+    defaultSort: decisions.default_sort.value,
+    filterOrder,
+    expandedFilters,
+    gridDensity,
+    colorHighlight: highlightColors,
+    categoryOrder: modelCategoryOrder(home),
+    card: {
+      ...layout.listing.card,
+      priceStyle: sections[0] === "sale" || decisions.price_filter_first.value ? "sale_emphasis" : "plain",
+      quickView: quickView ? "emphasized" : "button",
+    },
+  }
+  layout.ads = {
+    placements: layout.ads.placements
+      .filter((placement) => decisions.popups.value === "on" || placement.slot !== "popup")
+      .map((placement) => (placement.slot === "hero" ? { ...placement, adIds: [heroAd] } : placement)),
+  }
+
+  return {
+    layout,
+    categoryOrder: layout.listing.categoryOrder,
+    landingDepartment: landing,
+    highlightColors,
+    comparePanel,
+    recentlyViewedProminent: recentlyViewed,
+    cartReminder,
+    productPage,
+    log,
+  }
+}
+
+const V1_HERO: Record<string, HMHero> = {
+  editorial: "editorial",
+  discount_banner: "discount",
+  new_drop_banner: "new_drop",
+  collection_banner: "category",
+}
+
+/** Stored Snowflake documents are atelier.store_layout.v1. Older rows were HomepageDoc. */
+export function isStoreLayoutDoc(home: unknown): home is StoreLayoutDoc {
+  return (home as { format?: string } | null | undefined)?.format === "atelier.store_layout.v1"
+}
+
+function asStoreColor(value: string): StoreColor | null {
+  const mapped = HM_TO_APP_COLOR[value]
+  if (mapped) return mapped
+  const known = new Set<string>(Object.values(HM_TO_APP_COLOR))
+  return known.has(value) ? (value as StoreColor) : null
+}
+
+function v1ForYouIds(home: StoreLayoutDoc): string[] {
+  const meta = home.model_meta as { store_products?: { product_id: string }[] } | undefined
+  const known = new Set(PRODUCTS.map((product) => product.id))
+  const ranked = (meta?.store_products ?? []).map((pick) => pick.product_id).filter((id) => known.has(id))
+  if (ranked.length > 0) return uniq(ranked).slice(0, FOR_YOU_MAX)
+  const fromDepartments = home.products?.by_department.flatMap((group) => group.items) ?? []
+  return uniq(fromDepartments.filter((id) => known.has(id))).slice(0, FOR_YOU_MAX)
+}
+
+/**
+ * v2 layout from an atelier.store_layout.v1 document. The backend stores this shape;
+ * the store only applies layout v2.
+ */
+export function modelLayoutV1(home: StoreLayoutDoc, liveSession?: SessionDecisions): ModelLayout {
+  const decisions = home.layout
+  const meta = (home.model_meta ?? {}) as { session?: { decisions?: Partial<SessionDecisions> | null } }
+  const session = mergeSessionDecisions(liveSession, meta.session?.decisions)
+  const log: DecisionLogEntry[] = []
+  const note = (key: string, value: unknown, reason: string, source: string) =>
+    log.push({ key, value: String(value), reason, source, evidence: "stored decision" })
+  const live = (key: string, value: unknown, reason: string) =>
+    log.push({ key, value: String(value), reason, source: "Live session", evidence: "Estimated from your clicks" })
+
+  for (const key of Object.keys(decisions) as (keyof typeof decisions)[]) {
+    const decision = decisions[key]
+    if (decision.changed) note(key, JSON.stringify(decision.value), decision.reason, decision.source)
+  }
+
+  const department = HM_TO_APP_DEPARTMENT[decisions.landing_department.value as HMDepartment] ?? null
+  const landing = department ?? "women"
+  const navOrder: NavItemId[] = department
+    ? [department, ...DEFAULT_LAYOUT.nav.order.filter((id) => id !== department)]
+    : [...DEFAULT_LAYOUT.nav.order]
+  const filterOrder = uniq<FilterSectionId>([
+    ...decisions.filter_order.value.filter((id): id is FilterSectionId => FILTER_IDS.has(id)),
+    ...DEFAULT_LAYOUT.listing.filterOrder,
+  ])
+  const expandedFilters = uniq(
+    decisions.filter_order.expanded.filter((id): id is FilterSectionId => FILTER_IDS.has(id)),
+  )
+  const categoryOrder = uniq<Category>([
+    ...decisions.category_order.value.flatMap((category) => HM_TO_APP_CATEGORIES[category as HMCategory] ?? []),
+    ...CATEGORIES,
+  ])
+  const highlightColors = uniq(
+    decisions.color_highlight.value.map(asStoreColor).filter((color): color is StoreColor => color !== null),
+  ).slice(0, 3)
+
+  const blocks: HomeBlock[] = [{ type: "hero" }]
+  for (const section of decisions.homepage_sections.value) {
+    if (section === "new_in" || section === "bestsellers") {
+      blocks.push({ type: "product_row", source: { kind: section }, limit: 8 })
+    } else if (section === "sale_picks") {
+      blocks.push({ type: "product_row", source: { kind: "sale" }, limit: 8 })
+    } else if (section === "collections") {
+      blocks.push({ type: "category_tiles", categories: categoryOrder.slice(0, 4) })
+    }
+  }
+  if (blocks.length < 3) blocks.push({ type: "category_tiles", categories: categoryOrder.slice(0, 4) })
+
+  let gridDensity: 2 | 3 | 4 = decisions.grid_columns.value
+  let quickView = decisions.quick_view.value === "emphasized" || decisions.quick_add.value === "on"
+  let heroSize: "full" | "compact" = decisions.hero.minimized ? "compact" : "full"
+  let comparePanel = decisions.compare_panel.value === "on"
+  let recentlyViewed = decisions.recently_viewed.value === "prominent"
+  let cartReminder = decisions.cart_reminder.value === "on"
+  let productPage: ModelLayout["productPage"] = decisions.product_page.value
+
+  if (session) {
+    if (session.grid_columns.active) {
+      gridDensity = session.grid_columns.value
+      live("gridDensity", gridDensity, session.grid_columns.reason)
+    }
+    if (session.quick_add.active) {
+      quickView = true
+      live("quickView", true, session.quick_add.reason)
+    }
+    if (session.compare_panel.active) {
+      comparePanel = true
+      live("comparePanel", "on", session.compare_panel.reason)
+    }
+    if (session.recently_viewed.active) {
+      recentlyViewed = true
+      live("recentlyViewed", "prominent", session.recently_viewed.reason)
+    }
+    if (session.cart_reminder.active) {
+      cartReminder = true
+      live("cartReminder", "on", session.cart_reminder.reason)
+    }
+    if (session.product_page.active) {
+      productPage = session.product_page.value
+      heroSize = productPage === "compact" ? "compact" : "full"
+      live("productPage", productPage, session.product_page.reason)
+    }
+  }
+
+  const topGroup = decisions.category_order.value[0] as HMCategory | undefined
+  const heroAd = heroAdFor(V1_HERO[decisions.hero.value] ?? "editorial", department, topGroup)
+  const saleLead =
+    decisions.homepage_sections.value[0] === "sale_picks" ||
+    decisions.sale_badges.value === "prominent" ||
+    decisions.price_mode.value
+  const checkoutVariant =
+    decisions.checkout.value === "guest_express"
+      ? "guest_fast"
+      : decisions.checkout.value === "loyalty_pay"
+        ? "loyalty_pay"
+        : "click_to_pay"
+
+  const layout = cloneLayout(DEFAULT_LAYOUT)
+  layout.nav = {
+    order: navOrder,
+    highlight: department,
+    department,
+    searchEmphasized: decisions.search.value === "emphasized",
+  }
+  layout.home = {
+    ...layout.home,
+    blocks: blocks.slice(0, 8),
+    heroSize,
+    forYouIds: v1ForYouIds(home),
+    basketIds: [],
+  }
+  layout.listing = {
+    ...layout.listing,
+    defaultSort: decisions.default_sort.value,
+    filterOrder,
+    expandedFilters: expandedFilters.length > 0 ? expandedFilters : [...DEFAULT_LAYOUT.listing.expandedFilters],
+    gridDensity,
+    colorHighlight: highlightColors,
+    categoryOrder,
+    card: {
+      ...layout.listing.card,
+      priceStyle: saleLead ? "sale_emphasis" : "plain",
+      quickView: quickView ? "emphasized" : "button",
+    },
+  }
+  layout.ads = {
+    placements: layout.ads.placements
+      .filter((placement) => decisions.popups.value !== "off" || placement.slot !== "popup")
+      .map((placement) => (placement.slot === "hero" ? { ...placement, adIds: [heroAd] } : placement)),
+  }
+  layout.checkout = {
+    variant: checkoutVariant,
+    expressCheckout: checkoutVariant === "guest_fast",
+    showTrustBadges: checkoutVariant === "guest_fast",
+    loyaltyPrompt: checkoutVariant === "loyalty_pay",
+  }
+
+  return {
+    layout,
+    categoryOrder,
+    landingDepartment: landing,
+    highlightColors,
+    comparePanel,
+    recentlyViewedProminent: recentlyViewed,
+    cartReminder,
+    productPage,
+    log,
+  }
+}
 
 function hashId(id: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619) >>> 0;
-  return h % 2147483647;
+  let hash = 2166136261
+  for (let i = 0; i < id.length; i++) hash = Math.imul(hash ^ id.charCodeAt(i), 16777619) >>> 0
+  return hash % 2147483647
 }
 
 /**
  * Store event -> session model event. Product views count as clicks, add-to-bag as carts.
  * The demo has no order event; call tracker.add({ ts, aid, type: 2 }) at checkout if you add one.
  */
-export function fromStoreEvent(e: StoreEvent): SessionEvent | null {
-  const p = e.properties ?? {};
-  const id = p.productId ?? p.product_id ?? p.id;
-  if (id === undefined || id === null) return null;
-  const aid = typeof id === "number" ? id : hashId(String(id));
-  const ts = Math.floor(e.timestamp / 1000);
-  if (e.type === "product_viewed" || e.type === "quickview_opened") return { ts, aid, type: 0 };
-  if (e.type === "add_to_bag") return { ts, aid, type: 1 };
-  return null;
+export function fromStoreEvent(event: StoreEvent): SessionEvent | null {
+  const properties = event.properties ?? {}
+  const id = properties.productId ?? properties.product_id ?? properties.id
+  if (id === undefined || id === null || typeof id === "boolean") return null
+  const aid = typeof id === "number" ? id : hashId(String(id))
+  const ts = Math.floor(event.timestamp / 1000)
+  if (event.type === "product_viewed" || event.type === "quickview_opened") return { ts, aid, type: 0 }
+  if (event.type === "add_to_bag") return { ts, aid, type: 1 }
+  return null
 }

@@ -1,9 +1,10 @@
 "use client"
 
 import { create } from "zustand"
-import { PERSONA_ACCENTS } from "@/config/ui"
 import { DEFAULT_LAYOUT, cloneLayout } from "@/lib/layout/presets"
 import type { LayoutConfig } from "@/lib/layout/types"
+import { validateLayout, type ValidationReport } from "@/lib/layout/validate"
+import type { ModelContext } from "@/lib/model/homepage"
 import type { MockCapture, MockSession } from "@/lib/visa/mock"
 
 export interface BagLine {
@@ -23,28 +24,30 @@ export interface WishlistItem {
   color: string
 }
 
-export interface CursorState {
-  x: number
-  y: number
-  visible: boolean
-  clicking: boolean
-  outlineId: string | null
-  color: string
-}
-
 export type CheckoutPhase = "idle" | "session" | "paid"
 
 interface StorefrontState {
   layout: LayoutConfig
   layoutPresetName: string | null
   layoutToast: string | null
-  cursor: CursorState
-  cursorSpeed: number
+  layoutReport: ValidationReport | null
+  /**
+   * Boxes on what a layout step is changing, keyed by view-transition name. Shown before the
+   * change and kept through it; `leaving` fades them out.
+   */
+  layoutFlash: { names: Record<string, string>; leaving: boolean }
+  /** Ads already shown or dismissed this session, keyed "slot:adId". Survives setLayout; cleared on reset. */
+  adCaps: Record<string, "shown" | "dismissed">
+  /** Page views this session (page_count trigger). */
+  pagesViewed: number
+  /** Listing <-> product page moves this session (interstitial trigger). */
+  transitions: number
+  lastPath: string | null
+  interstitialOpen: boolean
+  stickyFooterOpen: boolean
   bag: BagLine[]
   wishlist: WishlistItem[]
   popupOpen: boolean
-  popupDismissed: boolean
-  showElementIds: boolean
   quickViewId: string | null
   bagOpen: boolean
   wishlistOpen: boolean
@@ -55,16 +58,19 @@ interface StorefrontState {
   conciergeAnswer: string | null
   selectedColor: Record<string, string>
   selectedSize: Record<string, string>
-  browseSort: string
-  browseFilters: string
   sessionNonce: number
-  setLayout: (layout: LayoutConfig, presetName?: string | null) => void
+  setLayout: (raw: unknown, options?: { model?: ModelContext | null; presetName?: string | null }) => void
+  /** Shows one already-validated stage of a layout swap. The final stage also records the report and toast. */
+  showLayoutStep: (layout: LayoutConfig, final?: { report: ValidationReport; presetName: string | null }) => void
+  setLayoutFlash: (names: Record<string, string>) => void
+  fadeLayoutFlash: () => void
+  markAd: (key: string, state: "shown" | "dismissed") => void
+  notePage: (path: string) => void
+  setInterstitialOpen: (open: boolean) => void
+  setStickyFooterOpen: (open: boolean) => void
   dismissToast: () => void
-  setCursor: (patch: Partial<CursorState>) => void
-  setCursorSpeed: (speed: number) => void
   setPopupOpen: (open: boolean) => void
   dismissPopup: () => void
-  setShowElementIds: (show: boolean) => void
   setQuickViewId: (id: string | null) => void
   setBagOpen: (open: boolean) => void
   setWishlistOpen: (open: boolean) => void
@@ -77,32 +83,38 @@ interface StorefrontState {
   setConciergeAnswer: (answer: string | null) => void
   selectColor: (productId: string, color: string) => void
   selectSize: (productId: string, size: string) => void
-  setBrowse: (sort: string, filters: string) => void
   resetStorefront: () => void
 }
 
-const initialCursor = (): CursorState => ({
-  x: 80,
-  y: 80,
-  visible: false,
-  clicking: false,
-  outlineId: null,
-  color: PERSONA_ACCENTS.price_hunter,
-})
-
 let lineSeq = 1
+
+const NO_FLASH = { names: {}, leaving: false }
+
+function isProductPath(path: string): boolean {
+  return path.startsWith("/store/product/")
+}
+
+const LISTING_PATHS = ["/store/women", "/store/men", "/store/new-in", "/store/sale", "/store/search", "/store/for-you"]
+
+function isListingPath(path: string): boolean {
+  return LISTING_PATHS.includes(path)
+}
 
 export const useStorefront = create<StorefrontState>((set) => ({
   layout: cloneLayout(DEFAULT_LAYOUT),
   layoutPresetName: null,
   layoutToast: null,
-  cursor: initialCursor(),
-  cursorSpeed: 1,
+  layoutReport: null,
+  layoutFlash: NO_FLASH,
+  adCaps: {},
+  pagesViewed: 0,
+  transitions: 0,
+  lastPath: null,
+  interstitialOpen: false,
+  stickyFooterOpen: false,
   bag: [],
   wishlist: [],
   popupOpen: false,
-  popupDismissed: false,
-  showElementIds: false,
   quickViewId: null,
   bagOpen: false,
   wishlistOpen: false,
@@ -113,23 +125,49 @@ export const useStorefront = create<StorefrontState>((set) => ({
   conciergeAnswer: null,
   selectedColor: {},
   selectedSize: {},
-  browseSort: "relevance",
-  browseFilters: "",
   sessionNonce: 0,
-  setLayout: (layout, presetName) =>
+  setLayout: (raw, options = {}) => {
+    const { layout, report } = validateLayout(raw, { model: options.model })
+    const presetName = options.presetName ?? null
     set({
-      layout: cloneLayout(layout),
-      layoutPresetName: presetName ?? null,
+      layout,
+      layoutReport: report,
+      layoutPresetName: presetName,
       layoutToast: presetName ? `Layout personalized for: ${presetName}` : null,
-      popupOpen: false,
-      popupDismissed: !layout.popupEnabled,
+      layoutFlash: NO_FLASH,
+    })
+  },
+  showLayoutStep: (layout, final) =>
+    set({
+      layout,
+      ...(final
+        ? {
+            layoutReport: final.report,
+            layoutPresetName: final.presetName,
+            layoutToast: final.presetName ? `Layout personalized for: ${final.presetName}` : null,
+          }
+        : {}),
     }),
+  setLayoutFlash: (names) => set({ layoutFlash: { names, leaving: false } }),
+  fadeLayoutFlash: () => set((current) => ({ layoutFlash: { ...current.layoutFlash, leaving: true } })),
+  markAd: (key, state) => set((current) => ({ adCaps: { ...current.adCaps, [key]: state } })),
+  notePage: (path) =>
+    set((current) => {
+      if (current.lastPath === path) return current
+      const prev = current.lastPath
+      const moved =
+        prev !== null && ((isListingPath(prev) && isProductPath(path)) || (isProductPath(prev) && isListingPath(path)))
+      return {
+        lastPath: path,
+        pagesViewed: current.pagesViewed + 1,
+        transitions: current.transitions + (moved ? 1 : 0),
+      }
+    }),
+  setInterstitialOpen: (open) => set({ interstitialOpen: open }),
+  setStickyFooterOpen: (open) => set({ stickyFooterOpen: open }),
   dismissToast: () => set({ layoutToast: null }),
-  setCursor: (patch) => set((state) => ({ cursor: { ...state.cursor, ...patch } })),
-  setCursorSpeed: (speed) => set({ cursorSpeed: speed }),
   setPopupOpen: (open) => set({ popupOpen: open }),
-  dismissPopup: () => set({ popupOpen: false, popupDismissed: true }),
-  setShowElementIds: (show) => set({ showElementIds: show }),
+  dismissPopup: () => set({ popupOpen: false }),
   setQuickViewId: (id) => set({ quickViewId: id }),
   setBagOpen: (open) => set({ bagOpen: open }),
   setWishlistOpen: (open) => set({ wishlistOpen: open }),
@@ -178,18 +216,22 @@ export const useStorefront = create<StorefrontState>((set) => ({
     set((state) => ({ selectedColor: { ...state.selectedColor, [productId]: color } })),
   selectSize: (productId, size) =>
     set((state) => ({ selectedSize: { ...state.selectedSize, [productId]: size } })),
-  setBrowse: (sort, filters) => set({ browseSort: sort, browseFilters: filters }),
   resetStorefront: () =>
     set((state) => ({
       layout: cloneLayout(DEFAULT_LAYOUT),
       layoutPresetName: null,
       layoutToast: null,
-      cursor: initialCursor(),
-      cursorSpeed: 1,
+      layoutReport: null,
+      layoutFlash: NO_FLASH,
+      adCaps: {},
+      pagesViewed: 0,
+      transitions: 0,
+      lastPath: null,
+      interstitialOpen: false,
+      stickyFooterOpen: false,
       bag: [],
       wishlist: [],
       popupOpen: false,
-      popupDismissed: false,
       quickViewId: null,
       bagOpen: false,
       wishlistOpen: false,
@@ -200,8 +242,6 @@ export const useStorefront = create<StorefrontState>((set) => ({
       conciergeAnswer: null,
       selectedColor: {},
       selectedSize: {},
-      browseSort: "relevance",
-      browseFilters: "",
       sessionNonce: state.sessionNonce + 1,
     })),
 }))

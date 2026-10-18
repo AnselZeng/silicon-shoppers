@@ -3,24 +3,27 @@
 import { useEffect, useRef, useState } from "react"
 import { UI_CONFIG } from "@/config/ui"
 import { BrowserChrome } from "@/components/shell/BrowserChrome"
-import { postSimMessage } from "@/lib/sim/protocol"
+import { PipelineLog } from "@/components/shell/PipelineLog"
 import { useSimStore, type ViewportChoice } from "@/lib/state/simStore"
 
 const VIEWS: { id: ViewportChoice; label: string }[] = [
   { id: "web", label: "Web" },
+  { id: "tablet", label: "Tablet" },
   { id: "mobile", label: "Mobile" },
 ]
+
+const PHONE = { width: 402, height: 844 }
+const TABLET = { width: 820, height: 1180 }
 
 export function DemoScreen() {
   const viewport = useSimStore((state) => state.viewport)
   const setViewport = useSimStore((state) => state.setViewport)
-  const showElementIds = useSimStore((state) => state.showElementIds)
-  const setShow = useSimStore((state) => state.setShowElementIds)
   const setIframe = useSimStore((state) => state.setIframe)
   const frameRef = useRef<HTMLIFrameElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
   const web = UI_CONFIG.demoViewports.web
+  const frame = viewport === "web" ? web : viewport === "tablet" ? TABLET : PHONE
 
   useEffect(() => {
     setIframe(frameRef.current)
@@ -34,21 +37,14 @@ export function DemoScreen() {
       const style = getComputedStyle(stage)
       const availW = stage.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
       const availH = stage.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
-      const next = Math.min(1, availW / web.width, availH / web.height)
+      const next = Math.min(1, availW / frame.width, availH / frame.height)
       setScale(Number.isFinite(next) && next > 0 ? next : 1)
     }
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(stage)
     return () => observer.disconnect()
-  }, [web.width, web.height])
-
-  function toggleIds() {
-    const next = !showElementIds
-    setShow(next)
-    const frame = frameRef.current?.contentWindow
-    if (frame) postSimMessage(frame, { type: "set_debug", showElementIds: next })
-  }
+  }, [frame.width, frame.height])
 
   return (
     <div className="flex h-full flex-col bg-[#141416]">
@@ -64,9 +60,9 @@ export function DemoScreen() {
             {view.label}
           </button>
         ))}
-        <button type="button" onClick={toggleIds} className="ml-auto border border-white/20 px-2 py-1">
-          {showElementIds ? "Hide IDs" : "Show IDs"}
-        </button>
+        <span className="ml-auto tabular-nums tracking-normal text-white/45">
+          {frame.width} × {frame.height}
+        </span>
       </div>
       <div ref={stageRef} className="flex min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-hidden px-6 py-5">
         {viewport === "web" ? (
@@ -79,17 +75,40 @@ export function DemoScreen() {
               <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full flex-1 bg-white" />
             </div>
           </div>
+        ) : viewport === "tablet" ? (
+          <div style={{ width: TABLET.width * scale, height: TABLET.height * scale }}>
+            <div
+              className="flex origin-top-left flex-col overflow-hidden rounded-[1.75rem] bg-[#1c1c1e] p-3 shadow-[0_28px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/15"
+              style={{ width: TABLET.width, height: TABLET.height, transform: `scale(${scale})` }}
+            >
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.25rem] bg-white">
+                <BrowserChrome mode="tablet" />
+                <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full min-w-0 flex-1 bg-white" />
+                <div className="flex h-5 shrink-0 items-center justify-center bg-[#f4f1ea]">
+                  <span className="h-1 w-28 rounded-full bg-neutral-900/80" />
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
-          <div className="flex h-[min(844px,100%)] w-[min(402px,100%)] min-w-0 flex-col rounded-[2.5rem] bg-[#1c1c1e] p-[10px] shadow-[0_28px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/15">
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[2rem] bg-white">
-              <BrowserChrome mode="mobile" />
-              <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full min-w-0 flex-1 bg-white" />
-              <div className="flex h-5 shrink-0 items-center justify-center bg-[#f4f1ea]">
-                <span className="h-1 w-28 rounded-full bg-neutral-900/80" />
+          <div style={{ width: PHONE.width * scale, height: PHONE.height * scale }}>
+            <div
+              className="flex origin-top-left flex-col overflow-hidden rounded-[2.5rem] bg-[#1c1c1e] p-[10px] shadow-[0_28px_80px_rgba(0,0,0,0.55)] ring-1 ring-white/15"
+              style={{ width: PHONE.width, height: PHONE.height, transform: `scale(${scale})` }}
+            >
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[2rem] bg-white">
+                <BrowserChrome mode="mobile" />
+                <iframe ref={frameRef} title="ATELIER NINE" src="/store" className="min-h-0 w-full min-w-0 flex-1 bg-white" />
+                <div className="flex h-5 shrink-0 items-center justify-center bg-[#f4f1ea]">
+                  <span className="h-1 w-28 rounded-full bg-neutral-900/80" />
+                </div>
               </div>
             </div>
           </div>
         )}
+      </div>
+      <div className="h-[220px] shrink-0 overflow-hidden border-t border-white/10">
+        <PipelineLog />
       </div>
     </div>
   )

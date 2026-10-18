@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "nav": {
+    "order": ["women", "men", "new_in", "sale", "collections", "for_you"],
+    "highlight": null,
+    "department": null,
+    "searchEmphasized": true
+  },
+  "home": {
+    "blocks": [
+      { "type": "hero" },
+      { "type": "product_row", "source": { "kind": "bestsellers" }, "limit": 8 },
+      { "type": "category_tiles", "categories": ["tshirts", "shirts", "knitwear", "coats", "jeans", "trousers"] },
+      { "type": "product_row", "source": { "kind": "new_in" }, "limit": 4 },
+      { "type": "collection_spotlight", "collection": "Essentials" },
+      { "type": "product_row", "source": { "kind": "for_you" }, "title": "A first pick for you", "limit": 4 },
+      { "type": "product_row", "source": { "kind": "sale" }, "limit": 4 }
+    ],
+    "heroSize": "compact"
+  },
+  "listing": {
+    "defaultSort": "bestsellers",
+    "filterOrder": ["category", "size", "color", "price", "sale", "collection"],
+    "expandedFilters": ["category"],
+    "gridDensity": 4,
+    "colorMerchandising": "swatches",
+    "colorHighlight": [],
+    "card": { "priceStyle": "plain", "showRating": true, "badges": ["new", "sale", "bestseller"], "quickView": "button" }
+  },
+  "ads": {
+    "placements": [
+      { "slot": "top_strip", "adIds": ["shipping"] },
+      { "slot": "hero", "adIds": ["collection_women", "collection_men"] },
+      { "slot": "listing_banner", "adIds": ["loyalty"] }
+    ]
+  },
+  "copy": {},
+  "checkout": { "variant": "click_to_pay", "expressCheckout": false, "showTrustBadges": true, "loyaltyPrompt": false },
+  "concierge": { "enabled": false, "tone": "mission" },
+  "reasons": [
+    { "field": "nav.department", "source": "llm", "text": "Both departments stay: only 3 add-to-bags, too few to pick one" },
+    { "field": "home.blocks", "source": "model", "modelDecision": "section_order", "text": "" },
+    { "field": "ads.placements", "source": "llm", "text": "No popup, interstitial or sticky footer with 3 add-to-bags of evidence" },
+    { "field": "nav.searchEmphasized", "source": "llm", "text": "Search drawn larger while the store learns what this shopper wants" }
+  ]
+}

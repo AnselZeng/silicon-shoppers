@@ -5,7 +5,7 @@
 //   2. AI shopper    fromAiShopper(id, label, preset, session?)  the simulator persona + live session model
 //   3. Tell us       fromIntent(intent)               the sentence the visitor typed (Gemini / keyword fallback)
 // Combine them with mergeLayouts(base, ...overlays): later sources win only where they changed something.
-// toLayoutConfig(doc) turns the document into the store's existing LayoutConfig for the set_layout message.
+// The store applies v2 layouts. modelLayoutV1() in adapter.ts is what turns this document into one.
 //
 // Every field is always present. Each one is a Decision: { value, changed, reason, source }.
 // changed = false means "same as the normal store"; reason is the "Why am I seeing this?" text.
@@ -14,8 +14,8 @@
 //
 // This file has no runtime imports, so it works in the browser, on the server and in Node scripts.
 
-import type { Intent } from "@/lib/model/intent";
 import type { LayoutConfig } from "@/lib/layout/types";
+import type { Intent } from "@/lib/model/intent";
 import type { SessionDecisions } from "@/lib/model/sessionStyle";
 
 // ---------------------------------------------------------------- vocabulary
@@ -209,8 +209,7 @@ const PERSONA_CHECKOUT: Record<string, "guest_express" | "loyalty_pay"> = {
 
 /**
  * personaId/label: what the simulator engine classified (e.g. "price_hunter", "Price Hunter").
- * preset: that persona's LayoutConfig (PERSONA_LAYOUTS[personaId] in lib/layout/presets.ts).
- * session: optional SessionTracker decisions; active ones override the browsing fields.
+ * preset: a v2 LayoutConfig. Session decisions, when active, override the browsing fields.
  */
 export function fromAiShopper(personaId: string, label: string, preset: LayoutConfig, session?: SessionDecisions,
   confidence: "low" | "medium" | "high" = "medium"): StoreLayoutDoc {
@@ -218,20 +217,33 @@ export function fromAiShopper(personaId: string, label: string, preset: LayoutCo
     description: `AI shopper: ${PERSONA_HABIT[personaId] ?? "simulated browsing"}` }, confidence });
   const why = (what: string) => `Detected ${label} (${PERSONA_HABIT[personaId] ?? "browsing pattern"}): ${what}`;
   const src: Source = "AI shopper";
+  const listing = preset.listing;
   const SORT_WORDS: Record<string, string> = { price_asc: "price low to high", price_desc: "price high to low",
     newest: "newest first", bestsellers: "bestsellers first", relevance: "most relevant first" };
-  set(out, "default_sort", preset.defaultSort as Sort, why(`sorted ${SORT_WORDS[preset.defaultSort] ?? preset.defaultSort}`), src);
-  set(out, "filter_order", preset.filterOrder as FilterId[], why(`${preset.filterOrder[0]} filter first`), src,
-    { expanded: preset.expandedFilters as FilterId[] });
-  set(out, "hero", preset.heroVariant as Hero, why(`${preset.heroVariant.replace(/_/g, " ")}`), src, { minimized: preset.heroMinimized });
-  set(out, "popups", preset.popupEnabled ? (preset.popupVariant as "newsletter" | "new_drop") : "off",
-    why(preset.popupEnabled ? `${preset.popupVariant.replace("_", " ")} pop-up` : "pop-ups off"), src);
-  set(out, "grid_columns", preset.gridDensity as 2 | 3 | 4, why(`${preset.gridDensity} products per row`), src);
-  set(out, "homepage_sections", preset.homeSectionOrder as HomeSection[], why(`${preset.homeSectionOrder[0].replace("_", " ")} first`), src);
-  set(out, "sale_badges", preset.showSaleBadgesProminently ? "prominent" : "default", why("sale badges stand out"), src);
-  set(out, "quick_view", preset.quickViewEmphasis ? "emphasized" : "default", why("quick view up front"), src);
-  set(out, "search", preset.searchEmphasized ? "emphasized" : "default", why("search up front"), src);
-  set(out, "price_mode", preset.defaultSort === "price_asc", why("price-first shopping"), src, { budget_rail: preset.defaultSort === "price_asc" });
+  const sections: HomeSection[] = [];
+  for (const block of preset.home.blocks) {
+    if (block.type === "product_row" && block.source.kind === "new_in") sections.push("new_in");
+    else if (block.type === "product_row" && block.source.kind === "bestsellers") sections.push("bestsellers");
+    else if (block.type === "product_row" && block.source.kind === "sale") sections.push("sale_picks");
+    else if (block.type === "category_tiles" || block.type === "collection_spotlight") sections.push("collections");
+  }
+  const heroAd = preset.ads.placements.find((placement) => placement.slot === "hero")?.adIds[0] ?? "";
+  const hero: Hero = heroAd.startsWith("sale") ? "discount_banner"
+    : heroAd.startsWith("new") ? "new_drop_banner"
+    : heroAd.startsWith("collection") || heroAd.startsWith("cat_") ? "collection_banner"
+    : "editorial";
+  const popup = preset.ads.placements.find((placement) => placement.slot === "popup");
+  set(out, "default_sort", listing.defaultSort as Sort, why(`sorted ${SORT_WORDS[listing.defaultSort] ?? listing.defaultSort}`), src);
+  set(out, "filter_order", listing.filterOrder as FilterId[], why(`${listing.filterOrder[0]} filter first`), src,
+    { expanded: listing.expandedFilters as FilterId[] });
+  set(out, "hero", hero, why(hero.replace(/_/g, " ")), src, { minimized: preset.home.heroSize === "compact" });
+  set(out, "popups", popup ? "newsletter" : "off", why(popup ? "pop-up on" : "pop-ups off"), src);
+  set(out, "grid_columns", listing.gridDensity, why(`${listing.gridDensity} products per row`), src);
+  if (sections.length) set(out, "homepage_sections", sections, why(`${sections[0].replace("_", " ")} first`), src);
+  set(out, "sale_badges", listing.card.priceStyle === "sale_emphasis" ? "prominent" : "default", why("sale badges stand out"), src);
+  set(out, "quick_view", listing.card.quickView === "emphasized" ? "emphasized" : "default", why("quick view up front"), src);
+  set(out, "search", preset.nav.searchEmphasized ? "emphasized" : "default", why("search up front"), src);
+  set(out, "price_mode", listing.defaultSort === "price_asc", why("price-first shopping"), src, { budget_rail: listing.defaultSort === "price_asc" });
   const co = PERSONA_CHECKOUT[personaId];
   if (co) set(out, "checkout", co, why(co === "guest_express" ? "guest express checkout" : "loyalty pay at checkout"), src);
   if (session) applySession(out, session);
@@ -296,19 +308,19 @@ export function mergeLayouts(base: StoreLayoutDoc, ...overlays: StoreLayoutDoc[]
   return out;
 }
 
-/** The store's existing LayoutConfig (for set_layout). Partial: callers spread it over their DEFAULT_LAYOUT. */
-export function toLayoutConfig(docu: StoreLayoutDoc): Partial<LayoutConfig> {
+/** Flat view of the v1 decisions. The store itself is driven by modelLayoutV1(), which emits layout v2. */
+export function toLayoutConfig(docu: StoreLayoutDoc): Record<string, unknown> {
   const L = docu.layout;
   return {
-    defaultSort: L.default_sort.value as LayoutConfig["defaultSort"],
-    filterOrder: L.filter_order.value as LayoutConfig["filterOrder"],
-    expandedFilters: L.filter_order.expanded as LayoutConfig["expandedFilters"],
-    heroVariant: L.hero.value as LayoutConfig["heroVariant"],
+    defaultSort: L.default_sort.value,
+    filterOrder: L.filter_order.value,
+    expandedFilters: L.filter_order.expanded,
+    heroVariant: L.hero.value,
     heroMinimized: L.hero.minimized,
     popupEnabled: L.popups.value !== "off",
-    popupVariant: (L.popups.value === "off" ? "newsletter" : L.popups.value) as LayoutConfig["popupVariant"],
+    popupVariant: L.popups.value === "off" ? "newsletter" : L.popups.value,
     gridDensity: L.grid_columns.value,
-    homeSectionOrder: L.homepage_sections.value as LayoutConfig["homeSectionOrder"],
+    homeSectionOrder: L.homepage_sections.value,
     showSaleBadgesProminently: L.sale_badges.value === "prominent",
     quickViewEmphasis: L.quick_view.value === "emphasized" || L.quick_add.value === "on",
     searchEmphasized: L.search.value === "emphasized",

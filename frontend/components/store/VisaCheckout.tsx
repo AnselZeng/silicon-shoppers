@@ -26,16 +26,15 @@ export function VisaCheckout() {
         <div className="border border-[#e6e6e6] p-4 text-sm">
           <p>Visa •••• {session.last4}</p>
           <p className="mt-1 text-lg tabular-nums">{formatMoney(session.amount)}</p>
-          {layout.loyaltyPrompt ? (
+          {layout.checkout.loyaltyPrompt ? (
             <p className="mt-2 text-xs">This payment awards {Math.round(session.amount)} points.</p>
           ) : null}
-          {layout.showTrustBadges ? (
+          {layout.checkout.showTrustBadges ? (
             <p className="mt-2 text-[10px] tracking-[0.16em] uppercase">Visa Secure</p>
           ) : null}
         </div>
         <button
           type="button"
-          data-agent-id="visa-pay-btn"
           onClick={() => {
             const captured = captureCheckout()
             if (captured) router.push("/store/confirmation")

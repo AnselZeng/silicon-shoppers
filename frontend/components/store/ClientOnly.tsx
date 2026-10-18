@@ -1,10 +1,15 @@
 "use client"
 
-import { useEffect, useState, type ReactNode } from "react"
+import { useSyncExternalStore, type ReactNode } from "react"
+
+const subscribe = () => () => undefined
 
 export function ClientOnly({ children }: { children: ReactNode }) {
-  const [ready, setReady] = useState(false)
-  useEffect(() => setReady(true), [])
+  const ready = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  )
   if (!ready) return null
   return children
 }

@@ -1,0 +1,319 @@
+REVIEW: docs/layout-expansion-plan.md
+Date: 2026-10-17
+Branch reviewed: sumin-dynamic (HEAD 0676ce3), plus origin/pb-backend (96c88c9)
+
+======================================================================
+VERDICT
+======================================================================
+
+The plan has the right shape, but it isn't ready to build from yet. It was
+written without looking at the model code on origin/pb-backend, it gets the
+catalog size wrong, and the v2 schema has internal gaps: RankingConfig is
+never attached, there are two or three ways to control the same thing, and
+no v1 -> v2 field mapping. Fix the schema and adjust the scope of Group 2,
+then step 1 can start.
+
+======================================================================
+CONCERNS (most severe first)
+======================================================================
+
+----------------------------------------------------------------------
+1. [BLOCKING] The plan ignores the model that now exists
+----------------------------------------------------------------------
+
+Commit 96c88c9 on origin/pb-backend adds the H&M model and serving code.
+backend/config/layout_rules.yaml already defines what it outputs:
+
+  - Features: markdown_affinity, novelty_affinity, mainstream_score,
+    rebuy_share, color_concentration, price_level. They come as
+    percentiles with confidence levels low/medium/high.
+  - Decisions: landing_department, category_order, section_order,
+    default_sort, hero, popups, grid_columns, each with a "validated"
+    flag and a templated reason.
+  - Vocabulary: H&M departments (dept_ladieswear, dept_menswear,
+    dept_divided, ...) and H&M category groups (cat_garment_upper_body,
+    ...). These don't map one-to-one onto the store's 11 CATEGORIES.
+
+Consequences for the plan:
+
+  - Most of AudienceTag (section 2a) is invented. "mission" and "browser"
+    can't be produced: the backend says "Browsing data not available in
+    this build". "category:jeans" has no matching H&M category group.
+  - LayoutReason text like "80% of purchases are menswear" invites the
+    LLM to make up statistics. The model already produces grounded
+    reason strings, so pass those through.
+  - The frontend seam already exists and the plan never mentions it:
+    HomepageDoc { decisions: {reason, validated}[] }
+    (lib/model/homepage.ts) and modelLayout() (lib/model/adapter.ts:7).
+  - The model's own validation marks landing_department as
+    validated: false in layouts_august.json. The headline demo
+    ("Men first") rests on a decision the model doesn't stand behind.
+
+Fix: derive AudienceTag and the ranking boosts from the model's feature
+names, and add a mapping table from H&M category groups to store
+categories. Restrict "reasons" to the model's reason strings, or to
+numbers that appear in the input. Decide whether the LLM gets raw
+features, model decisions, or both (see missing questions).
+
+----------------------------------------------------------------------
+2. [BLOCKING] The v2 schema isn't complete or self-consistent
+----------------------------------------------------------------------
+
+  - Ranking has no home. RankingConfig (section 3b) is defined but isn't
+    a field of LayoutConfig (top-level sketch).
+    Fix: add  ranking: RankingConfig.
+
+  - "None are dropped" isn't true. heroVariant, popupEnabled and
+    popupVariant are replaced by ad placements, and
+    showSaleBadgesProminently has no stated target. loyaltyPrompt isn't
+    placed in any group, and it drives real behaviour:
+    BagDrawer.tsx:44, VisaCheckout.tsx:29, and loyalty awarding in
+    actions.ts:80,97.
+    Fix: add an explicit table mapping all 19 v1 fields to v2 paths.
+
+  - Hero hiding has three sources of truth: heroSize: "hidden", the
+    absence of a {type:"hero"} block, and the rule "hero placement
+    required if hero block present".
+    Fix: drop "hidden". No hero block means no hero. If a hero block has
+    no placement, fill it with a default hero ad rather than rejecting
+    the config.
+
+  - Two thin bars above the header. nav.utilityBar and ad slot top_strip
+    are both a "thin bar above the header" with shipping/loyalty content.
+    Fix: delete utilityBar and make shipping/loyalty house ads for
+    top_strip.
+
+  - Hero copy has two paths. copy.heroHeadline/heroCta and
+    copy.adOverrides[heroAdId] both set it.
+    Fix: keep adOverrides only, or hero fields only.
+
+  - ProductSource "under_price" has no price parameter.
+
+  - Block titles bypass the copy rules. product_row.title is free text
+    that isn't in CopyConfig, so no length limit applies. Put it under
+    the copy rules.
+
+----------------------------------------------------------------------
+3. [SHOULD-FIX] The schema is awkward to express as JSON Schema for
+   tool use
+----------------------------------------------------------------------
+
+  - ProductSource mixes strings and objects ("sale" | {category}). Use
+    one discriminated object: {kind: "category", category}.
+  - `category:${Category}` must become an explicit enum.
+  - adIds, ad_banner.adId, adOverrides keys and pinnedProductIds are
+    free strings. Generate enums from lib/ads/catalog.ts and PRODUCTS so
+    the model can't invent ids. Better still, drop pinnedProductIds:
+    84 ids is a big enum for little gain.
+  - LayoutReason.field: string should be an enum of field paths.
+  - Provider-side structured output may not enforce maxItems, string
+    lengths or cross-field rules. Assume the validator is the only
+    enforcement and test it that way.
+
+----------------------------------------------------------------------
+4. [SHOULD-FIX] The ad rules are underspecified, so clamping will be
+   arbitrary
+----------------------------------------------------------------------
+
+  - "intrusiveness" repeats what "placements" already says. With "low"
+    plus a popup and a sticky footer, which one gets dropped?
+    "Non-blocking" is never defined.
+    Fix: derive intrusiveness from the placements (or make it the only
+    input), and give a fixed drop priority, e.g.
+    interstitial > popup > sticky_footer.
+
+  - format x slot is an open matrix: a carousel interstitial, a
+    dismissible hero.
+    Fix: fix the format per slot and allow "carousel" only for hero and
+    top_strip.
+
+  - grid_tile doesn't say which grid on the home page it goes in.
+    Inserting a tile into a 4-item row breaks the row.
+    Fix: limit it to listings, and clamp gridPosition to the number of
+    cards.
+
+  - exit_intent will never fire in the simulator. The ghost cursor is
+    synthetic (StoreShell.tsx:60-70 only moves state; actions call
+    el.click()), so there is no real mouseleave at the top of the
+    viewport. Either simulate it (e.g. fire when the agent decides to
+    end the session) or accept that it can't be demoed.
+
+  - The hero also shows on listings. The slot table says "hero" is
+    Home-only, but StoreShell.tsx:233 renders <Hero compact /> on every
+    listing page. listing_banner would stack under it. Decide which one
+    owns listings.
+
+----------------------------------------------------------------------
+5. [SHOULD-FIX] The plan doesn't say where validation runs
+----------------------------------------------------------------------
+
+set_layout arrives over postMessage, and readEnvelope just casts the
+payload (protocol.ts:103). StoreShell.tsx:188 passes it straight into
+setLayout.
+
+Fix: call the validator inside setLayout (storeState.ts:119) so every
+source (presets, preview, LLM) goes through it.
+
+Also, setLayout currently re-arms the popup
+(popupDismissed: !layout.popupEnabled). The new frequency caps must
+survive setLayout, because the runner swaps layouts mid-session
+(runner.ts:190), and reset only on sessionNonce.
+
+----------------------------------------------------------------------
+6. [SHOULD-FIX] The simulator impact is understated
+----------------------------------------------------------------------
+
+  - Classifier signals. evidence.ts:100-132 scores popup_dismissed,
+    popup_clicked and banner_clicked with
+    variant in {discount, new_drop, collection}. If those become ad_*
+    events, the classifier loses its signals.
+    Fix: either keep emitting the old events, or map ad_clicked.kind
+    (sale -> discount, new_drop, collection) in the evidence rules.
+    Don't leave it as "or keep both".
+
+  - The agent only handles the popup. It looks for popup-close /
+    popup-cta on home in the first 6 steps (agent.ts:220-246). An
+    interstitial or sticky footer won't be dismissed. Because el.click()
+    works through overlays and isShown (dom.ts:3) ignores occlusion, the
+    cursor will visibly click through a full-screen ad.
+    Fix: give all dismissible ads one shared "ad-close" id and a generic
+    dismissal rule driven by popupTolerance.
+
+  - The agent only knows the hero. It reads hero-banner-cta and
+    data-banner (agent.ts:304). Ads in new slots need the same data
+    attributes, or the agent never interacts with them.
+
+  - /store/for-you isn't a listing to the agent. It isn't in isListing
+    (agent.ts:72-79), so the agent won't count it as "landed".
+
+  - Hidden nav items. landingNav hard-codes nav-men / nav-women
+    (agent.ts:115). When the LLM hides one, the agent silently loses its
+    landing action and falls through to scrolling. That's acceptable,
+    but mention it.
+
+----------------------------------------------------------------------
+7. [SHOULD-FIX] Ordering and effort
+----------------------------------------------------------------------
+
+  - Step 1 is a large step, not a refactor. About 22 files read the flat
+    config: every store component, actions.ts, protocol.ts, runner.ts,
+    preview.ts, PersonaPanel.tsx, adapter.ts. "Keep rendering exactly as
+    today" means touching all of them in one go.
+
+  - Navigation isn't small, and it depends on Group 3. for_you needs
+    ranking (step 3). It also needs a new ListingMode
+    (store/types.ts:75) plus updates to modePath, baseProducts in
+    filtering.ts, the ListingView title switch and the agent.
+    defaultDepartment changing the home product pools is Group 3 work.
+    Fix: move for_you and defaultDepartment into step 3, or run ranking
+    before navigation.
+
+  - New pages need Suspense. next.config.ts has cacheComponents: true,
+    and ListingView uses useSearchParams, so new pages need the
+    <Suspense> wrapper that app/store/men/page.tsx uses.
+
+  - Group 2 is more than half of step 1 as written: 10 slots, 5
+    triggers, 3 formats and caps. With the cuts below it becomes about
+    half.
+
+----------------------------------------------------------------------
+8. [SHOULD-FIX] Ranking may not visibly change anything
+----------------------------------------------------------------------
+
+Popularity runs from 20 to 98. Boosts smaller than about 40 points won't
+move items past the popular ones, so for_you and bestsellers rows can
+show the same 8 products. The rule "no two identical product_row
+sources" doesn't stop that.
+
+Fix: set the boost sizes relative to the popularity spread, remove
+duplicate products across home rows, and add a unit test asserting that
+two contrasting configs give different top-8 lists.
+
+----------------------------------------------------------------------
+9. [NICE-TO-HAVE] Links ignore the department
+----------------------------------------------------------------------
+
+"Collections" goes to /store/women (Header.tsx:15), and collection tiles
+link to /store/women?collection=... (HomeView.tsx:79). A menswear-heavy
+user who clicks a collection lands in womenswear. Make these links
+depend on defaultDepartment. "essentials" will have the same problem.
+
+======================================================================
+FACTUAL ERRORS
+======================================================================
+
+  - Catalog size. "About 16 base products" (open question 3) is wrong.
+    PRODUCTS is 16 anchors plus generated items for 84 in total
+    (catalog.ts:209,251): 52 women and 32 men; 22 on sale and 27 new.
+    Men have 7 sale items, 9 new, and 9 categories, some with only 2-3
+    items (jeans 2; tshirts, jackets and shoes 3 each). The catalog is
+    enough for ranking and tiles to differ, so open question 3 mostly
+    goes away. Men's single-category rows will be thin.
+
+  - zod. "zod (not installed yet)" is half right. zod 4.6.7 is already
+    in node_modules as a transitive dependency but isn't in
+    package.json. Add it as a direct dependency. zod 4 has built-in
+    z.toJSONSchema(), so no separate generator is needed.
+
+  - Hero placement. The plan treats the hero as Home-only; it also
+    renders compact on listings (StoreShell.tsx:233).
+
+  - v1 consumers. "Only the presets and the simulator use it today"
+    (open question 4) is wrong; see the file count under concern 7.
+
+  - Preview tool. The "layout preview tool" row in cross-cutting work is
+    out of date. The latest commit 93dbdd8 already added default/persona
+    preview (lib/layout/preview.ts, PersonaPanel.tsx). Extend that
+    rather than building a new panel.
+
+  - Model seam. HomepageDoc / modelLayout in adapter.ts are not
+    mentioned.
+
+  - "None are dropped." Contradicted by heroVariant, popupVariant and
+    the others being replaced; see concern 2.
+
+======================================================================
+SUGGESTED CUTS
+======================================================================
+
+  - Card options: cut priceStyle "hidden_until_hover" (touch devices
+    don't hover, so the price is just hidden) and the low_stock badge
+    (Product has no stock data, so it would be invented urgency).
+
+  - Home blocks: cut recently_viewed and loyalty_panel. The store keeps
+    no viewed-items or points state (storeState.ts), so both are empty
+    for a fresh demo user. If you want a history block, buy_again from
+    the model's section_labels is the grounded one.
+
+  - Ad slots: defer sidebar_card, pdp_cross_sell and bag_upsell. They're
+    only seen deep in the flow and add little visible difference. Keep
+    the intrusive set the team decided on (popup, interstitial, sticky
+    footer), plus top_strip, hero, grid_tile and listing_banner.
+
+  - HouseAd.audience: keep it as prompt metadata only. The LLM picks
+    ads; no matching code is needed.
+
+  - maxShowsPerSession: make it a constant per slot instead of an
+    LLM-chosen field.
+
+======================================================================
+MISSING OPEN QUESTIONS
+======================================================================
+
+  1. What does the LLM consume? Raw model features, the model's
+     "decisions" (already validated layout choices), or both? And may it
+     override a validated: true decision?
+
+  2. Live or precomputed? Is the LLM called live during the demo, or are
+     configs precomputed per demo profile and cached? A multi-second
+     call mid-session, plus possible validator fallbacks, is a risk on
+     stage.
+
+  3. What happens to the click classifier? When an LLM config is active,
+     should runner.applyClassification still swap in a persona preset
+     mid-run (runner.ts:181-201), or is it switched off?
+
+  4. Exit intent. How should it be triggered in a synthetic-cursor demo?
+
+  5. Department mismatch. How do H&M departments with no store
+     counterpart (divided, sport, baby_children) map to women/men?

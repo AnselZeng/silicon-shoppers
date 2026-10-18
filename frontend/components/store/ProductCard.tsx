@@ -9,14 +9,15 @@ import { effectivePrice, type Product } from "@/lib/store/types"
 import { formatMoney } from "@/lib/utils"
 import { GarmentImage } from "@/components/store/GarmentImage"
 
+/** Products at or above this popularity get the Bestseller badge. */
+const BESTSELLER_POPULARITY = 85
+
 export function ProductCard({
   product,
   colorway,
-  agentSuffix = "",
 }: {
   product: Product
   colorway?: string
-  agentSuffix?: string
 }) {
   const layout = useStorefront((state) => state.layout)
   const openQuick = useStorefront((state) => state.setQuickViewId)
@@ -25,23 +26,21 @@ export function ProductCard({
   const colors = product.colors
   const resting = colorway ?? colors[0] ?? "black"
   const [hovered, setHovered] = useState<string | null>(null)
-  const preview = layout.colorMerchandising === "hover_preview"
+  const preview = layout.listing.colorMerchandising === "hover_preview"
   const color = preview && hovered ? hovered : resting
-  const showSwatches = layout.colorMerchandising === "swatches" && colors.length > 1
-  const cardId = `product-card-${product.id}${agentSuffix}`
+  const showSwatches = layout.listing.colorMerchandising === "swatches" && colors.length > 1
+  const card = layout.listing.card
+  const badges = card.badges.filter(
+    (badge) =>
+      (badge === "sale" && onSale) ||
+      (badge === "new" && product.isNew) ||
+      (badge === "bestseller" && product.popularity >= BESTSELLER_POPULARITY),
+  )
 
   return (
     <article className="group relative">
       <Link
         href={`/store/product/${product.id}`}
-        data-agent-id={cardId}
-        data-product-id={product.id}
-        data-price={price}
-        data-color={color}
-        data-is-new={product.isNew ? "1" : "0"}
-        data-on-sale={onSale ? "1" : "0"}
-        data-collection={product.collection}
-        data-name={product.name}
         className="block"
       >
         <div
@@ -49,19 +48,27 @@ export function ProductCard({
           onMouseLeave={() => setHovered(null)}
         >
           <GarmentImage type={product.garmentType} color={color} className="aspect-[4/5] w-full" />
-          {onSale ? (
-            <span
-              className={
-                layout.showSaleBadgesProminently
-                  ? "absolute top-3 left-3 bg-[#9f2d2d] px-2 py-1 text-[11px] font-semibold tracking-[0.16em] text-white uppercase"
-                  : "absolute top-3 left-3 text-[10px] tracking-[0.2em] text-[#9f2d2d] uppercase"
-              }
-            >
-              Sale
-            </span>
-          ) : null}
-          {product.isNew && !preview ? (
-            <span className="absolute top-3 right-3 text-[10px] tracking-[0.2em] uppercase">New</span>
+          {badges.length > 0 ? (
+            <div className="absolute top-3 left-3 flex flex-col items-start gap-1">
+              {badges.map((badge) =>
+                badge === "sale" ? (
+                  <span
+                    key={badge}
+                    className={
+                      card.priceStyle === "sale_emphasis"
+                        ? "bg-[#9f2d2d] px-2 py-1 text-[11px] font-semibold tracking-[0.16em] text-white uppercase"
+                        : "text-[10px] tracking-[0.2em] text-[#9f2d2d] uppercase"
+                    }
+                  >
+                    Sale
+                  </span>
+                ) : (
+                  <span key={badge} className="bg-[#f6f3ee]/85 px-1.5 py-0.5 text-[10px] tracking-[0.2em] uppercase">
+                    {badge === "new" ? "New" : "Bestseller"}
+                  </span>
+                ),
+              )}
+            </div>
           ) : null}
           {preview && colors.length > 1 ? (
             <div className="absolute inset-x-0 bottom-0 flex justify-center gap-1.5 bg-gradient-to-t from-black/25 to-transparent px-3 pt-8 pb-3 opacity-0 transition group-hover:opacity-100">
@@ -81,7 +88,7 @@ export function ProductCard({
           <p className="shrink-0 text-[13px] tabular-nums">
             {onSale ? (
               <>
-                <span className={layout.showSaleBadgesProminently ? "font-semibold text-[#9f2d2d]" : "text-[#9f2d2d]"}>
+                <span className={layout.listing.card.priceStyle === "sale_emphasis" ? "font-semibold text-[#9f2d2d]" : "text-[#9f2d2d]"}>
                   {formatMoney(price)}
                 </span>{" "}
                 <span className="text-neutral-400 line-through">{formatMoney(product.price)}</span>
@@ -92,8 +99,13 @@ export function ProductCard({
           </p>
         </div>
         <p className="mt-1 text-[10px] tracking-[0.18em] text-neutral-500 uppercase">
-          {layout.colorMerchandising === "split_colors" ? `${resting} · ` : ""}
+          {layout.listing.colorMerchandising === "split_colors" ? `${resting} · ` : ""}
           {product.collection}
+          {card.showRating ? (
+            <span className="ml-2 tracking-normal normal-case">
+              ★ {product.rating.toFixed(1)} ({product.reviewCount})
+            </span>
+          ) : null}
         </p>
         {showSwatches ? (
           <div className="mt-2 flex gap-1.5">
@@ -109,7 +121,6 @@ export function ProductCard({
       </Link>
       <button
         type="button"
-        data-agent-id={`wishlist-btn-${product.id}${agentSuffix}`}
         aria-label={`Save ${product.name}`}
         onClick={(event) => {
           event.preventDefault()
@@ -122,14 +133,13 @@ export function ProductCard({
       </button>
       <button
         type="button"
-        data-agent-id={`quickview-btn-${product.id}${agentSuffix}`}
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()
           openQuick(product.id)
         }}
         className={
-          layout.quickViewEmphasis
+          layout.listing.card.quickView === "emphasized"
             ? "absolute bottom-16 left-3 z-10 bg-black px-3 py-1.5 text-[10px] tracking-[0.18em] text-white uppercase"
             : "absolute bottom-16 left-3 z-10 bg-white/90 px-3 py-1.5 text-[10px] tracking-[0.18em] uppercase opacity-0 transition group-hover:opacity-100"
         }

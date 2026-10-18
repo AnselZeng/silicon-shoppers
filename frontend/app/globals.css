@@ -130,19 +130,131 @@
   }
 }
 
-.show-agent-ids [data-agent-id] {
-  outline: 1px dashed rgba(232, 168, 56, 0.9);
-  outline-offset: 1px;
+/* Layout swaps: --layout-step-ms is set per swap by lib/store/layoutMotion.ts. */
+::view-transition-group(*) {
+  animation-duration: var(--layout-step-ms, 560ms);
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.show-agent-ids [data-agent-id]::after {
-  content: attr(data-agent-id);
+/* A block with no partner on the other side is entering or leaving. */
+::view-transition-new(*):only-child {
+  animation: layout-enter var(--layout-step-ms, 560ms) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+::view-transition-old(*):only-child {
+  animation: layout-exit calc(var(--layout-step-ms, 560ms) * 0.7) ease-in both;
+}
+
+@keyframes layout-enter {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+
+@keyframes layout-exit {
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+/*
+ * Ad replace: the new ad slides over the old one, which recedes underneath. layoutMotion.ts
+ * sets data-ad-swap on <html> for the slots whose ad changes in a stage, and waits for
+ * the transition to finish, so the 1.5x stretch here needs no JS counterpart.
+ */
+:root[data-ad-swap~="top_strip"] [data-ad-slot="top_strip"],
+:root[data-ad-swap~="hero"] [data-ad-slot="hero"],
+:root[data-ad-swap~="listing_banner"] [data-ad-slot="listing_banner"] {
+  view-transition-class: ad-swap;
+}
+
+::view-transition-group(*.ad-swap) {
+  overflow: hidden;
+  animation-duration: calc(var(--layout-step-ms, 560ms) * 1.5);
+}
+
+::view-transition-old(*.ad-swap) {
+  mix-blend-mode: normal;
+  animation: ad-recede calc(var(--layout-step-ms, 560ms) * 1.5) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+::view-transition-new(*.ad-swap) {
+  mix-blend-mode: normal;
+  animation: ad-cover calc(var(--layout-step-ms, 560ms) * 1.5) cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+@keyframes ad-recede {
+  to {
+    transform: scale(0.9);
+    opacity: 0.35;
+    filter: brightness(0.5) blur(3px);
+  }
+}
+
+@keyframes ad-cover {
+  from {
+    transform: translateX(100%);
+    box-shadow: -48px 0 64px rgb(0 0 0 / 0.45);
+  }
+  85% {
+    box-shadow: -48px 0 64px rgb(0 0 0 / 0.45);
+  }
+  to {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.layout-flash {
+  outline: 2px solid #b8893b;
+  outline-offset: -2px;
+  animation: layout-flash-in 250ms ease-out backwards;
+  transition: opacity var(--layout-fade-ms, 350ms) ease-in;
+}
+
+.layout-flash.is-leaving {
+  opacity: 0;
+}
+
+.layout-flash-tag {
   position: absolute;
-  z-index: 70;
-  padding: 0 4px;
+  padding: 3px 8px;
   background: #141414;
   color: #f6f3ee;
-  font-size: 9px;
-  letter-spacing: 0.04em;
-  pointer-events: none;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@keyframes layout-flash-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Text a layout step changes in place: enlarged with a marker tint while its box is up. */
+.layout-pulse {
+  transition:
+    transform var(--layout-lead-ms, 700ms) cubic-bezier(0.4, 0, 0.2, 1),
+    color var(--layout-lead-ms, 700ms),
+    background-color var(--layout-lead-ms, 700ms);
+}
+
+.layout-pulse.is-on {
+  transform: scale(1.5);
+  color: #141414;
+  background-color: rgb(184 137 59 / 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout-pulse.is-on {
+    transform: none;
+  }
+
+  .layout-flash {
+    display: none;
+  }
 }

@@ -1,0 +1,60 @@
+You are reviewing a plan, not writing code. Do not edit any files. Your output is a written review.
+
+## Context
+
+Repo: /Users/surf/Desktop/silicon-shoppers (branch layout-v2). It's a demo shopping site (ATELIER NINE) that rebuilds its layout per shopper: a persona's basket goes to an H&M-trained model, the model's output goes to an LLM, and the store re-renders from the resulting layout config.
+
+Read these first, in order:
+1. docs/project-plan.md - the overall goal and the 6-step work plan (steps 0-5).
+2. docs/persona-builder-plan.md - THE PLAN UNDER REVIEW (detailed plan for step 2, the persona builder).
+3. docs/layout-expansion-plan.md - the detailed plan for step 1, which is being implemented right now in the working tree. Read it only to check for conflicts and shared assumptions.
+
+## Ground truth to check the plan against
+
+Verify claims against the code, not against the plan's own description of it.
+
+Frontend (frontend/):
+- lib/personas/schema.ts, lib/personas/defaults.ts, lib/state/personaStore.ts - what's being replaced.
+- components/shell/PersonaPanel.tsx, components/shell/TraitEditor.tsx, components/shell/SimulatorApp.tsx - the current shell UI.
+- lib/store/catalog.ts, lib/store/types.ts - the 84-product catalog the generator draws from.
+- lib/model/homepage.ts, lib/model/mapping.ts, lib/model/adapter.ts, lib/model/fixtures.ts - the model output types and H&M mapping.
+- public/model/fixtures/index.json - fixture shoppers and their baskets.
+- lib/sim/rng.ts, lib/sim/protocol.ts, config/ui.ts.
+
+Backend (on the remote branch, read with `git show origin/pb-backend:<path>`):
+- backend/server/catalog.py - how store products and events become H&M features (price percentile, colour, sale, new, per-day grouping).
+- backend/server/score.py - build_docs, rank_store, CARTS, evidence.
+- backend/server/hm_features.py - what the H&M model actually reads from those units.
+
+Note: the working tree has uncommitted step 1 changes. Don't treat them as finished or as part of this plan.
+
+## What to review
+
+1. Factual accuracy. Check every concrete claim: catalog counts (department, sale, new, price range, colours), what the model reads from a basket item, how price percentile is computed, the colour fallback, the per-(day, product, colour) cap, which files import what, which constants are used where. Run small read-only scripts if that helps (e.g. `npx tsx` from frontend/ to count catalog products; put temporary files in a scratch directory, not in the repo). List each wrong or unverifiable claim with the correct fact and its source (file:line).
+
+2. Model alignment. Does each slider actually move something the model reads, by a big enough amount to change the model's output? Are there model inputs the builder can't control but should (e.g. category mix, popularity, recency)? Does anything the plan adds have no effect on the model? Is the "at least 10 add-to-bags" threshold handled correctly?
+
+3. Generator design. Is the algorithm deterministic as described? Do the quota and greedy-score steps produce the claimed results, including when the catalog runs out? Are the weights sensible, and is the relaxation order right? Look for edge cases: all-zero or all-100 sliders, no favourite colours, pins that break the quotas, every product in a department excluded, basket size smaller than the number of pins, purchase days vs. createdAt for items created recently or in the future relative to "today".
+
+4. Data model and store. Is deriving the basket (rather than storing it) the right call, given exports, cache links and preset snapshots? Is the pinned/excluded model clear for a judge using the UI? Is the v1 migration worth keeping? Any problems with localStorage persistence in a Next.js client component (hydration, blocked storage)?
+
+5. Presets and caching. Do the proposed presets give visibly different model output, given the catalog limits? Does the snapshot test plus basketKey approach actually protect cached model/LLM output from going stale?
+
+6. Interfaces with other steps. Is the ScoreRequest shape reasonable for the backend's existing event pipeline (units_from_events / build_docs)? Does anything conflict with the layout plan (e.g. home.basketIds, the validator, PersonaPanel ownership)? Is the work order safe to run alongside step 1?
+
+7. Scope and UI. Is anything over-built for a hackathon demo, or missing that a judge will hit within the first minute? Does the proposed UI fit the panel size (35% of a 1280px-wide screen, 55% of its height)?
+
+8. Open questions. Can you answer any of the plan's four open questions from the code? Are there questions it should be asking but isn't?
+
+## Output format
+
+Write the review as plain text with these sections:
+
+- Summary: 3-5 sentences. Is the plan sound? What are the top 3 things to change?
+- Must fix: errors or design problems that would make the build wrong or the demo fail. For each: the problem, the evidence (file:line or a script result), and a concrete fix.
+- Should fix: real improvements that aren't blocking.
+- Nits: wording, small inconsistencies.
+- Answers to open questions: what the code tells you, if anything.
+- Verified: a short list of the plan's key claims you checked and found correct.
+
+Be specific and terse. Don't restate the plan. Rank items within each section by importance. If you're unsure about something, say so and say what would settle it.

@@ -1,7 +1,7 @@
 import type { StoreColor } from "@/config/ui"
 import type { SortOption } from "@/lib/personas/schema"
 import { collectionSlug } from "@/lib/utils"
-import { PRODUCTS } from "@/lib/store/catalog"
+import { getProduct, PRODUCTS } from "@/lib/store/catalog"
 import {
   CATEGORIES,
   type Category,
@@ -132,7 +132,8 @@ function matchesQueryText(product: Product, q: string): boolean {
   return tokens.every((token) => haystack.includes(token))
 }
 
-export function baseProducts(mode: ListingMode): Product[] {
+/** forYouIds is the layout's home.forYouIds, in the model's order; only the for-you listing reads it. */
+export function baseProducts(mode: ListingMode, forYouIds: string[] = []): Product[] {
   switch (mode) {
     case "women":
       return PRODUCTS.filter((product) => product.department === "women")
@@ -144,6 +145,8 @@ export function baseProducts(mode: ListingMode): Product[] {
       return PRODUCTS.filter((product) => product.salePrice !== undefined)
     case "search":
       return PRODUCTS
+    case "for-you":
+      return forYouIds.map((id) => getProduct(id)).filter((p): p is Product => p !== undefined)
   }
 }
 

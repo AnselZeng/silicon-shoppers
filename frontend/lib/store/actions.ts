@@ -52,7 +52,7 @@ export function startCheckout() {
   const state = useStorefront.getState()
   if (state.bag.length === 0) return
   const amount = bagSubtotal(state.bag)
-  const session = createMockSession({ amount, mode: state.layout.checkoutVariant })
+  const session = createMockSession({ amount, mode: state.layout.checkout.variant })
   state.setVisaSession(session)
   state.setCheckoutPhase("session")
   state.setBagOpen(false)
@@ -77,7 +77,7 @@ export function captureCheckout() {
   const state = useStorefront.getState()
   const session = state.visaSession
   if (!session) return null
-  const captured = captureMockSession(session, { awardLoyalty: state.layout.loyaltyPrompt })
+  const captured = captureMockSession(session, { awardLoyalty: state.layout.checkout.loyaltyPrompt })
   state.setOrder(captured)
   state.setCheckoutPhase("paid")
   emitStoreEvent("payment_completed", {
@@ -94,7 +94,7 @@ export function captureCheckout() {
     body: JSON.stringify({
       action: "capture",
       sessionId: session.id,
-      awardLoyalty: state.layout.loyaltyPrompt,
+      awardLoyalty: state.layout.checkout.loyaltyPrompt,
       session,
     }),
   }).catch(() => undefined)

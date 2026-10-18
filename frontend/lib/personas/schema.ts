@@ -9,44 +9,14 @@ export const PERSONA_IDS = [
 
 export type PersonaId = (typeof PERSONA_IDS)[number]
 
-export type DepartmentPref = "women" | "men" | "both"
-export type SortOption =
-  | "relevance"
-  | "newest"
-  | "price_asc"
-  | "price_desc"
-  | "bestsellers"
-export type FirstFilter =
-  | "sale"
-  | "color"
-  | "size"
-  | "category"
-  | "collection"
-  | "none"
-export type BannerTrigger = "discount" | "new_drop" | "collection" | "any"
-
+/** Shopping profile the model can read. Shares and price level are 0–100. */
 export interface PersonaTraits {
-  preferredDepartment: DepartmentPref
-  defaultSortPreference: SortOption
-  firstFilterUsed: FirstFilter
-  priceSensitivity: number
-  maxBudget: number
-  popupTolerance: number
-  bannerClickRate: number
-  bannerTrigger: BannerTrigger
-  scrollDepth: number
-  productsViewedBeforeDecision: number
-  imageVsTextAttention: number
-  readsReviews: boolean
-  usesSearch: number
-  usesWishlist: number
+  menShare: number
+  saleShare: number
+  newShare: number
+  priceLevel: number
   colorPreference: StoreColor[]
-  sizePreference: string
-  noveltySeeking: number
-  brandCollectionLoyalty: number
-  sessionPatience: number
-  addToCartThreshold: number
-  device: "desktop"
+  basketSize: number
 }
 
 export interface Persona {
@@ -64,13 +34,15 @@ export const PERSONA_LABEL: Record<PersonaId, string> = {
   brand_loyalist: "Brand Loyalist",
 }
 
-export const SORT_OPTIONS: SortOption[] = [
+export const SORT_OPTIONS = [
   "relevance",
   "newest",
   "price_asc",
   "price_desc",
   "bestsellers",
-]
+] as const
+
+export type SortOption = (typeof SORT_OPTIONS)[number]
 
 export const SORT_LABEL: Record<SortOption, string> = {
   relevance: "Relevance",
