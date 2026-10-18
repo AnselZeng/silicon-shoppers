@@ -1,0 +1,57 @@
+{
+  "version": 2,
+  "nav": {
+    "order": ["men", "sale", "new_in", "for_you", "collections", "women"],
+    "highlight": "sale",
+    "department": "men",
+    "searchEmphasized": false
+  },
+  "home": {
+    "blocks": [
+      { "type": "hero" },
+      { "type": "product_row", "source": { "kind": "sale" }, "title": "Marked down for you", "limit": 8 },
+      { "type": "product_row", "source": { "kind": "for_you" }, "limit": 4 },
+      { "type": "category_tiles", "categories": ["shirts", "knitwear", "jackets", "trousers"] },
+      { "type": "product_row", "source": { "kind": "under_price", "max": 100 }, "title": "Under $100", "limit": 4 },
+      { "type": "product_row", "source": { "kind": "bestsellers" }, "limit": 4 },
+      { "type": "ad_banner", "adId": "loyalty" },
+      { "type": "product_row", "source": { "kind": "buy_again" }, "limit": 4 }
+    ],
+    "heroSize": "full"
+  },
+  "listing": {
+    "defaultSort": "price_asc",
+    "filterOrder": ["sale", "price", "color", "category", "size", "collection"],
+    "expandedFilters": ["sale", "price"],
+    "gridDensity": 3,
+    "colorMerchandising": "color_locked",
+    "colorHighlight": ["navy", "black"],
+    "card": { "priceStyle": "sale_emphasis", "showRating": false, "badges": ["sale"], "quickView": "button" }
+  },
+  "ads": {
+    "placements": [
+      { "slot": "top_strip", "adIds": ["sale_men", "shipping"] },
+      { "slot": "hero", "adIds": ["sale_men", "cat_upper_men"] },
+      { "slot": "listing_banner", "adIds": ["sale_men"] },
+      { "slot": "grid_tile", "adIds": ["sale_men", "cat_lower_men"], "gridPosition": 3 },
+      { "slot": "popup", "adIds": ["offer_men"], "trigger": "delay", "triggerValue": 4000 },
+      { "slot": "sticky_footer", "adIds": ["shipping"], "trigger": "scroll_depth", "triggerValue": 40 }
+    ]
+  },
+  "copy": {
+    "adOverrides": {
+      "sale_men": { "headline": "Men's sale, picked for you" }
+    }
+  },
+  "checkout": { "variant": "guest_fast", "expressCheckout": true, "showTrustBadges": true, "loyaltyPrompt": false },
+  "concierge": { "enabled": true, "tone": "deals" },
+  "reasons": [
+    { "field": "nav.department", "source": "model", "modelDecision": "landing_department", "text": "" },
+    { "field": "nav.order", "source": "llm", "text": "Men and Sale lead the nav: menswear is about 71% of next picks and sale 41%" },
+    { "field": "home.blocks", "source": "model", "modelDecision": "section_order", "text": "" },
+    { "field": "ads.placements", "source": "llm", "text": "Sale hero, sale tiles and an offer popup: Sale is the top section at 41%" },
+    { "field": "listing.defaultSort", "source": "model", "modelDecision": "default_sort", "text": "" },
+    { "field": "listing.card", "source": "llm", "text": "Sale prices drawn larger for a shopper who buys on markdown" },
+    { "field": "checkout.variant", "source": "llm", "text": "Guest express checkout keeps a sale purchase short" }
+  ]
+}

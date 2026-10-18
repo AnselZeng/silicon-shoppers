@@ -15,7 +15,6 @@ export function SortDropdown({
     <div className="relative">
       <button
         type="button"
-        data-agent-id="sort-dropdown"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
         className="border border-[#d9d3c8] bg-white px-3 py-2 text-[11px] tracking-[0.14em] uppercase"
@@ -28,7 +27,6 @@ export function SortDropdown({
             <li key={option}>
               <button
                 type="button"
-                data-agent-id={`sort-option-${option}`}
                 onClick={() => {
                   setOpen(false)
                   onSort(option)

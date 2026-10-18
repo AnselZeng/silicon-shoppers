@@ -12,7 +12,7 @@ export function BagDrawer() {
   const bag = useStorefront((state) => state.bag)
   const layout = useStorefront((state) => state.layout)
   const total = bagSubtotal(bag)
-  const copy = CHECKOUT_COPY[layout.checkoutVariant]
+  const copy = CHECKOUT_COPY[layout.checkout.variant]
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent side="right" showCloseButton={false} className="bg-[#f6f3ee] text-[#141414] sm:max-w-md">
@@ -41,10 +41,10 @@ export function BagDrawer() {
             <span>Subtotal</span>
             <span className="tabular-nums">{formatMoney(total)}</span>
           </div>
-          {layout.loyaltyPrompt ? (
+          {layout.checkout.loyaltyPrompt ? (
             <p className="mb-3 text-xs text-neutral-600">Earn {Math.round(total)} Atelier points with this order.</p>
           ) : null}
-          {layout.showTrustBadges ? (
+          {layout.checkout.showTrustBadges ? (
             <p className="mb-3 text-[10px] tracking-[0.16em] text-neutral-500 uppercase">Visa Secure · Buyer protection</p>
           ) : null}
           <p className="mb-3 text-xs text-neutral-600">
@@ -52,12 +52,11 @@ export function BagDrawer() {
           </p>
           <button
             type="button"
-            data-agent-id="checkout-btn"
             disabled={bag.length === 0}
             onClick={() => startCheckout()}
             className="w-full bg-[#141414] py-3 text-[11px] tracking-[0.18em] text-white uppercase disabled:opacity-40"
           >
-            {layout.expressCheckout ? "Express checkout" : "Checkout"}
+            {layout.checkout.expressCheckout ? "Express checkout" : "Checkout"}
           </button>
         </div>
       </SheetContent>

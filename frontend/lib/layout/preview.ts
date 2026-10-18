@@ -1,23 +1,58 @@
-import { cloneLayout, DEFAULT_LAYOUT, PERSONA_LAYOUTS } from "@/lib/layout/presets"
+import { llmStage, modelStage, type PipelineStage } from "@/lib/layout/pipeline"
+import { cloneLayout, DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import type { LayoutConfig } from "@/lib/layout/types"
-import { PERSONA_LABEL, type Persona } from "@/lib/personas/schema"
+import type { ValidationReport } from "@/lib/layout/validate"
+import { loadFixture, type FixtureEntry } from "@/lib/model/fixtures"
+import type { ModelContext } from "@/lib/model/homepage"
 
-/**
- * The storefront a shopper should see right now.
- * Persona ids map to layout presets today. A later model can replace this
- * function without changing the page.
- */
-export function previewLayout(
-  preview: string,
-  personas: Persona[],
-): { layout: LayoutConfig; presetName: string | null } {
-  if (preview === "default") {
-    return { layout: cloneLayout(DEFAULT_LAYOUT), presetName: null }
+/** A layout the shell can show: "default", or "<fixture id>:model" / "<fixture id>:llm". */
+export interface Preview {
+  id: string
+  stage: PipelineStage
+  label: string
+  layout: LayoutConfig
+  model: ModelContext | null
+  report: ValidationReport
+  note?: string
+}
+
+export function previewId(fixtureId: string, stage: Exclude<PipelineStage, "default">): string {
+  return `${fixtureId}:${stage}`
+}
+
+export function parsePreviewId(id: string): { fixtureId: string | null; stage: PipelineStage } {
+  const [fixtureId, stage] = id.split(":")
+  if (!fixtureId || id === "default") return { fixtureId: null, stage: "default" }
+  return { fixtureId, stage: stage === "llm" ? "llm" : "model" }
+}
+
+const DEFAULT_PREVIEW = (): Preview => ({
+  id: "default",
+  stage: "default",
+  label: "House default",
+  layout: cloneLayout(DEFAULT_LAYOUT),
+  model: null,
+  report: { changes: [], fellBack: false },
+})
+
+export async function buildPreview(id: string, fixtures: FixtureEntry[]): Promise<Preview> {
+  const { fixtureId, stage } = parsePreviewId(id)
+  const entry = fixtures.find((item) => item.id === fixtureId)
+  if (!entry) return DEFAULT_PREVIEW()
+  const fixture = await loadFixture(entry)
+  if (!fixture) return { ...DEFAULT_PREVIEW(), note: `could not load ${entry.doc}` }
+  const model: ModelContext = { doc: fixture.doc, basketIds: entry.basket }
+  if (stage === "llm" && fixture.llm !== null) {
+    const result = llmStage(fixture.llm, model)
+    return { id, stage, label: `${entry.label} · LLM layout`, model, ...result }
   }
-  const persona = personas.find((item) => item.id === preview)
-  if (!persona) return { layout: cloneLayout(DEFAULT_LAYOUT), presetName: null }
+  const result = modelStage(model)
   return {
-    layout: cloneLayout(PERSONA_LAYOUTS[persona.baseId]),
-    presetName: PERSONA_LABEL[persona.baseId],
+    id: previewId(entry.id, "model"),
+    stage: "model",
+    label: `${entry.label} · model layout`,
+    model,
+    ...result,
+    note: stage === "llm" ? "no LLM output for this fixture, showing the model layout" : undefined,
   }
 }

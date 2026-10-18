@@ -8,7 +8,7 @@ export function ObservabilityPanel() {
   const spans = useObsStore((state) => state.spans)
   const notes = useObsStore((state) => state.notes)
   const runId = useObsStore((state) => state.runId)
-  const origin = crumbs[0]?.ts ?? spans[0]?.startTs ?? Date.now()
+  const origin = crumbs[0]?.ts ?? spans[0]?.startTs ?? 0
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-auto pr-1 text-[11px]">

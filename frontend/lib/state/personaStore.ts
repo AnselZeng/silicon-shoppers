@@ -31,6 +31,10 @@ function isStoreColor(value: unknown): value is StoreColor {
   return typeof value === "string" && (STORE_COLORS as readonly string[]).includes(value)
 }
 
+function numberOr(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback
+}
+
 function asPersona(value: unknown): Persona | null {
   if (typeof value !== "object" || value === null) return null
   const record = value as Record<string, unknown>
@@ -54,11 +58,15 @@ function asPersona(value: unknown): Persona | null {
     baseId,
     isCustom: record.isCustom === true || !isPersonaId(record.id),
     traits: {
-      ...template.traits,
-      ...traits,
+      preferredDepartment:
+        traits.preferredDepartment === "women" || traits.preferredDepartment === "men" || traits.preferredDepartment === "both"
+          ? traits.preferredDepartment
+          : template.traits.preferredDepartment,
+      priceSensitivity: numberOr(traits.priceSensitivity, template.traits.priceSensitivity),
+      maxBudget: numberOr(traits.maxBudget, template.traits.maxBudget),
+      noveltySeeking: numberOr(traits.noveltySeeking, template.traits.noveltySeeking),
       colorPreference: colors.length > 0 ? colors : template.traits.colorPreference,
-      device: "desktop",
-    } as PersonaTraits,
+    },
   }
 }
 
