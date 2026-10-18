@@ -15,8 +15,9 @@ const VIEWS: { id: ViewportChoice; label: string }[] = [
 
 const PHONE = { width: 402, height: 844 }
 /** Pipeline log height in px; the screen above keeps at least SCREEN_MIN px. */
-// Below `full` it snaps to `collapsed`, a strip with just the tabs.
-const LOG = { initial: 220, full: 180, collapsed: 48 }
+// `full` is the smallest height where the terminal still shows one log line (header, tabs, one
+// line, command input). Below it the log snaps to `collapsed`, a strip with just the tabs.
+const LOG = { initial: 220, full: 153, collapsed: 48 }
 const SCREEN_MIN = 240
 const TABLET = { width: 820, height: 1180 }
 

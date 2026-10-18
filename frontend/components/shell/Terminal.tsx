@@ -9,16 +9,18 @@ import { useLogStore } from "@/lib/state/logStore"
 export function Terminal() {
   const lines = useLogStore((state) => state.lines)
   const origin = useLogStore((state) => state.origin)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const [draft, setDraft] = useState("")
 
+  // Scroll only the log itself; scrollIntoView would also scroll the clipped panes around it.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ block: "end" })
+    const box = scrollRef.current
+    if (box) box.scrollTop = box.scrollHeight
   }, [lines.length])
 
   return (
-    <div className="flex h-full min-h-28 flex-col bg-black/40 font-mono text-[11px]">
-      <div className="min-h-0 flex-1 overflow-auto px-2 py-1">
+    <div className="flex h-full min-h-0 flex-col bg-black/40 font-mono text-[11px]">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto px-2 py-1">
         {lines.map((line) => (
           <div key={line.id} className="flex gap-2 leading-5">
             <span className="text-white/30">{formatClock(line.ts - origin)}</span>
@@ -26,7 +28,6 @@ export function Terminal() {
             <span className="text-white/90">{line.message}</span>
           </div>
         ))}
-        <div ref={bottomRef} />
       </div>
       <form
         className="flex border-t border-white/10"
