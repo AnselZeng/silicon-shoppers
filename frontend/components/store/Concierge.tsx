@@ -177,6 +177,15 @@ export function Concierge() {
         // Buttons are the "are you done?" ask — show them whenever the agent bagged
         // something, whether or not the model remembered to emit ask_checkout.
         setPendingCheckout(result.asksCheckout || safe.some((a) => a.action === "add_to_bag"))
+        // The model may have claimed an add that didn't resolve — never let the chat lie.
+        if (result.failed.length) {
+          setMessages((prev) => {
+            const last = prev[prev.length - 1]
+            const note = ` (Couldn't find ${result.failed.join(", ")} in the catalog, want me to pick something similar?)`
+            if (last?.role === "assistant") return [...prev.slice(0, -1), { ...last, content: last.content + note }]
+            return [...prev, { role: "assistant" as const, content: note.trim() }]
+          })
+        }
       }
       history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: text }].slice(-12)
     } catch (error) {

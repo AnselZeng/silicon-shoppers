@@ -9,7 +9,7 @@
 
 import type { StoreColor } from "@/config/ui"
 import { emitStoreEvent } from "@/lib/store/emit"
-import { getProduct } from "@/lib/store/catalog"
+import { getProduct, PRODUCTS } from "@/lib/store/catalog"
 import { addProductToBag, captureCheckout, startCheckout } from "@/lib/store/actions"
 import { useStorefront } from "@/lib/store/storeState"
 
@@ -27,7 +27,8 @@ export interface ChatAction {
 export function splitActions(full: string): { text: string; actions: ChatAction[] } {
   const marker = /<+\s*ACTIONS\s*>+/i.exec(full)
   const at = marker ? marker.index : -1
-  const text = (at === -1 ? full : full.slice(0, at)).replace(/<+$/, "").trimEnd()
+  // Also hide a trailing partial marker while it is still streaming in ("<<<ACT").
+  const text = (at === -1 ? full : full.slice(0, at)).replace(/<+[ACTIONS>]*$/i, "").trimEnd()
   if (at === -1) return { text, actions: [] }
   const json = full.slice(at).replace(/^<+\s*ACTIONS\s*>+/, "")
   try {
@@ -53,15 +54,27 @@ export function splitActions(full: string): { text: string; actions: ChatAction[
  * Runs the actions the model requested. Returns what was done for the caller to log.
  * `checkout` pays for real (demo Visa flow) and hands back the order for navigation.
  */
-export function runChatActions(actions: ChatAction[], navigate: (path: string) => void): { done: string[]; asksCheckout: boolean } {
+export function runChatActions(
+  actions: ChatAction[],
+  navigate: (path: string) => void,
+): { done: string[]; failed: string[]; asksCheckout: boolean } {
   const done: string[] = []
+  const failed: string[] = []
   const store = useStorefront.getState()
 
   for (const a of actions) {
     if (a.action === "ask_checkout") continue
     if (a.action === "add_to_bag") {
-      const product = a.productId ? getProduct(a.productId) : undefined
-      if (!product) continue
+      // Models sometimes send the product name instead of the id — accept either.
+      const ref = String(a.productId ?? "")
+      const product =
+        getProduct(ref) ?? PRODUCTS.find((p) => p.name.toLowerCase() === ref.toLowerCase()) ??
+        PRODUCTS.find((p) => ref && p.name.toLowerCase().includes(ref.toLowerCase()))
+      if (!product) {
+        failed.push(ref || "an item")
+        emitStoreEvent("concierge_action", { action: "add_failed", detail: `no such product: ${ref}` })
+        continue
+      }
       if (a.color && (product.colors as string[]).includes(a.color)) store.selectColor(product.id, a.color as StoreColor)
       if (a.size && product.sizes.includes(a.size)) store.selectSize(product.id, a.size)
       addProductToBag(product)
@@ -81,7 +94,7 @@ export function runChatActions(actions: ChatAction[], navigate: (path: string) =
       emitStoreEvent("concierge_action", { action: "checkout" })
       // Auto-pay on: the agent clicks Pay too. Off: stop on the Visa sheet, shopper clicks.
       if (!useStorefront.getState().agentAutoPay) continue
-      window.setTimeout(() => {
+      setTimeout(() => {
         try {
           // The shopper may have clicked Pay themselves in the meantime — never double-charge.
           if (useStorefront.getState().checkoutPhase !== "session") return
@@ -98,5 +111,5 @@ export function runChatActions(actions: ChatAction[], navigate: (path: string) =
       }, 900)
     }
   }
-  return { done, asksCheckout: actions.some((a) => a.action === "ask_checkout") }
+  return { done, failed, asksCheckout: actions.some((a) => a.action === "ask_checkout") }
 }

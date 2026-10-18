@@ -17,6 +17,8 @@ export interface ChatContext {
   bag: { name: string; color: string; size: string; qty: number; price: number }[]
   wishlist: { name: string; price: number }[]
   route: string
+  /** Last completed order this session, so "did it go through?" answers truthfully. */
+  order: { orderId: string; amount: number; last4: string; points: number } | null
   catalog: {
     id: string; name: string; department: string; category: string
     colors: string[]; sizes: string[]; price: number; isNew: boolean; description: string
@@ -49,6 +51,14 @@ export function buildChatContext(): ChatContext {
     })),
     wishlist: state.wishlist.map((item) => ({ name: item.name, price: item.price })),
     route: typeof window === "undefined" ? "/store" : window.location.pathname,
+    order: state.order
+      ? {
+          orderId: state.order.orderId,
+          amount: state.order.amount,
+          last4: state.order.last4,
+          points: state.order.loyaltyPoints,
+        }
+      : null,
     catalog: PRODUCTS.map((p) => ({
       id: p.id,
       name: p.name,
