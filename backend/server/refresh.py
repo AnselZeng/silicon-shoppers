@@ -123,6 +123,21 @@ def refresh_once(db: DB | None = None, B: dict | None = None, session_model: dic
         if verbose:
             print(f"[{now:%H:%M:%S}] {run_id}: {info['users']} shoppers rescored from {info['events']} events "
                   f"({info['add_to_bags']} add-to-bags) in {info['seconds']}s", flush=True)
+            from .layout_v1 import CAT_LABELS, DEPT_LABELS
+            label = lambda x: DEPT_LABELS.get(x) or CAT_LABELS.get(x) or str(x)
+            for r in docs.itertuples():
+                h = r.homepage
+                sh = h.get("shopper", {})
+                persona = (sh.get("persona") or {}).get("name") or sh.get("label", "?")
+                conf = sh.get("confidence", "low")
+                changed = []
+                for k, v in (h.get("layout") or {}).items():
+                    if v.get("changed"):
+                        val = v["value"]
+                        changed.append(f"{k}={label(val) if not isinstance(val, list) else '/'.join(map(label, val[:2]))}")
+                print(f"  {r.user_id:<28} {persona} ({conf})  {sh.get('persona_reason', '')}", flush=True)
+                if changed:
+                    print(f"    {' | '.join(changed[:4])}", flush=True)
         return info
     except Exception as e:
         _record(db, run_id, "refresh", started, "error", B, {"error": repr(e)[:2000]})
