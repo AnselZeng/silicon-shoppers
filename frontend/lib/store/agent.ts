@@ -38,6 +38,12 @@ export function shopperConfirmed(message: string): boolean {
   return SHORT_YES_RE.test(message) || CHECKOUT_WORDS_RE.test(message)
 }
 
+// The model's prose claims an add or a payment — verified against what really ran.
+export const CLAIM_ADD_RE =
+  /\b(added|adding|i'?ll (add|grab|bag|toss)|let me (add|grab|bag)|in your (bag|cart)|to your (bag|cart)|into your (bag|cart)|bagged)\b/i
+export const CLAIM_PAY_RE =
+  /\b(take|taking|check|checking|bring|bringing|head|heading)( you)?( over| right)? to (check ?out|payment)|pay(ing|ment) (for you|now|complete)|order (is |has been |)(placed|confirmed)|you'?re all set|process(ed|ing) (your |the |)payment/i
+
 // Recovery of a claimed add only runs when the SHOPPER actually asked to buy —
 // otherwise a browsing ask ("show me men's sale") can't be turned into a bagged
 // item by a model that got over-eager with its prose.
@@ -198,6 +204,89 @@ export function runChatActions(
  * in its own prose, honor the color/size it quoted, and do the add for real so the
  * claim becomes true instead of a lie.
  */
+/**
+ * The post-LLM orchestration Concierge.send() runs on a completed reply: parse the
+ * action block, gate checkout on the shopper's own words, recover claimed adds,
+ * auto-checkout when the shopper confirmed but the model forgot, and audit the
+ * prose against what actually ran. One function drives UI and tests.
+ */
+export interface ReplyOutcome {
+  /** Clean reply text, marker stripped. */
+  text: string
+  /** What actually ran. */
+  result: ActionResult
+  /** Whether the done-shopping Yes/No buttons should show. */
+  pending: boolean
+  /** Honest corrections to append to the assistant bubble. */
+  notes: string[]
+}
+
+export function processReply(
+  message: string,
+  reply: string,
+  navigate: (path: string) => void,
+  onOrder?: (order: { orderId: string; amount: number }) => void,
+): ReplyOutcome {
+  const { text, actions } = splitActions(reply)
+  // The shopper's own words gate real payment. A pure confirmation ("yeah im
+  // done", "check me out") allows a model checkout; anything else downgrades it
+  // to the Yes/No prompt so a "purchase X" request can never skip the ask.
+  const confirmed = shopperConfirmed(message)
+  const safe = actions.map((a): ChatAction =>
+    a.action === "checkout" && !confirmed ? { action: "ask_checkout" } : a,
+  )
+  const result = runChatActions(safe, navigate, onOrder)
+
+  // The model claimed an add but no action landed — recover the product it named
+  // from its own prose and do the add for real. Gated on the shopper's own buy
+  // intent: a browsing ask can never become a bagged item via model prose.
+  if (BUY_INTENT_RE.test(message) && CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
+    const recovered = recoverClaimedAdd(text, navigate, onOrder)
+    if (recovered) {
+      result.added.push(...recovered.added)
+      result.failed.push(...recovered.failed)
+    }
+  }
+  // The model sometimes says "checking you out" but forgets the action. When the
+  // shopper clearly confirmed and the bag has items, the agent owes them a checkout.
+  if (confirmed && !result.checkedOut && useStorefront.getState().bag.length > 0) {
+    const retry = runChatActions([{ action: "checkout" }], navigate, onOrder)
+    result.checkedOut = retry.checkedOut
+    result.checkoutSkipped = retry.checkoutSkipped
+  }
+
+  // Buttons are the "are you done?" ask — show them whenever the agent bagged
+  // something, whether or not the model remembered to emit ask_checkout.
+  const pending = !result.checkedOut && (result.asksCheckout || result.added.length > 0)
+
+  // The model's prose must never claim an action that didn't happen. If it said
+  // "added" but nothing landed, or "paying" but no session started, say so.
+  const notes: string[] = []
+  if (result.failed.length) {
+    const hint = result.failed.map(suggestSimilar).find(Boolean)
+    notes.push(
+      hint
+        ? `Could not find ${result.failed.join(", ")} — but we do have the ${hint}, want that instead?`
+        : `Couldn't find ${result.failed.join(", ")} in the catalog, want me to pick something similar?`,
+    )
+  } else if (CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
+    const hint = suggestSimilar(text)
+    notes.push(
+      hint
+        ? `Nothing was bagged just yet — want me to add the ${hint}?`
+        : "Hmm, that did not make it into your bag. Tell me the item again and I will grab it!",
+    )
+  }
+  if (CLAIM_PAY_RE.test(text) && !result.checkedOut) {
+    notes.push(
+      useStorefront.getState().bag.length === 0
+        ? "Your bag is actually empty right now, tell me what to add first!"
+        : "Checkout did not kick off, say check me out and I will run it!",
+    )
+  }
+  return { text, result, pending, notes }
+}
+
 /** Keyword-overlap lookup: "the Clean Jean" the model invented → the real Straight Jean. */
 export function suggestSimilar(text: string): string | null {
   const words = text

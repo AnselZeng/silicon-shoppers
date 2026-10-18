@@ -6,15 +6,11 @@ import type { ConciergeTone } from "@/lib/layout/types"
 import { buildChatContext } from "@/lib/store/chatContext"
 import { applyChatIntent } from "@/lib/store/chatIntent"
 import {
-  BUY_INTENT_RE,
   confirmReply,
   NEW_ORDER_RE,
-  recoverClaimedAdd,
-  suggestSimilar,
+  processReply,
   runChatActions,
-  shopperConfirmed,
   splitActions,
-  type ChatAction,
 } from "@/lib/store/agent"
 import { emitStoreEvent } from "@/lib/store/emit"
 import { captureCheckout } from "@/lib/store/actions"
@@ -242,73 +238,20 @@ export function Concierge() {
         }
         if (done) break
       }
-      const { text, actions } = splitActions(reply)
-      if (!text) throw new Error("empty reply")
-      // The shopper's own words gate real payment. A pure confirmation ("yeah im
-      // done", "check me out") allows a model checkout; anything else downgrades it
-      // to the Yes/No prompt so a "purchase X" request can never skip the ask.
-      const confirmed = shopperConfirmed(message)
-      const safe = actions.map((a): ChatAction =>
-        a.action === "checkout" && !confirmed ? { action: "ask_checkout" } : a,
-      )
-      const result = runChatActions(safe, (path: string) => router.push(path))
-      // The model claimed an add but no action landed — recover the product it named
-      // from its own prose and do the add for real. The claim becomes true. Gated on
-      // the shopper's own buy intent: a browsing ask ("show me sale stuff") can never
-      // be turned into a bagged item by over-eager model prose.
-      if (BUY_INTENT_RE.test(message) && CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
-        const recovered = recoverClaimedAdd(text, (path: string) => router.push(path))
-        if (recovered) {
-          result.added.push(...recovered.added)
-          result.failed.push(...recovered.failed)
-        }
-      }
-      // The model sometimes says "checking you out" but forgets the action. When the
-      // shopper clearly confirmed and the bag has items, the agent owes them a checkout.
-      if (confirmed && !result.checkedOut && useStorefront.getState().bag.length > 0) {
-        const retry = runChatActions([{ action: "checkout" }], (path: string) => router.push(path))
-        result.checkedOut = retry.checkedOut
-        result.checkoutSkipped = retry.checkoutSkipped
-      }
-      // Buttons are the "are you done?" ask — show them whenever the agent bagged
-      // something, whether or not the model remembered to emit ask_checkout.
-      if (!result.checkedOut) {
-        setPendingCheckout(result.asksCheckout || result.added.length > 0)
-      }
-      // The model's prose must never claim an action that didn't happen. If it said
-      // "added" but nothing landed, or "paying" but no session started, say so.
-      const notes: string[] = []
-      if (result.failed.length) {
-        const hint = result.failed.map(suggestSimilar).find(Boolean)
-        notes.push(
-          hint
-            ? `Could not find ${result.failed.join(", ")} — but we do have the ${hint}, want that instead?`
-            : `Couldn't find ${result.failed.join(", ")} in the catalog, want me to pick something similar?`,
-        )
-      } else if (CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
-        const hint = suggestSimilar(text)
-        notes.push(
-          hint
-            ? `Nothing was bagged just yet — want me to add the ${hint}?`
-            : "Hmm, that did not make it into your bag. Tell me the item again and I will grab it!",
-        )
-      }
-      if (CLAIM_PAY_RE.test(text) && !result.checkedOut) {
-        notes.push(
-          useStorefront.getState().bag.length === 0
-            ? "Your bag is actually empty right now, tell me what to add first!"
-            : "Checkout did not kick off, say check me out and I will run it!",
-        )
-      }
-      if (notes.length) {
+      // Everything the reply may do — actions, recovery, confirmation, honesty —
+      // is one shared orchestration (lib/store/agent.ts) so the UI and tests agree.
+      const outcome = processReply(message, reply, (path: string) => router.push(path))
+      if (!outcome.text) throw new Error("empty reply")
+      setPendingCheckout(outcome.pending)
+      if (outcome.notes.length) {
         setMessages((prev) => {
           const last = prev[prev.length - 1]
-          const note = ` (${notes.join(" ")})`
+          const note = ` (${outcome.notes.join(" ")})`
           if (last?.role === "assistant") return [...prev.slice(0, -1), { ...last, content: last.content + note }]
           return [...prev, { role: "assistant" as const, content: note.trim() }]
         })
       }
-      history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: text }].slice(-12)
+      history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: outcome.text }].slice(-12)
     } catch (error) {
       emitStoreEvent("concierge_error", { tone, error: error instanceof Error ? error.message : "failed" })
       const fallback =
