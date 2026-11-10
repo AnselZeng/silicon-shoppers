@@ -3,10 +3,9 @@
 %% The Web Conference 2027 - Demo Track
 %% Max 4 pages including references.
 %% TODO before submission:
-%%   1. Fill in authors/affiliations
-%%   2. Add figures (placeholders marked % FIGURE)
-%%   3. Record 2-minute screencast and add link
-%%   4. Verify repo is public or make it public
+%%   1. Add figures (placeholders marked % FIGURE)
+%%   2. Record 2-minute screencast and add link
+%%   3. Verify repo is public or make it public
 
 \setcopyright{none}
 \settopmatter{printacmref=false}
@@ -17,7 +16,6 @@
 
 \title{Silicon Shoppers: An Adaptive Storefront the Shopper Can Operate}
 
-%% TODO: replace with real author list
 \author{Prabhu Pugalenthi}
 \affiliation{%
   \institution{University of Southern California}
@@ -26,20 +24,24 @@
   \country{USA}}
 \email{pugalent@usc.edu}
 
-\author{Anson Zeng}
+\author{Ansel Zeng}
 \affiliation{%
-  \institution{TODO Affiliation}
+  \institution{University of Southern California}
+  \city{Los Angeles}
+  \state{CA}
   \country{USA}}
-\email{todo@example.com}
+\email{anselzen@usc.edu}
 
-\author{TODO Author Three}
+\author{Sumin Jo}
 \affiliation{%
-  \institution{TODO Affiliation}
+  \institution{University of Southern California}
+  \city{Los Angeles}
+  \state{CA}
   \country{USA}}
-\email{todo@example.com}
+\email{suminjo@usc.edu}
 
 \begin{abstract}
-E-commerce personalization stops at the recommendation rail: the store itself looks identical for every shopper, and when the underlying model is wrong the shopper has no recourse. We present \emph{Silicon Shoppers}, a deployed web storefront in which the entire layout -- navigation order, hero advertisements, homepage rails, listing sort, filters, badges, and checkout variant -- is a typed, versioned document that three different writers can mutate: a purchase-history model, a live browsing model, and the shopper, speaking to an LLM concierge. The concierge is not decorative: it emits structured actions that are validated, executed, and audited against real store state, so a reply that claims an action the model did not emit is either recovered into a real state change or honestly corrected. A staged animation engine plays every layout change component by component, making the rearrangement itself inspectable. Attendees can chat with the concierge, rearrange the store in natural language, complete a purchase end to end, and watch every model decision, layout step, and agent action narrated live on a companion terminal.
+E-commerce personalization stops at the recommendation rail: the store itself looks identical for every shopper, and when the underlying model is wrong the shopper has no recourse. We present \emph{Silicon Shoppers}, a deployed web storefront in which the entire layout (navigation order, hero advertisements, homepage rails, listing sort, filters, badges, and checkout variant) is a typed, versioned document that three different writers can mutate: a purchase-history model, a live browsing model, and the shopper, speaking to an LLM concierge. The concierge is not decorative: it emits structured actions that are validated, executed, and audited against real store state, so a reply that claims an action the model did not emit is either recovered into a real state change or honestly corrected. A staged animation engine plays every layout change component by component, making the rearrangement itself inspectable. Attendees can chat with the concierge, rearrange the store in natural language, complete a purchase end to end, and watch every model decision, layout step, and agent action narrated live on a companion terminal.
 \end{abstract}
 
 \begin{CCSXML}
@@ -73,7 +75,7 @@ E-commerce personalization stops at the recommendation rail: the store itself lo
 % ============================================================
 \section{Introduction}
 
-Online personalization has converged on a single shape: a fixed storefront with a recommendation shelf stapled on. The navigation, the hero banner, the order of homepage sections, the sort order of a listing -- the structure of the store -- is identical for a first-time browser and a decade-long customer. Meanwhile, a new generation of LLM agents is being deployed into consumer settings, where they do more than answer questions: they add items to carts, apply filters, and initiate payments. Two problems meet here. First, shoppers cannot talk back to the store; the model's decisions are opaque and unappealable. Second, LLM agents that act are unreliable narrators of their own behavior -- they routinely report actions they never executed \cite{taubench, webarena}.
+Online personalization has converged on a single shape: a fixed storefront with a recommendation shelf stapled on. The navigation, the hero banner, the order of homepage sections, the sort order of a listing, the structure of the store, is identical for a first-time browser and a decade-long customer. Meanwhile, a new generation of LLM agents is being deployed into consumer settings, where they do more than answer questions: they add items to carts, apply filters, and initiate payments. Two problems meet here. First, shoppers cannot talk back to the store; the model's decisions are opaque and unappealable. Second, LLM agents that act are unreliable narrators of their own behavior: they routinely report actions they never executed \cite{taubench, webarena}.
 
 Silicon Shoppers is a deployed fashion storefront built around a simple idea: the store layout itself is data, and an agent can act on it. Three writers mutate one typed, versioned layout contract: (i) a model trained on purchase history merchandises the store before first paint; (ii) a live browsing model refreshes it every four minutes from in-session events; and (iii) the shopper, through a concierge chat, rearranges the store in natural language (``make this more men-friendly, navy forward'') or delegates whole tasks to it (``buy the wool trouser in black, size M''). Every change plays as a staged animation, and every model input, layout output, and event persists to Snowflake.
 
@@ -82,7 +84,7 @@ The demo's technical contribution is the agent's \emph{honesty layer}: a pipelin
 % ============================================================
 \section{System Overview}
 
-Figure~\ref{fig:arch} shows the architecture. The system has three surfaces -- the storefront, a simulator shell that hosts and instruments it, and a data plane that persists everything -- connected by a single typed layout contract.
+Figure~\ref{fig:arch} shows the architecture. The system has three surfaces (the storefront, a simulator shell that hosts and instruments it, and a data plane that persists everything) connected by a single typed layout contract.
 
 % FIGURE: architecture diagram, full column width.
 % Suggested content: store iframe + shell (persona panel, terminal) + three layout writers (history model, browsing model, concierge) + Snowflake plane + /api/chat NDJSON stream.
@@ -96,13 +98,13 @@ Figure~\ref{fig:arch} shows the architecture. The system has three surfaces -- t
 
 \subsection{The layout contract}
 
-The whole storefront renders from one JSON document, \texttt{atelier.store\_layout.v1}: navigation order and highlight, hero and secondary ad placements, ordered homepage blocks (rails, grids, offer strips), per-listing sort and filter state, sale-badge emphasis, and checkout variant. The document is schema-validated on every mutation, so no writer -- model or human -- can emit a malformed store. Because layout is data rather than code, it can be diffed, replayed, audited, and animated. The contract is deliberately the same object regardless of writer: the frozen model, the live model, and the shopper all write through it, which is what makes shopper control a first-class feature rather than a settings page.
+The storefront renders entirely from one versioned JSON document (\texttt{atelier.store\_layout.v1}): navigation order and highlight, hero and secondary ad placements, homepage blocks (rails, grids, offer strips), listing sort and filter state, badge emphasis, and checkout variant. Every mutation is schema-validated, so no writer, model or human, can produce a malformed store. Because layout is data rather than code, it can be diffed, replayed, audited, and animated. All three writers (the frozen model, the live model, and the shopper) mutate the same contract, which is what makes shopper control a feature of the store itself rather than a settings page.
 
 \subsection{Two personalization models}
 
-\textbf{First paint.} A model trained on the H\&M Personalized Fashion Recommendations dataset \cite{hmdataset} reads a shopper's purchase history and assigns a deterministic persona -- \emph{Price Hunter}, \emph{Trend Seeker}, \emph{Mission Shopper}, or \emph{Brand Loyalist} -- from interpretable features (markdown affinity, novelty affinity, purchase frequency, category concentration, rebuy share). The persona selects the initial layout document, so the store arrives already merchandised: a Price Hunter sees sale-forward navigation and price-ascending sort; a Brand Loyalist sees a rail built around previously purchased colors and categories.
+\textbf{First paint.} A model trained on the H\&M Personalized Fashion Recommendations dataset \cite{hmdataset} reads a shopper's purchase history and assigns a deterministic persona (\emph{Price Hunter}, \emph{Trend Seeker}, \emph{Mission Shopper}, or \emph{Brand Loyalist}) from interpretable features (markdown affinity, novelty affinity, purchase frequency, category concentration, rebuy share). The persona selects the initial layout document, so the store arrives already merchandised: a Price Hunter sees sale-forward navigation and price-ascending sort; a Brand Loyalist sees a rail built around previously purchased colors and categories.
 
-\textbf{In-session.} Two components adapt the store while the shopper browses. A LightGBM session model trained on the OTTO dataset \cite{otto} runs in the browser and re-derives per-field browsing decisions (grid density, comparison UI, quick-add, product-page density, cart reminders) after every click; each field activates only once the model's held-out accuracy for it crosses a threshold. Alongside it, a provisional persona is computed live from the shopper's own event stream -- sale adds, price sorts, newest sorts, filters, searches, repeat views -- nudged by the OTTO model's predicted browsing style. The persona is named only once enough evidence exists (five events minimum, a minimum score, then low/medium/high confidence rising with evidence), and only at medium confidence may it touch the layout, reordering navigation, hero, rails, and sort. A server-side refresh loop recomputes the shopper's document every four minutes, and every applied decision carries a human-readable reason string the UI surfaces on demand (``why am I seeing this?'').
+\textbf{In-session.} Two components adapt the store while the shopper browses. A LightGBM session model trained on the OTTO dataset \cite{otto} runs in the browser and re-derives per-field browsing decisions (grid density, comparison UI, quick-add, product-page density, cart reminders) after every click; each field activates only once the model's held-out accuracy for it crosses a threshold. Alongside it, a provisional persona is computed live from the shopper's own event stream (sale adds, price sorts, newest sorts, filters, searches, repeat views), nudged by the OTTO model's predicted browsing style. The persona is named only once enough evidence exists (five events minimum, a minimum score, then low/medium/high confidence rising with evidence), and only at medium confidence may it touch the layout, reordering navigation, hero, rails, and sort. A server-side refresh loop recomputes the shopper's document every four minutes, and every applied decision carries a human-readable reason string the UI surfaces on demand (``why am I seeing this?'').
 
 \subsection{The concierge agent}
 
@@ -122,13 +124,35 @@ Deployed shopping agents fail in a specific way we observed repeatedly in develo
   \item \textbf{Audit.} After every reply, claims in the text are compared against actual state transitions; a claim that did not execute is either recovered or an honest correction is appended.
 \end{enumerate}
 
-Two guardrails sit underneath. Payment is gated on the shopper's \emph{own words} -- a typed confirmation or a button press, never a phrase inside a product request -- and checkout capture is phase-guarded so that agent timers, manual payment, and toggles cannot race into a double charge. In our development traces this turned several real failure modes (phantom cart items, a double-captured order, misread ``nope'') into test cases; the system is covered by 100+ Vitest cases including scripted multi-turn shopper sessions.
+Two guardrails sit underneath. Payment is gated on the shopper's \emph{own words} (a typed confirmation or a button press, never a phrase inside a product request), and checkout capture is phase-guarded so that agent timers, manual payment, and toggles cannot race into a double charge. In our development traces this turned several real failure modes (phantom cart items, a double-captured order, misread ``nope'') into test cases; the system is covered by 100+ Vitest cases including scripted multi-turn shopper sessions.
+
+As a check, we run seven scripted transcripts through the production reply handler. Five reconstruct failure modes we observed during development (a claimed add with no emitted action, a hallucinated product, a premature checkout, a browse ask answered as a buy, a ghosted payment) and two are controls. A naive baseline that executes the emitted actions and shows the model's prose unchanged tells the shopper something false in 4 of the 7 and starts a payment the shopper did not ask for in 1. The audited pipeline does neither: one claim is recovered into a real state change and four are followed by an appended correction (Table~\ref{tab:faith}). The transcripts are hand-written, so this shows the layer handles the failures it was built for, not how often a given model produces them.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Case & Naive & Audited \\
+\midrule
+Claimed add, no action & false claim & recovered \\
+Hallucinated product & false claim & corrected \\
+Premature checkout & unasked payment & corrected \\
+Browse answered as buy & false claim & corrected \\
+Ghosted payment & false claim & corrected \\
+Clean action (control) & true & true \\
+Answer only (control) & true & true \\
+\bottomrule
+\end{tabular}
+\caption{Seven scripted transcripts, run naively and through the audited pipeline. Naive: 4 false claims and 1 unasked payment. Audited: none of either.}
+\label{tab:faith}
+\end{table}
 
 \subsection{Observability and persistence}
 
-The simulator shell renders the store inside a fake-browser frame beside a persona panel, and narrates every event on a live terminal: tracker events, layout stages, LLM latency, agent actions, and payments. The same event stream -- model inputs, emitted layouts, store events, live shopper layouts -- persists to Snowflake, which serves as the substrate for the refresh loop and for post-hoc analysis of agent behavior.
+The simulator shell renders the store inside a fake-browser frame beside a persona panel, and narrates every event on a live terminal: tracker events, layout stages, LLM latency, agent actions, and payments. The same event stream (model inputs, emitted layouts, store events, live shopper layouts) persists to Snowflake, which serves as the substrate for the refresh loop and for post-hoc analysis of agent behavior.
 
-The refresh loop itself runs inside Snowflake: a scheduled task invokes a Snowpark stored procedure every four minutes, rescores shoppers with new events using the frozen model bundle (staged as artifacts), and rewrites the layout, trending, and run-log tables. A second nightly job retrains a store-native next-department predictor on accumulated events, versions each trained model into a stage, and writes per-shopper predictions back to the warehouse -- a signal that genuinely learns with usage, independent of the frozen models.
+The refresh loop itself runs inside Snowflake: a scheduled task invokes a Snowpark stored procedure every four minutes, rescores shoppers with new events using the frozen model bundle (staged as artifacts), and rewrites the layout, trending, and run-log tables. A second nightly job retrains a store-native next-department predictor on accumulated events, versions each trained model into a stage, and writes per-shopper predictions back to the warehouse: a signal that genuinely learns with usage, independent of the frozen models.
 
 % ============================================================
 \section{Demonstration}
@@ -139,7 +163,7 @@ The demo runs the full system on a laptop: the store in a fake-browser frame, th
 
 \textbf{Talk back to the store.} Attendees type layout intent into the concierge (``women's section first,'' ``nothing too expensive,'' ``show me more navy'') and watch the nav slide, the hero swap, and the rails reorder. They can interrogate the result (``why am I seeing this shirt?'') and get the actual decision reason.
 
-\textbf{Shop end to end.} Attendees ask the concierge to shop (``buy the wool trouser in black, size M''), watch the item land in the bag with a checkout confirmation, answer ``yes'' or ``nope'' in their own words, and complete a mock Visa payment -- including an auto-pay toggle they can flip mid-session. The terminal narrates every step, and attempted edge cases (invented product names, contradictory requests, toggling auto-pay mid-countdown) demonstrate the honesty layer live.
+\textbf{Shop end to end.} Attendees ask the concierge to shop (``buy the wool trouser in black, size M''), watch the item land in the bag with a checkout confirmation, answer ``yes'' or ``nope'' in their own words, and complete a mock Visa payment, including an auto-pay toggle they can flip mid-session. The terminal narrates every step, and attempted edge cases (invented product names, contradictory requests, toggling auto-pay mid-countdown) demonstrate the honesty layer live.
 
 % FIGURE: composite screenshot, full column width.
 % Left: store mid-rearrange with flash tags. Right: concierge + terminal.
@@ -161,7 +185,7 @@ The demo uses public research datasets (H\&M Personalized Fashion Recommendation
 % ============================================================
 \section{Conclusion}
 
-Silicon Shoppers treats store layout as an agent-operable object: a typed contract that models and shoppers can both write, with every claim verified against state. We believe this direction -- interfaces as action spaces, and agents that must account for what they actually did -- is where conversational commerce needs to go, and we welcome hands-on scrutiny.
+Silicon Shoppers treats store layout as an agent-operable object: a typed contract that models and shoppers can both write, with every claim verified against state. We believe this direction, interfaces as action spaces and agents that must account for what they actually did, is where conversational commerce needs to go, and we welcome hands-on scrutiny.
 
 \bibliographystyle{ACM-Reference-Format}
 \begin{thebibliography}{10}
