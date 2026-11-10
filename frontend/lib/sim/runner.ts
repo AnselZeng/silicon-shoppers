@@ -14,6 +14,8 @@ import {
   type ParentPayload,
   type StoreEvent,
 } from "@/lib/sim/protocol"
+import { getShopperId } from "@/lib/model/eventSink"
+import { replayLines, type ReplayEvent, type ReplayLayout } from "@/lib/sim/replay"
 import { describeStoreEvent } from "@/lib/sim/tracker"
 import { useLogStore } from "@/lib/state/logStore"
 import { useSimStore } from "@/lib/state/simStore"
@@ -34,16 +36,24 @@ class ShellRunner {
       return
     }
     if (payload.type === "model_status") {
-      useSimStore.getState().noteLive()
+      // A persona read from this visit's clicks changes with every event; only a stored
+      // document is worth refetching for.
+      if (!payload.live) useSimStore.getState().noteLive()
       const logs = useLogStore.getState()
       if (payload.state === "disabled") {
         logs.push("model", `snowflake off · shopper ${payload.shopperId}`)
       } else if (payload.state === "waiting") {
-        logs.push("model", `shopper ${payload.shopperId} · no layout yet (the laptop scores on its next refresh)`)
+        logs.push("model", `shopper ${payload.shopperId} · no layout yet (scored on the next refresh)`)
       } else {
         const who = payload.persona ?? "shopper"
         const conf = payload.confidence ? ` (${payload.confidence})` : ""
-        logs.push("model", `${who}${conf} · ${payload.reason || payload.shopperId}`)
+        const origin = payload.live ? " · this visit, until the next refresh" : ""
+        logs.push("model", `${who}${conf}${origin} · ${payload.reason || payload.shopperId}`)
+        useSimStore.getState().setPersona(
+          payload.persona
+            ? { name: payload.persona, confidence: payload.confidence ?? "low", reason: payload.reason ?? "", live: !!payload.live }
+            : null,
+        )
       }
       return
     }
@@ -287,6 +297,38 @@ class ShellRunner {
     useLogStore.getState().push("sim", "session cleared")
   }
 
+  /**
+   * Prints what Snowflake holds for a shopper: their events and every layout version the
+   * refresh loop wrote, oldest first. Defaults to this browser's shopper and the last 60 events.
+   */
+  async replay(args: string[]) {
+    const logs = useLogStore.getState()
+    const count = args.find((arg) => /^\d+$/.test(arg)) ?? "60"
+    const userId = args.find((arg) => !/^\d+$/.test(arg)) ?? getShopperId()
+    try {
+      const res = (await fetch(`/api/replay?userId=${encodeURIComponent(userId)}&events=${count}`).then((r) =>
+        r.json(),
+      )) as { events?: ReplayEvent[]; layouts?: ReplayLayout[]; disabled?: boolean; error?: string }
+      if (res.disabled) {
+        logs.push("sim", "replay · snowflake off, nothing stored to read back")
+        return
+      }
+      if (res.error) {
+        logs.push("sim", `replay · ${res.error}`)
+        return
+      }
+      const events = res.events ?? []
+      const layouts = res.layouts ?? []
+      logs.push("sim", `replay · ${userId} · ${events.length} events · ${layouts.length} layout versions`)
+      for (const line of replayLines(events, layouts)) {
+        logs.push(line.source, `${line.ts.slice(5, 19)} · ${line.message}`)
+      }
+      logs.push("sim", "replay · end")
+    } catch {
+      logs.push("sim", "replay · could not reach /api/replay")
+    }
+  }
+
   command(line: string) {
     const trimmed = line.trim()
     if (!trimmed) return
@@ -295,7 +337,13 @@ class ShellRunner {
     const arg = rest.join(" ")
     switch (cmd) {
       case "help":
-        useLogStore.getState().push("sim", "help · preview default | preview <fixture-id>[:model|:llm] · reset · clear")
+        useLogStore.getState().push(
+          "sim",
+          "help · preview default | preview <fixture-id>[:model|:llm] · replay [shopper-id] [events] · reset · clear",
+        )
+        return
+      case "replay":
+        void this.replay(rest)
         return
       case "preview":
         this.preview(arg || "default")

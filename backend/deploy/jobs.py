@@ -61,84 +61,110 @@ def refresh_shoppers(session) -> str:
     return json.dumps({"tick": "refresh", **info}, default=str)
 
 
-def retrain_interest(session) -> str:
-    """Nightly task: learn each shopper's likely department from live store events.
+INTEREST_FEATURES = ["n_events", "view_share", "cart_share", "women_share", "men_share",
+                     "sale_share", "price_mean", "span_hours"]
+MIN_EVENTS = 10          # a shopper needs this many events to be a training row
+MIN_SHOPPERS = 4         # and the model needs this many rows, with both departments present
 
-    Store-native signal: features come from the shopper's first 70% of events,
-    the label is their dominant department in the last 30%. Not used by the
-    demo storefront; the registry keeps every version so the signal grows with data.
-    """
-    B, sm, db, dt = _bootstrap(session)
-    import numpy as np
+
+def interest_rows(ev, cat):
+    """One training row per shopper: features from their first 70% of events, label = the
+    department they shopped most in the last 30%. Shoppers with too little history are left out."""
     import pandas as pd
-    from snowpark_db import DB  # already bound
 
-    run_id = f"interest_{dt.datetime.utcnow():%Y%m%d_%H%M%S}"
-    ev = db.query("SELECT USER_ID, TYPE, TS, PRODUCT_ID FROM EVENTS ORDER BY USER_ID, TS")
-    cat = db.query("SELECT PRODUCT_ID, DEPARTMENT, CATEGORY, PRICE, SALE_PRICE FROM CATALOG")
-    info = {"run_id": run_id, "status": "ok", "n_shoppers": 0, "accuracy": None, "version": None}
+    a = cat.set_index(cat["product_id"].astype(str))
+    ev = ev.merge(a[["department", "price", "sale_price"]],
+                  left_on=ev["product_id"].astype(str), right_index=True, how="left")
+    rows = []
+    for u, g in ev.groupby("user_id"):
+        g = g.sort_values("ts")
+        n = len(g)
+        if n < MIN_EVENTS:
+            continue
+        head, tail = g.iloc[: int(n * 0.7)], g.iloc[int(n * 0.7):]
+        if len(tail) < 3:
+            continue
+        clicks = head["type"].isin(["product_viewed", "quickview_opened"])
+        carts = head["type"].isin(["add_to_bag", "purchase", "checkout"])
+        dept = head.loc[clicks | carts, "department"].value_counts(normalize=True)
+        rows.append({
+            "user_id": u,
+            "n_events": len(head),
+            "view_share": float(clicks.mean()),
+            "cart_share": float(carts.mean()),
+            "women_share": float(dept.get("women", 0.0)),
+            "men_share": float(dept.get("men", 0.0)),
+            "sale_share": float(head.loc[carts, "sale_price"].notna().mean()) if carts.any() else 0.0,
+            "price_mean": float(head["price"].mean()) if head["price"].notna().any() else 0.0,
+            "span_hours": float((pd.to_datetime(head["ts"].iloc[-1]) - pd.to_datetime(head["ts"].iloc[0])).total_seconds() / 3600),
+            "label": tail.loc[tail["department"].notna(), "department"].value_counts().idxmax()
+                   if tail["department"].notna().any() else None,
+        })
+    cols = ["user_id", *INTEREST_FEATURES, "label"]
+    return pd.DataFrame(rows, columns=cols).dropna(subset=["label"])
+
+
+def train_interest(db, save_model=None, now=None) -> dict:
+    """Train the next-department model on every shopper's events and write its predictions.
+
+    db is any object with query/replace/insert (snowpark_db.DB in Snowflake, the same shim over
+    DuckDB in tests). save_model(blob, run_id) stores the trained model and returns where.
+    train_accuracy is measured on the rows the model was fitted on, so it says the fit ran,
+    not how well the model predicts a shopper it has not seen."""
+    import datetime as dt
+    import pandas as pd
+
+    now = now or dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+    run_id = f"interest_{now:%Y%m%d_%H%M%S}"
+    info = {"run_id": run_id, "status": "ok", "n_shoppers": 0, "train_accuracy": None, "version": None}
     try:
-        a = cat.set_index(cat["product_id"].astype(str))
-        ev = ev.merge(a[["department", "price", "sale_price"]],
-                      left_on=ev["product_id"].astype(str), right_index=True, how="left")
-        rows = []
-        for u, g in ev.groupby("user_id"):
-            g = g.sort_values("ts")
-            n = len(g)
-            if n < 10:
-                continue
-            head, tail = g.iloc[: int(n * 0.7)], g.iloc[int(n * 0.7):]
-            if len(tail) < 3:
-                continue
-            clicks = head["type"].isin(["product_viewed", "quickview_opened"])
-            carts = head["type"].isin(["add_to_bag", "purchase", "checkout"])
-            dept = head.loc[clicks | carts, "department"].value_counts(normalize=True)
-            rows.append({
-                "user_id": u,
-                "n_events": len(head),
-                "view_share": float(clicks.mean()),
-                "cart_share": float(carts.mean()),
-                "women_share": float(dept.get("women", 0.0)),
-                "men_share": float(dept.get("men", 0.0)),
-                "sale_share": float(head.loc[carts, "sale_price"].notna().mean()) if carts.any() else 0.0,
-                "price_mean": float(head["price"].mean()) if head["price"].notna().any() else 0.0,
-                "span_hours": float((pd.to_datetime(head["ts"].iloc[-1]) - pd.to_datetime(head["ts"].iloc[0])).total_seconds() / 3600),
-                "label": tail.loc[tail["department"].notna(), "department"].value_counts().idxmax()
-                       if tail["department"].notna().any() else None,
-            })
-        df = pd.DataFrame(rows).dropna(subset=["label"])
+        ev = db.query("SELECT USER_ID, TYPE, TS, PRODUCT_ID FROM EVENTS ORDER BY USER_ID, TS")
+        cat = db.query("SELECT PRODUCT_ID, DEPARTMENT, CATEGORY, PRICE, SALE_PRICE FROM CATALOG")
+        df = interest_rows(ev, cat)
         info["n_shoppers"] = int(len(df))
-        FEATS = ["n_events", "view_share", "cart_share", "women_share", "men_share",
-                 "sale_share", "price_mean", "span_hours"]
-        if len(df) >= 4 and df["label"].nunique() >= 2:
+        if len(df) >= MIN_SHOPPERS and df["label"].nunique() >= 2:
             from sklearn.ensemble import GradientBoostingClassifier
-            X, y = df[FEATS].fillna(0.0), df["label"]
+            X, y = df[INTEREST_FEATURES].fillna(0.0), df["label"]
             model = GradientBoostingClassifier(n_estimators=120, max_depth=3)
             model.fit(X, y)
-            info["accuracy"] = float(model.score(X, y))
-            # versioned artifact: the trained model itself goes back into the stage
-            mpath = f"{ART_DIR}/interest_{run_id}.pkl"
-            pickle.dump({"model": model, "features": FEATS, "n_shoppers": len(df),
-                         "accuracy": info["accuracy"]}, open(mpath, "wb"))
-            session.file.put(mpath, f"{STAGE}/models", auto_compress=False, overwrite=True)
+            info["train_accuracy"] = float(model.score(X, y))
+            if save_model is not None:
+                # versioned artifact: the trained model itself goes back into the stage
+                info["artifact"] = save_model({"model": model, "features": INTEREST_FEATURES, "n_shoppers": len(df),
+                                               "train_accuracy": info["train_accuracy"]}, run_id)
             info["version"] = run_id
-            info["artifact"] = f"{STAGE}/models/interest_{run_id}.pkl"
             preds = df[["user_id"]].copy()
             preds["pred_department"] = model.predict(X)
             probs = model.predict_proba(X)
             preds["confidence"] = [round(float(p.max()), 4) for p in probs]
             preds["trained_on"] = run_id
-            preds["updated_at"] = pd.Timestamp.utcnow().tz_localize(None)
+            preds["updated_at"] = pd.Timestamp(now)
             db.replace("INTEREST_PREDICTIONS", preds)
         else:
             info["status"] = "skipped: not enough labeled shoppers yet"
-        _record(db, run_id, info)
-        return json.dumps(info, default=str)
     except Exception as e:
         info["status"] = "error"
         info["error"] = repr(e)[:1000]
-        _record(db, run_id, info)
-        return json.dumps(info, default=str)
+    _record(db, run_id, info)
+    return info
+
+
+def retrain_interest(session) -> str:
+    """Nightly task: learn each shopper's likely department from live store events.
+
+    Store-native signal, retrained from scratch on everything in EVENTS. Each trained model is
+    kept in the stage under models/, and the store reads INTEREST_PREDICTIONS through /api/layout.
+    """
+    B, sm, db, dt = _bootstrap(session)
+
+    def save_model(blob: dict, run_id: str) -> str:
+        path = f"{ART_DIR}/{run_id}.pkl"
+        with open(path, "wb") as fh:
+            pickle.dump(blob, fh)
+        session.file.put(path, f"{STAGE}/models", auto_compress=False, overwrite=True)
+        return f"{STAGE}/models/{run_id}.pkl"
+
+    return json.dumps(train_interest(db, save_model), default=str)
 
 
 def _record(db, run_id: str, info: dict):

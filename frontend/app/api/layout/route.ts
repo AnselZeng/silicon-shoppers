@@ -24,17 +24,26 @@ export async function GET(req: Request) {
   if (!snowflakeEnabled()) return NextResponse.json({ homepage: null, trending: [], disabled: true });
   if (!ID.test(userId)) return NextResponse.json({ error: "bad userId" }, { status: 400 });
   try {
-    const [rows, trend] = await Promise.all([
+    const [rows, trend, interest] = await Promise.all([
       sql<Record<string, unknown>>(
         "SELECT HOMEPAGE, UPDATED_AT FROM USER_LAYOUTS WHERE USER_ID = ?", [userId]),
       sql<Record<string, unknown>>(
         "SELECT PRODUCT_ID, SCORE FROM TRENDING ORDER BY RANK LIMIT 12"),
+      sql<Record<string, unknown>>(
+        "SELECT PRED_DEPARTMENT, CONFIDENCE, TRAINED_ON FROM INTEREST_PREDICTIONS WHERE USER_ID = ?",
+        [userId]).catch(() => []),
     ]);
     const row = rows[0];
+    const ip = interest[0];
     return NextResponse.json({
       homepage: row ? parse(cell(row, "HOMEPAGE")) : null,
       updatedAt: row ? (cell(row, "UPDATED_AT") ?? null) : null,
       trending: trend.map((item) => ({ productId: cell(item, "PRODUCT_ID"), score: cell(item, "SCORE") })),
+      interest: ip ? {
+        department: cell(ip, "PRED_DEPARTMENT"),
+        confidence: cell(ip, "CONFIDENCE"),
+        trainedOn: cell(ip, "TRAINED_ON"),
+      } : null,
     });
   } catch (err) {
     console.error("layout read failed", err);

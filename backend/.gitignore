@@ -12,3 +12,6 @@ runs/
 
 # secrets
 .env
+
+# Snowpark bundle built by deploy/pack.py
+deploy/out/

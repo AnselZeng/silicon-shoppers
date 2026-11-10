@@ -211,6 +211,51 @@ function liveReason(pid: LivePersonaId, s: LiveStats): string {
   return bits.join("; ") || `${s.nEvents} events so far`
 }
 
+// ---------------------------------------------------------------- one persona
+
+/** The persona the refresh loop stored in the shopper's document. */
+export interface StoredPersona {
+  personaId?: string
+  name: string
+  confidence: "low" | "medium" | "high"
+  reason: string
+}
+
+/** The single persona the label, the overlay and the concierge all use. */
+export interface ResolvedPersona {
+  /** Null when the stored persona is not one of the four overlay personas. */
+  personaId: LivePersonaId | null
+  name: string
+  confidence: "low" | "medium" | "high"
+  reason: string
+  /** "stored": the refresh loop's document. "session": this visit's events, until the next refresh names one. */
+  origin: "stored" | "session"
+}
+
+/**
+ * The stored persona was scored on the shopper's whole history, so when the document names one
+ * it wins. This visit's persona only fills the gap while the document has none.
+ */
+export function resolvePersona(stored: StoredPersona | null, session: LivePersona | null): ResolvedPersona | null {
+  if (stored) {
+    const id = stored.personaId && stored.personaId in PERSONAS ? (stored.personaId as LivePersonaId) : null
+    return { personaId: id, name: stored.name, confidence: stored.confidence, reason: stored.reason, origin: "stored" }
+  }
+  if (!session) return null
+  return {
+    personaId: session.personaId,
+    name: session.name,
+    confidence: session.confidence,
+    reason: session.reason,
+    origin: "session",
+  }
+}
+
+/** True when the persona has earned a layout change. */
+export function canOverlay(persona: ResolvedPersona | null): persona is ResolvedPersona & { personaId: LivePersonaId } {
+  return persona !== null && persona.personaId !== null && persona.confidence !== "low"
+}
+
 // ---------------------------------------------------------------- layout overlay
 
 function heroAd(layout: LayoutConfig, ad: AdId): void {
@@ -240,7 +285,7 @@ function saleHero(dept: string | null): AdId {
  * What a provisional persona is allowed to change once it has earned it
  * (confidence >= medium). Conservative: reorder and re-emphasize, never hide.
  */
-export function applyPersonaOverlay(layout: LayoutConfig, persona: LivePersona): LayoutConfig {
+export function applyPersonaOverlay(layout: LayoutConfig, persona: { personaId: LivePersonaId }): LayoutConfig {
   const out = structuredClone(layout)
   const dept = out.nav.department
   switch (persona.personaId) {

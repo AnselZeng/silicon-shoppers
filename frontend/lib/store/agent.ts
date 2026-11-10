@@ -266,14 +266,14 @@ export function processReply(
     const hint = result.failed.map(suggestSimilar).find(Boolean)
     notes.push(
       hint
-        ? `Could not find ${result.failed.join(", ")} — but we do have the ${hint}, want that instead?`
+        ? `Could not find ${result.failed.join(", ")}, but we do have the ${hint}, want that instead?`
         : `Couldn't find ${result.failed.join(", ")} in the catalog, want me to pick something similar?`,
     )
   } else if (CLAIM_ADD_RE.test(text) && result.added.length === 0 && !result.checkedOut) {
     const hint = suggestSimilar(text)
     notes.push(
       hint
-        ? `Nothing was bagged just yet — want me to add the ${hint}?`
+        ? `Nothing was bagged just yet, want me to add the ${hint}?`
         : "Hmm, that did not make it into your bag. Tell me the item again and I will grab it!",
     )
   }

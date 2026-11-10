@@ -76,8 +76,11 @@ class DB:
         if df.empty:
             return 0
         stg, cols = self._stage(df, variant)
-        self.execute(f"INSERT INTO {table} ({', '.join(cols)}) SELECT {self._select(cols, variant)} FROM {stg}")
-        self.execute(f"DROP TABLE IF EXISTS {stg}")
+        try:
+            self.execute(f"INSERT INTO {table} ({', '.join(cols)}) SELECT {self._select(cols, variant)} FROM {stg}")
+        finally:
+            # the staging table is permanent, so a failed write must not leave it behind
+            self.execute(f"DROP TABLE IF EXISTS {stg}")
         return len(df)
 
     def upsert(self, table: str, df: pd.DataFrame, key: str, variant: tuple = ()) -> int:
@@ -85,9 +88,11 @@ class DB:
             return 0
         stg, cols = self._stage(df, variant)
         k = key.upper()
-        self.execute(f"DELETE FROM {table} WHERE {k} IN (SELECT {k} FROM {stg})")
-        self.execute(f"INSERT INTO {table} ({', '.join(cols)}) SELECT {self._select(cols, variant)} FROM {stg}")
-        self.execute(f"DROP TABLE IF EXISTS {stg}")
+        try:
+            self.execute(f"DELETE FROM {table} WHERE {k} IN (SELECT {k} FROM {stg})")
+            self.execute(f"INSERT INTO {table} ({', '.join(cols)}) SELECT {self._select(cols, variant)} FROM {stg}")
+        finally:
+            self.execute(f"DROP TABLE IF EXISTS {stg}")
         return len(df)
 
     def replace(self, table: str, df: pd.DataFrame, variant: tuple = ()):

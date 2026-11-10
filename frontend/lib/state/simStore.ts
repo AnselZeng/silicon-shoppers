@@ -17,6 +17,8 @@ interface SimState {
   layoutProgress: { index: number; total: number } | null
   /** Bumped when the store reports a Snowflake layout, so the panel refetches it. */
   liveRevision: number
+  /** The persona the store is using right now. `live` means read from this visit, not the stored document. */
+  persona: { name: string; confidence: string; reason: string; live: boolean } | null
   /** True while a Run waits for the LLM's layout. */
   llmPending: boolean
   /** What the LLM has written so far on the current Run, as it streams in. */
@@ -32,6 +34,7 @@ interface SimState {
   setIframe: (iframe: HTMLIFrameElement | null) => void
   setLayoutProgress: (progress: { index: number; total: number } | null) => void
   noteLive: () => void
+  setPersona: (persona: SimState["persona"]) => void
   setLlmPending: (pending: boolean) => void
   setLlmText: (text: string) => void
   setHistory: (canBack: boolean, canForward: boolean) => void
@@ -46,6 +49,7 @@ export const useSimStore = create<SimState>((set) => ({
   iframe: null,
   layoutProgress: null,
   liveRevision: 0,
+  persona: null,
   llmPending: false,
   llmText: "",
   canBack: false,
@@ -58,6 +62,7 @@ export const useSimStore = create<SimState>((set) => ({
   setIframe: (iframe) => set({ iframe }),
   setLayoutProgress: (layoutProgress) => set({ layoutProgress }),
   noteLive: () => set((state) => ({ liveRevision: state.liveRevision + 1 })),
+  setPersona: (persona) => set({ persona }),
   setLlmPending: (llmPending) => set({ llmPending }),
   setLlmText: (llmText) => set({ llmText }),
   setHistory: (canBack, canForward) => set({ canBack, canForward }),

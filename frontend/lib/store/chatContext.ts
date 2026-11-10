@@ -5,7 +5,7 @@
 // log's reason strings), what's in the bag, where they are, and the catalog. Everything the
 // LLM may quote comes from here so it can explain instead of invent.
 
-import { getDecisionLog, getShopperDoc } from "@/lib/model/personalize"
+import { getDecisionLog, getPersona, getShopperDoc, getStatements } from "@/lib/model/personalize"
 import { isStoreLayoutDoc } from "@/lib/model/adapter"
 import { PRODUCTS } from "@/lib/store/catalog"
 import { effectivePrice } from "@/lib/store/types"
@@ -13,6 +13,8 @@ import { useStorefront } from "@/lib/store/storeState"
 
 export interface ChatContext {
   shopper: { id?: string; persona?: string; confidence?: string; reason?: string }
+  /** What the shopper told the concierge on this and earlier visits, oldest first. */
+  remembered: string[]
   decisions: { field: string; value: string; reason: string; source: string }[]
   bag: { name: string; color: string; size: string; qty: number; price: number }[]
   wishlist: { name: string; price: number }[]
@@ -29,16 +31,22 @@ export function buildChatContext(): ChatContext {
   const state = useStorefront.getState()
   const doc = getShopperDoc()
 
+  // The same persona the terminal and the layout use, so the concierge never names a different one.
+  const persona = getPersona()
   const shopper: ChatContext["shopper"] = {}
-  if (doc && isStoreLayoutDoc(doc)) {
-    shopper.id = doc.shopper.id
-    shopper.persona = doc.shopper.persona?.name ?? doc.shopper.label
+  if (doc && isStoreLayoutDoc(doc)) shopper.id = doc.shopper.id
+  if (persona) {
+    shopper.persona = persona.name
+    shopper.confidence = persona.confidence
+    shopper.reason = persona.reason
+  } else if (doc && isStoreLayoutDoc(doc)) {
+    shopper.persona = doc.shopper.label
     shopper.confidence = doc.shopper.confidence
-    shopper.reason = doc.shopper.persona_reason
   }
 
   return {
     shopper,
+    remembered: getStatements(),
     decisions: getDecisionLog()
       .filter((entry) => entry.reason)
       .map((entry) => ({ field: entry.key, value: entry.value, reason: entry.reason, source: entry.source })),

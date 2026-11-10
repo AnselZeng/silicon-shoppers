@@ -261,6 +261,115 @@ async function chatGemini(model: string, system: string, messages: ChatMessage[]
   return text
 }
 
+// ---------------------------------------------------------------- concierge chat with tools
+//
+// Nebius only (OpenAI-style tool calling). The model may call tools for several rounds; each
+// round streams. A round that ends in tool calls was the model thinking out loud ("let me
+// look that up"), so the caller is told to drop whatever text it streamed.
+
+interface ToolChunk extends ErrorBody {
+  choices?: {
+    delta?: {
+      content?: string | null
+      tool_calls?: { index?: number; id?: string; function?: { name?: string; arguments?: string } }[]
+    }
+    finish_reason?: string | null
+  }[]
+}
+
+export interface ToolHooks {
+  /** Reply text as the model writes it. */
+  onDelta: OnDelta
+  /** The round ended in tool calls: text streamed since the last drop was not the reply. */
+  onDrop: () => void
+  /** Runs one tool call and returns its JSON-serializable result. */
+  runTool: (name: string, args: Record<string, unknown>) => unknown
+}
+
+export interface ToolChatReply extends ChatReply {
+  /** Model calls made, including the one that wrote the reply. */
+  rounds: number
+}
+
+/** True when the configured provider can call tools. */
+export function toolsAvailable(): boolean {
+  return llmProvider() === "nebius"
+}
+
+const MAX_TOOL_ROUNDS = 5
+
+/**
+ * A concierge reply where the model may call `tools` first. Returns the text of the last round.
+ * Throws with a readable message on any failure; nothing has been streamed if the first call fails.
+ */
+export async function chatWithTools(
+  system: string,
+  messages: ChatMessage[],
+  tools: readonly unknown[],
+  hooks: ToolHooks,
+): Promise<ToolChatReply> {
+  if (!toolsAvailable()) throw new Error("tool calling needs the Nebius provider")
+  const model = llmModel("nebius")
+  const started = Date.now()
+  const convo: unknown[] = [{ role: "system", content: system }, ...messages]
+  for (let round = 1; round <= MAX_TOOL_ROUNDS; round += 1) {
+    const res = await fetch("https://api.tokenfactory.nebius.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${process.env.NEBIUS_API_KEY ?? ""}` },
+      body: JSON.stringify({
+        model,
+        temperature: 0.4,
+        max_tokens: 1024,
+        stream: true,
+        chat_template_kwargs: { thinking: false },
+        messages: convo,
+        tools,
+        // the last round must answer in words
+        tool_choice: round === MAX_TOOL_ROUNDS ? "none" : "auto",
+      }),
+    })
+    if (!res.ok) throw new Error(`Nebius ${res.status}: ${await errorMessage(res)}`)
+    let text = ""
+    const calls: { id: string; name: string; args: string }[] = []
+    for await (const data of sseData(res)) {
+      const chunk = data as ToolChunk
+      if (chunk.error) throw new Error(`Nebius: ${typeof chunk.error === "string" ? chunk.error : chunk.error.message}`)
+      const delta = chunk.choices?.[0]?.delta
+      const piece = delta?.content ?? ""
+      if (piece) {
+        text += piece
+        hooks.onDelta(piece)
+      }
+      for (const part of delta?.tool_calls ?? []) {
+        const at = part.index ?? calls.length
+        calls[at] ??= { id: "", name: "", args: "" }
+        if (part.id) calls[at].id = part.id
+        if (part.function?.name) calls[at].name += part.function.name
+        if (part.function?.arguments) calls[at].args += part.function.arguments
+      }
+    }
+    const asked = calls.filter((call) => call && call.name)
+    if (!asked.length) return { text, model, ms: Date.now() - started, rounds: round }
+    hooks.onDrop()
+    convo.push({
+      role: "assistant",
+      content: text,
+      tool_calls: asked.map((call) => ({ id: call.id, type: "function", function: { name: call.name, arguments: call.args || "{}" } })),
+    })
+    for (const call of asked) {
+      let result: unknown
+      try {
+        const args = JSON.parse(call.args || "{}") as unknown
+        result = hooks.runTool(call.name, args && typeof args === "object" ? (args as Record<string, unknown>) : {})
+      } catch {
+        result = { ok: false, error: "the arguments were not valid JSON" }
+      }
+      convo.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify(result) })
+    }
+  }
+  throw new Error("Nebius kept calling tools without answering")
+}
+
 /**
  * Streams a concierge reply to `onDelta`. `system` is the shopping-scope prompt and context block
  * built by the route. Throws with a readable message on any failure.

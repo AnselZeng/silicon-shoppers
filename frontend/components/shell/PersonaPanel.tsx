@@ -25,6 +25,7 @@ export function PersonaPanel() {
   const layoutPreview = useSimStore((state) => state.layoutPreview)
   const fixtures = useSimStore((state) => state.fixtures)
   const liveRevision = useSimStore((state) => state.liveRevision)
+  const reported = useSimStore((state) => state.persona)
   const [sentence, setSentence] = useState("")
   const [live, setLive] = useState<LiveFetch | null>(null)
   const [cohort, setCohort] = useState<CohortSnapshot | null>(null)
@@ -164,8 +165,9 @@ export function PersonaPanel() {
         <p className="mt-2 truncate text-[11px] leading-snug text-white/55">
           {custom && !fromSentence ? (
             `Custom, edited from ${active.title}. Run uses the sliders.`
-          ) : showingLive ? (
-            `${stored?.shopper.persona?.name ?? "This shopper"} · ${stored?.shopper.confidence ?? "low"} confidence. ${stored?.shopper.persona_reason ?? "Run applies the stored layout."}`
+          ) : showingLive || (followLive && reported) ? (
+            // The store reports the one persona it is using, so the panel and the terminal agree.
+            `${reported?.name ?? stored?.shopper.persona?.name ?? "This shopper"} · ${reported?.confidence ?? stored?.shopper.confidence ?? "low"} confidence${reported?.live ? ", this visit" : ""}. ${reported?.reason || stored?.shopper.persona_reason || "Run applies the stored layout."}`
           ) : stored ? (
             <>
               Example mix.{" "}

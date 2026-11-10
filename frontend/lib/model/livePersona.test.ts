@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { applyPersonaOverlay, LivePersonaTracker } from "@/lib/model/livePersona"
+import { applyPersonaOverlay, canOverlay, LivePersonaTracker, resolvePersona, type LivePersona, type StoredPersona }
+  from "@/lib/model/livePersona"
 import { DEFAULT_LAYOUT } from "@/lib/layout/presets"
 import { PRODUCTS } from "@/lib/store/catalog"
 import type { StoreEvent, StoreEventType } from "@/lib/sim/protocol"
@@ -132,13 +133,7 @@ describe("applyPersonaOverlay", () => {
   const base = structuredClone(DEFAULT_LAYOUT)
 
   it("Price Hunter: sale leads the nav, price sort ascends, sale emphasised", () => {
-    const out = applyPersonaOverlay(base, {
-      personaId: "price_hunter",
-      name: "Price Hunter",
-      confidence: "high",
-      reason: "",
-      score: 0.6,
-    })
+    const out = applyPersonaOverlay(base, { personaId: "price_hunter" })
     expect(out.nav.order[0]).toBe("sale")
     expect(out.nav.highlight).toBe("sale")
     expect(out.listing.defaultSort).toBe("price_asc")
@@ -150,27 +145,47 @@ describe("applyPersonaOverlay", () => {
   })
 
   it("Trend Seeker: new_in leads, newest sort", () => {
-    const out = applyPersonaOverlay(base, {
-      personaId: "trend_seeker",
-      name: "Trend Seeker",
-      confidence: "medium",
-      reason: "",
-      score: 0.4,
-    })
+    const out = applyPersonaOverlay(base, { personaId: "trend_seeker" })
     expect(out.nav.order[0]).toBe("new_in")
     expect(out.listing.defaultSort).toBe("newest")
     expect(out.listing.card.badges).toContain("new")
   })
 
   it("does not mutate the input layout", () => {
-    applyPersonaOverlay(base, {
-      personaId: "price_hunter",
-      name: "Price Hunter",
-      confidence: "high",
-      reason: "",
-      score: 0.6,
-    })
+    applyPersonaOverlay(base, { personaId: "price_hunter" })
     expect(base.nav.order[0]).not.toBe("sale")
     expect(base.listing.defaultSort).toBe("relevance")
+  })
+})
+
+describe("resolvePersona: one persona for the label, the overlay and the concierge", () => {
+  const session: LivePersona = { personaId: "price_hunter", name: "Price Hunter", confidence: "high", reason: "3 bag adds", score: 0.7 }
+  const stored: StoredPersona = { personaId: "brand_loyalist", name: "Brand Loyalist", confidence: "medium", reason: "16 bag adds" }
+
+  it("has none before either side names one", () => {
+    expect(resolvePersona(null, null)).toBeNull()
+    expect(canOverlay(resolvePersona(null, null))).toBe(false)
+  })
+
+  it("uses this visit's persona while the stored document has none", () => {
+    const p = resolvePersona(null, session)
+    expect(p).toMatchObject({ name: "Price Hunter", confidence: "high", origin: "session" })
+    expect(canOverlay(p)).toBe(true)
+  })
+
+  it("lets the stored document win once it names a persona, even against a confident visit", () => {
+    const p = resolvePersona(stored, session)
+    expect(p).toMatchObject({ personaId: "brand_loyalist", name: "Brand Loyalist", reason: "16 bag adds", origin: "stored" })
+  })
+
+  it("never overlays on low confidence, whichever side it came from", () => {
+    expect(canOverlay(resolvePersona({ ...stored, confidence: "low" }, session))).toBe(false)
+    expect(canOverlay(resolvePersona(null, { ...session, confidence: "low" }))).toBe(false)
+  })
+
+  it("keeps the label but skips the overlay for a stored persona outside the four", () => {
+    const p = resolvePersona({ name: "Cohort 12", confidence: "high", reason: "" }, session)
+    expect(p).toMatchObject({ name: "Cohort 12", personaId: null, origin: "stored" })
+    expect(canOverlay(p)).toBe(false)
   })
 })

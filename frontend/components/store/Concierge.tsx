@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import type { ConciergeTone } from "@/lib/layout/types"
+import { forgetStatements, rememberStatement } from "@/lib/model/personalize"
+import { FORGET_RE } from "@/lib/model/statements"
 import { buildChatContext } from "@/lib/store/chatContext"
 import { applyChatIntent } from "@/lib/store/chatIntent"
 import {
@@ -180,6 +182,18 @@ export function Concierge() {
       setBusy(false)
       return
     }
+    // "forget what I told you": drop the remembered statements, here and on later visits.
+    if (FORGET_RE.test(message)) {
+      const rebuilt = forgetStatements()
+      emitStoreEvent("concierge_layout", { tone, summary: "forgot what the shopper said", forget: true })
+      const reply = rebuilt
+        ? "Done, I have let go of what you told me. The store is back to what it learned from your shopping."
+        : "Done, I have let go of what you told me, so it will not come back on your next visit."
+      setMessages((prev) => [...prev, { role: "user", content: message }, { role: "assistant" as const, content: reply }])
+      history.current = [...history.current, { role: "user" as const, content: message }, { role: "assistant" as const, content: reply }].slice(-12)
+      setBusy(false)
+      return
+    }
     // A stated preference the store can act on is applied right away — the shopper asked
     // out loud, so no confidence gate. It plays through the same staged animation as a
     // model-driven layout: each changed region scrolls, flashes and swaps on its own.
@@ -192,7 +206,9 @@ export function Concierge() {
         onStep: (index, total, label) => post({ type: "layout_step", index, total, label }),
         onSettled: () => post({ type: "layout_settled" }),
       })
-      emitStoreEvent("concierge_layout", { tone, summary: applied.summary })
+      // The sentence is stored with the event, so the store can re-apply it on the next visit.
+      rememberStatement(message)
+      emitStoreEvent("concierge_layout", { tone, summary: applied.summary, q: message })
     }
     setMessages((prev) => [...prev, { role: "user", content: message }])
     try {
@@ -222,7 +238,18 @@ export function Concierge() {
         buffer = done ? "" : (lines.pop() ?? "")
         for (const line of lines) {
           if (!line.trim()) continue
-          const event = JSON.parse(line) as { type: string; text?: string; error?: string; model?: string; ms?: number }
+          const event = JSON.parse(line) as {
+            type: string; text?: string; error?: string; model?: string; ms?: number; name?: string; detail?: string
+          }
+          // The model looked something up or acted through a tool: show it in the terminal.
+          if (event.type === "tool") {
+            emitStoreEvent("concierge_action", { action: `tool ${event.name ?? "?"}`, detail: event.detail ?? "" })
+          }
+          // What streamed so far was the model thinking out loud before a tool call, not the reply.
+          if (event.type === "reset") {
+            reply = ""
+            setMessages((prev) => [...prev.slice(0, -1), { role: "assistant", content: "" }])
+          }
           if (event.type === "delta" && event.text) {
             reply += event.text
             // The trailing <<<ACTIONS>>> block is machine-readable; never render it.
