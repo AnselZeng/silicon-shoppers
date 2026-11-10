@@ -20,7 +20,7 @@ def _app_dir() -> Path:
 APP_DIR = _app_dir()   # the store app; set ATELIER_APP_DIR in .env to point elsewhere
 
 # refresh job
-REFRESH_EVERY_S = int(os.environ.get("REFRESH_EVERY_S", 120))
+REFRESH_EVERY_S = int(os.environ.get("REFRESH_EVERY_S", 240))
 TRENDING_MINUTES = int(os.environ.get("TRENDING_MINUTES", 60))
 SESSION_LAST_EVENTS = 40                      # the session model was trained on prefixes of up to 40 events
 

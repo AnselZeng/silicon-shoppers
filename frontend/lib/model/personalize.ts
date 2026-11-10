@@ -8,6 +8,7 @@
 
 import { fromStoreEvent, isStoreLayoutDoc, modelLayout, modelLayoutV1, type DecisionLogEntry }
   from "@/lib/model/adapter";
+import { applyPersonaOverlay, LivePersonaTracker } from "@/lib/model/livePersona";
 import { getShopperId, queueEvent } from "@/lib/model/eventSink";
 import type { HomepageDoc } from "@/lib/model/homepage";
 import { SessionTracker, type SessionDecisions, type SessionModel } from "@/lib/model/sessionStyle";
@@ -19,6 +20,8 @@ const POLL_MS = 60_000;
 
 let home: HomepageDoc | StoreLayoutDoc | null = null;
 let tracker: SessionTracker | null = null;
+let liveTracker = new LivePersonaTracker();
+let lastOverlayKey = "";
 let trackerReady: Promise<void> | null = null;
 let updatedAt: string | null = null;
 let poll: ReturnType<typeof setInterval> | null = null;
@@ -47,6 +50,7 @@ function report(status: {
   persona?: string;
   confidence?: string;
   reason?: string;
+  live?: boolean;
   updatedAt?: string | null;
 }): void {
   const shopperId = getShopperId();
@@ -69,6 +73,7 @@ export function initPersonalization(): void {
   }
   void refreshLayout();
   if (!poll) poll = setInterval(() => void refreshLayout(), POLL_MS);
+  liveTracker = new LivePersonaTracker();
 }
 
 async function refreshLayout(): Promise<void> {
@@ -119,13 +124,35 @@ function describe(doc: HomepageDoc | StoreLayoutDoc, at: string | null): {
   return { state: "applied", persona: doc.demo_id ?? doc.user_id, updatedAt: at };
 }
 
-/** Feed one store event: upload it for the slow loop and let the live model react. */
+/** Feed one store event: upload it, let the session model react, update the live persona. */
 export function onStoreEvent(e: StoreEvent): void {
   queueEvent(e);
+  liveTracker.add(e);
+  const lp = liveTracker.current(tracker?.current().style);
+  if (lp) {
+    report({
+      state: "applied",
+      persona: lp.name,
+      confidence: lp.confidence,
+      reason: lp.reason,
+      live: true,
+    });
+  }
   const ev = fromStoreEvent(e);
   if (!ev || !tracker) return;
   const { decisions } = tracker.add(ev);
-  if (home && signature(decisions) !== lastSignature) apply(decisions);
+  const overlayKey = lp && lp.confidence !== "low" ? `${lp.personaId}:${lp.confidence}` : "";
+  if (home && (signature(decisions) !== lastSignature || overlayKey !== lastOverlayKey)) {
+    lastOverlayKey = overlayKey;
+    apply(decisions);
+  } else if (!home && overlayKey && lp) {
+    // no stored document: the live persona still gets to rearrange the default store
+    if (overlayKey !== lastOverlayKey) {
+      lastOverlayKey = overlayKey;
+      const next = applyPersonaOverlay(useStorefront.getState().layout, lp);
+      useStorefront.getState().setLayout(next, { presetName: `Live persona · ${lp.name}` });
+    }
+  }
 }
 
 function signature(decisions: SessionDecisions): string {
@@ -137,7 +164,18 @@ function signature(decisions: SessionDecisions): string {
 function apply(live?: SessionDecisions): void {
   if (!home) return;
   const { layout, log } = isStoreLayoutDoc(home) ? modelLayoutV1(home, live) : modelLayout(home, live);
+  const lp = liveTracker.current(tracker?.current().style);
+  const final = lp && lp.confidence !== "low" ? applyPersonaOverlay(layout, lp) : layout;
+  if (final !== layout) {
+    log.push({
+      key: "live_persona",
+      value: lp!.name,
+      reason: lp!.reason,
+      source: "Live persona (in-session)",
+      evidence: `${liveTracker.stats().nEvents} events`,
+    });
+  }
   lastSignature = live ? signature(live) : "";
   lastLog = log;
-  useStorefront.getState().setLayout(layout, { presetName: live ? "Live session" : "H&M model" });
+  useStorefront.getState().setLayout(final, { presetName: live ? "Live session" : "H&M model" });
 }

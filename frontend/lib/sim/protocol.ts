@@ -67,6 +67,8 @@ export type StorePayload =
       persona?: string
       confidence?: string
       reason?: string
+      /** Persona computed in-session from this browser's own events, not the stored document. */
+      live?: boolean
       updatedAt?: string | null
     }
   /** Whether the fake browser can go back or forward, and the address it should show. */
