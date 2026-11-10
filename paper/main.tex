@@ -108,7 +108,7 @@ The storefront renders entirely from one versioned JSON document (\texttt{atelie
 
 \subsection{The concierge agent}
 
-The chat bubble streams responses from DeepSeek-V4-Flash via the Nebius API (with a Gemini fallback) through an NDJSON endpoint. Each request carries a grounded context payload: the shopper document, persona and decision reasons, the current layout, bag contents, and the product catalog, so questions like ``what is my most purchased size?'' are answered from data.
+The chat bubble streams responses from DeepSeek-V4.1-Flash via the Nebius API (with a Gemini fallback) through an NDJSON endpoint. Each request carries a grounded context payload: the shopper document, persona and decision reasons, the current layout, bag contents, and the product catalog, so questions like ``what is my most purchased size?'' are answered from data.
 
 The agent acts through a marker protocol. A reply may end with a typed action block (e.g., \texttt{add\_to\_bag}, \texttt{checkout}, \texttt{ask\_checkout}), or with natural-language layout intent that a deterministic parser maps onto contract edits (department, price direction, sale negation, color focus). Chat-driven layout changes play through the same staged animation as model-driven ones, so the shopper sees the store respond to their own words step by step.
 

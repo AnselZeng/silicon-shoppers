@@ -5,7 +5,7 @@
 //
 // Env (.env.local / Vercel; never NEXT_PUBLIC_):
 //   NEBIUS_API_KEY=...            Nebius Token Factory key
-//   NEBIUS_MODEL=...              optional, default deepseek-ai/DeepSeek-V4-Flash-0731
+//   NEBIUS_MODEL=...              optional, default deepseek-ai/DeepSeek-V4.1-Flash-1017
 //   GEMINI_API_KEY=...            free key from aistudio.google.com/apikey
 //   GEMINI_MODEL=...              optional, default gemini-3.5-flash
 //   LLM_PROVIDER=nebius|gemini    optional; otherwise the first provider with a key, Nebius first
@@ -38,7 +38,7 @@ export function missingKeyMessage(): string {
 
 export function llmModel(provider: Provider): string {
   return provider === "nebius"
-    ? process.env.NEBIUS_MODEL || "deepseek-ai/DeepSeek-V4-Flash-0731"
+    ? process.env.NEBIUS_MODEL || "deepseek-ai/DeepSeek-V4.1-Flash-1017"
     : process.env.GEMINI_MODEL || "gemini-3.5-flash"
 }
 

@@ -104,14 +104,14 @@ describe("generateLayout with Nebius", () => {
     const pieces: string[] = []
     const first = await generateLayout(input, (piece) => pieces.push(piece))
     expect(first.cached).toBe(false)
-    expect(first.model).toBe("deepseek-ai/DeepSeek-V4-Flash-0731")
+    expect(first.model).toBe("deepseek-ai/DeepSeek-V4.1-Flash-1017")
     expect(pieces.length).toBeGreaterThan(1)
     expect(pieces.join("")).toBe(first.text)
     const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit]
     expect(url).toBe("https://api.tokenfactory.nebius.com/v1/chat/completions")
     expect((init.headers as Record<string, string>).authorization).toBe("Bearer nebius-key")
     const sent = JSON.parse(String(init.body)) as { model: string; stream: boolean; response_format: unknown; messages: { role: string; content: string }[] }
-    expect(sent.model).toBe("deepseek-ai/DeepSeek-V4-Flash-0731")
+    expect(sent.model).toBe("deepseek-ai/DeepSeek-V4.1-Flash-1017")
     expect(sent.stream).toBe(true)
     expect(sent.response_format).toEqual({ type: "json_object" })
     expect((sent as unknown as { chat_template_kwargs: unknown }).chat_template_kwargs).toEqual({ thinking: false })
