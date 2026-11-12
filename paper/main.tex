@@ -3,15 +3,16 @@
 %% The Web Conference 2027 - Demo Track
 %% Max 4 pages including references.
 %% TODO before submission:
-%%   1. Add figures (placeholders marked % FIGURE)
-%%   2. Record 2-minute screencast and add link
-%%   3. Verify repo is public or make it public
+%%   1. Record 2-minute screencast and replace TODO_VIDEO
+%%   2. Verify repo is public or make it public
 
 \setcopyright{none}
 \settopmatter{printacmref=false}
 \renewcommand\footnotetextcopyrightpermission[1]{}
 \pagestyle{plain}
 \acmConference[WWW '27]{The ACM Web Conference 2027}{May 10--14, 2027}{Dublin, Ireland}
+
+\usepackage{tikz}
 
 \begin{document}
 
@@ -87,11 +88,26 @@ The demo's technical contribution is the agent's \emph{honesty layer}: a pipelin
 
 Figure~\ref{fig:arch} shows the architecture. The system has three surfaces (the storefront, a simulator shell that hosts and instruments it, and a data plane that persists everything) connected by a single typed layout contract.
 
-% FIGURE: architecture diagram, full column width.
-% Suggested content: store iframe + shell (persona panel, terminal) + three layout writers (history model, browsing model, concierge) + Snowflake plane + /api/chat NDJSON stream.
 \begin{figure}[t]
   \centering
-  \fbox{\parbox{0.95\columnwidth}{\vspace{1.4in}\centering \emph{System architecture: layout contract, three writers, honesty layer, data plane.}\vspace{1.4in}}}
+  \begin{tikzpicture}[font=\footnotesize, >=stealth,
+      box/.style={draw, rounded corners=1.5pt, align=center, inner sep=3pt, minimum height=7mm},
+      w/.style={box, text width=20mm}, wide/.style={box, text width=74mm}]
+    \node[w] (hist) at (0,0) {Purchase model\\(H\&M), first paint};
+    \node[w] (sess) at (2.75,0) {Session model\\(OTTO), per click};
+    \node[w] (chat) at (5.5,0) {Concierge\\(LLM + tools)};
+    \node[wide, fill=black!8] (contract) at (2.75,-1.45) {Layout contract \texttt{atelier.store\_layout.v1}\\schema-validated on every write};
+    \node[wide] (store) at (2.75,-2.9) {Storefront: staged animation, bag, mock Visa checkout};
+    \node[wide] (audit) at (2.75,-4.25) {Honesty layer: validate, recover, audit claims against state};
+    \node[wide] (snow) at (2.75,-5.7) {Snowflake: events, layout history, 4-minute refresh task,\\nightly retrain};
+    \draw[->] (hist) -- (hist |- contract.north);
+    \draw[->] (sess) -- (contract);
+    \draw[->] (chat) -- node[right, pos=0.45] {intent} (chat |- contract.north);
+    \draw[->] (contract) -- (store);
+    \draw[<->] (store) -- node[right] {actions, replies} (audit);
+    \draw[->] (audit) -- node[right] {events} (snow);
+    \draw[->] (snow.west) -- ++(-0.35,0) |- node[pos=0.25, left, align=right] {stored\\layout} (contract.west);
+  \end{tikzpicture}
   \caption{Silicon Shoppers architecture. All layout mutation flows through one versioned contract; all mutation events are validated, staged, and logged.}
   \label{fig:arch}
   \Description{Diagram of the system architecture.}
@@ -168,15 +184,13 @@ The demo runs the full system on a laptop: the SoCal Atelier store in a fake-bro
 
 \textbf{Shop end to end.} Attendees ask the concierge to shop (``buy the wool trouser in black, size M''), watch the item land in the bag with a checkout confirmation, answer ``yes'' or ``nope'' in their own words, and complete a mock Visa payment, including an auto-pay toggle they can flip mid-session. The terminal narrates every step, and attempted edge cases (invented product names, contradictory requests, toggling auto-pay mid-countdown) demonstrate the honesty layer live.
 
-% FIGURE: composite screenshot, full column width.
-% Left: store mid-rearrange with flash tags. Right: concierge + terminal.
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
-  \fbox{\parbox{0.95\columnwidth}{\vspace{1.2in}\centering \emph{Demo UI: store mid-rearrange (left), concierge and live terminal (right).}\vspace{1.2in}}}
-  \caption{The demo interface. The layout diff animates in stages with tagged regions; the terminal logs every model, layout, agent, and payment event.}
+  \includegraphics[width=0.72\textwidth]{fig-demo.png}
+  \caption{The store and terminal after two concierge turns. The first sentence moved menswear to the front of the navigation and swapped the hero. The second asked to pay with an empty bag; with tools switched off the model announced payment, and the audit appended the correction in parentheses. The terminal shows the skipped checkout.}
   \label{fig:demo}
-  \Description{Screenshot of the demo interface.}
-\end{figure}
+  \Description{Screenshot of the storefront with the concierge chat open and the terminal log underneath.}
+\end{figure*}
 
 A 2-minute screencast of the full flow is available at \url{TODO_VIDEO}, and the source at \url{https://github.com/AnselZeng/silicon-shoppers}.
 
