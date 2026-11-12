@@ -137,13 +137,6 @@ export function applyChatIntent(message: string, current: LayoutConfig): ChatApp
     changes.push(`${colors.join(" + ")} colors forward`)
   }
 
-  // Stated colors → color merchandising: those colors first on cards and in the color filter.
-  if (colors.length) {
-    layout.listing.colorHighlight = colors
-    layout.listing.expandedFilters = [...new Set<typeof layout.listing.expandedFilters[number]>(["color", ...layout.listing.expandedFilters])]
-    changes.push(`${colors.join(" + ")} colors forward`)
-  }
-
   // The hero is part of the rearrange too — swap the banner to match what they asked
   // for, so the headline/visual changes with the store instead of staying constant.
   const deptForHero = landing ?? layout.nav.department

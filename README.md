@@ -43,13 +43,14 @@ Today's personalization only swaps a few products in a recommendation strip; **t
 
 ## What we built
 
-Three AI signals feed one store:
+Four signals feed one store:
 
 | Signal | What it learns | Model | When it acts |
 | --- | --- | --- | --- |
-| **Purchase history** | What you buy: departments, categories, colors, price level, sale and newness habits | Models trained on **100,000 real H&M shoppers** (GRU sequence model, LightGBM, learned blend, product ranker) | Before the first click |
+| **Purchase history** | What you buy: departments, categories, colors, price level, sale and newness habits | Models trained on **100,000 real H&M shoppers** (LightGBM trees, a learned blend with store popularity, a LambdaRank section model, a product ranker) | Before the first click |
 | **Live clicks** | How you browse: pace, exploring vs deciding, comparing, cart habits | Session model trained on **200,000 real OTTO shoppers**, running in the browser | After every click |
-| **What you say** | "Back-to-school stuff for my 6-year-old, under $25 each" | **Gemini** reads the model's output plus your sentence and designs the layout inside a fixed, validated schema | When you press Run |
+| **What you say** | "Back-to-school stuff for my 6-year-old, under $25 each" | An **LLM** (DeepSeek on Nebius, or Gemini) reads the model's output plus your sentence and designs the layout inside a fixed, validated schema | When you press Run |
+| **What you tell the concierge** | "Make it more men friendly, navy first" or "buy the wool trouser in black, size M" | A keyword parser turns layout intent into layout edits; the LLM shops through four checked tools | In the chat, at any time |
 
 What the store changes for you:
 
@@ -66,21 +67,22 @@ What the store changes for you:
 ## Demo in 2 minutes
 
 1. **Normal store:** everyone sees the same editorial layout.
-2. **Pick an AI shopper** (Price Hunter, seed 42, Adaptive on) and press **Run**. A ghost cursor browses SOCAL ATELIER while the terminal streams `[agent]`, `[tracker]`, `[engine]`, `[layout]` and `[visa]`.
-3. After a few events the engine classifies the session and the store **switches live**: discount hero, sale filters, pop-ups off, guest checkout.
-4. The cursor adds a piece, opens the **mock Visa Unified Checkout**, and lands on `/store/confirmation`.
-5. **Tell the store what you need:** type "gym clothes for my husband, spend $100 total". Men and Sport move up, Budget picks appears, and every card shows whether it fits.
-6. **Flip Adaptive off:** the same store snaps back to the default. Same persona and same seed replay the same choices.
+2. **Pick a shopper** (Price Hunter, Trend Seeker, Mission Shopper, Brand Loyalist) or drag the shopping-mix sliders, then press **Run**. The terminal streams `[model]`, `[llm]`, `[layout]`, `[tracker]` and `[visa]`.
+3. The store **rearranges in stages**: nav, then hero and ads, then home rows, then sort and filters. Each stage is boxed and tagged while it plays, and the panel lists the reason for every decision.
+4. **Describe the shopper instead:** type "gym clothes for my husband, spend $100 total" under "Or describe them" and press Run.
+5. **Talk to the concierge** in the store: "make it more men friendly, navy first" rearranges the store; "buy the wool trouser in black, size M" adds it to the bag and asks before paying.
+6. Pay through the **mock Visa Unified Checkout** and land on `/store/confirmation`.
+7. **Default website** puts the store back to the layout everyone gets.
 
 ---
 
 ## How it works
 
 ```
- Purchase history (H&M)          Live clicks (OTTO-trained)         A sentence (Gemini)
+ Purchase history (H&M)          Live clicks (OTTO-trained)         A sentence (LLM)   
  100k shoppers, 2 years          first 3 to 40 events               "under $60, for my kid"
           |                                |                                  |
- GRU + LightGBM + blend          LightGBM trees in the browser      fixed JSON schema + keyword fallback
+ LightGBM + blend + ranker       LightGBM trees in the browser      fixed JSON schema + keyword fallback
  + product ranker                predicts browsing style            departments, priority, budget
           |                                |                                  |
           +----------------+---------------+----------------------------------+
@@ -97,38 +99,39 @@ What the store changes for you:
 
 - **Data:** 100,000 H&M shoppers (25,000 from each activity group, so light shoppers aren't buried), each summarized as a 25-number profile: category, department and color shares, price level, sale and newness affinity, rebuy share, online share, frequency and mainstreamness.
 - **Labels:** what each shopper actually bought in the next 4 weeks.
-- **Five model options, compared per decision:**
-  - a learned blend of the shopper's history with store popularity (runs in the browser);
-  - LightGBM, one model per decision;
-  - a GRU over the last 30 purchases, trained across 11 earlier months so it learns seasons;
-  - k-means personas, used as friendly labels;
-  - a LightGBM product ranker on (shopper, product) pairs.
-- **The best option per decision was picked on July data only**, and results are reported on August data.
+- **Several setups compared per decision** (details in `backend/model/README.md`):
+  - categories: LightGBM with a seasonality offset, trained on 12 monthly windows;
+  - department: a learned blend of the shopper's own share with store popularity;
+  - sections: LightGBM LambdaRank over (shopper, section) rows;
+  - products: a LightGBM ranker on (shopper, product) pairs;
+  - personas: rule-scored labels from the shopper's profile, used as friendly names, not as a tested prediction.
+- **The setup per decision was chosen on August 2020**, then frozen and tested once on a reserved 2019 window with 100,000 shoppers outside the cohort (`backend/model/results/test_2019.json`).
 - **A second pipeline** adds 128 purchase-history features and the H&M + OTTO fused profile, and exports one homepage document per shopper to Supabase.
 
 ### 2. The live session model (OTTO)
 
 - H&M has purchases but no browsing data, and OTTO has browsing but different people, so we can't look anyone up in both.
 - Instead, the session model learns browsing directly: for 200,000 OTTO shoppers it sees only their **first N events** (N = 3, 5, 10, 20, 40) and predicts how they browse for the rest of the session, so every number is a real forecast.
-- It predicts 7 browsing-style values and maps them to UI decisions (grid density, quick add, compare panel, Recently Viewed, cart reminder, product-page density).
+- It predicts 7 browsing-style values and maps them to UI decisions (grid density, quick add, compare panel, Recently Viewed, cart reminder, product-page density). The cart reminder also needs the cart-to-order value, whose single-visit R² peaks at 0.05, so it stays off within one visit.
 - **It only switches a decision on once its held-out accuracy is good enough** (R² of at least 0.10) for that many clicks.
 - The trees run in the browser with no dependencies, and are verified identical to the Python model.
 
-### 3. The conversational layer (Gemini)
+### 3. The LLM layout designer
 
-- **Run** sends the model's output (layout decisions, predicted mix, evidence, with no product tiles or shopper ids) and the optional "Or describe them" sentence to a Next.js server route, `app/api/llm-layout`, which calls Gemini (`gemini-3.5-flash`, override with `GEMINI_MODEL`). The system prompt is the generated design guideline and the response is constrained to the layout JSON Schema (`LlmLayoutSchema`).
+- **Run** sends the model's output (layout decisions, predicted mix, evidence, with no product tiles or shopper ids) and the optional "Or describe them" sentence to a Next.js server route, `app/api/llm-layout`, which calls the configured provider: DeepSeek on Nebius (`NEBIUS_API_KEY`, `NEBIUS_MODEL`) when its key is set, otherwise Gemini (`GEMINI_API_KEY`, `GEMINI_MODEL`, default `gemini-3.5-flash`). The system prompt is the generated design guideline and the response is constrained to the layout JSON Schema (`LlmLayoutSchema`).
 - **The LLM designs inside a box.** Code copies product ids in afterwards, and the validator enforces the model's validated decisions (section and category order), ad rules and copy limits, and drops any reason that cites a number not in the model's output. The sentence steers the design like an unvalidated decision and never overrides a validated one.
-- **If Gemini fails** (no key, API error, invalid or unusable JSON), Run falls back to the model's rules (`modelLayout`) and the error goes to the terminal (`[llm]`) and the browser console.
+- **If the LLM fails** (no key, API error, invalid or unusable JSON), Run falls back to the model's rules (`modelLayout`) and the error goes to the terminal (`[llm]`) and the browser console.
 - **Live every time:** temperature 0, and every Run streams a fresh answer (the side panel shows it as it's written). Set `LLM_CACHE=on` to reuse the answer for the same input instead. There is no timeout; Run waits for the LLM.
 - **A keyword parser returns the same format** if there's no key, the API is slow, or the Wi-Fi drops, so the demo never breaks.
 - **What leaves the app:** the model's aggregate output and the sentence, with no shopper ids. The API key stays on the server.
 
-### 4. The store and the simulator
+### 4. The store and the shell
 
-- **Next.js store:** SOCAL ATELIER (women, men, new in, sale, search, product, confirmation pages) runs in an iframe inside a simulator.
-- **The simulator:** a persona editor (4 personas, about 21 traits each), seeded runs (mulberry32) and a terminal.
-- **The ghost-cursor agent** scores candidate actions with trait-weighted heuristics. The engine scores events, converts them with softmax, and declares a persona once its top probability is at least 0.75 after at least 3 events.
-- **Layout changes** are sent into the store with a `set_layout` message.
+- **Next.js store:** SOCAL ATELIER (women, men, new in, sale, for you, search, product, confirmation pages) runs in an iframe inside the demo shell.
+- **The shell:** a shopper picker with shopping-mix sliders, the Run button, and a terminal with a `replay` command.
+- **Live persona:** the store names a provisional persona from the visitor's own events once there are at least 5, and lets it touch the layout from medium confidence (`lib/model/livePersona.ts`).
+- **Layout changes** are sent into the store with a `set_layout` message and played in stages (`lib/store/layoutMotion.ts`).
+- **The concierge** and its honesty layer are described under [Since the hackathon](#since-the-hackathon).
 
 ---
 
@@ -178,7 +181,7 @@ All 11 false claims announced payment for an empty bag. These numbers are from t
 
 - **Explains itself:** every block, tile, rail and badge carries a "Why am I seeing this?" reason.
 - **Only changes when confident:** a decision only changes for a group of shoppers if it beat the default for that group on held-out data. Everyone else keeps the normal store.
-- **The LLM is boxed in:** Gemini fills a fixed schema, the validator enforces the model's validated decisions, and it can't write product ids or touch prices.
+- **The LLM is boxed in:** the LLM fills a fixed schema, the validator enforces the model's validated decisions, and it can't write product ids or touch prices.
 - **You stay in control of money:** stated budgets drive the meter and badges. Checkout is a clearly labeled mock Visa Unified Checkout, and no real payment is taken.
 - **Privacy:**
   - No age, location or customer IDs are used as model inputs.
@@ -192,7 +195,7 @@ All 11 false claims announced payment for an empty bag. These numbers are from t
 ## Challenges we ran into
 
 - **Two datasets, zero shared shoppers.** H&M has purchases and OTTO has browsing, but they're different people. We matched them by buying behavior, then measured the link: R² of 0.00 to 0.23, too weak to trust. So we stopped borrowing browsing from strangers and trained a live model on OTTO that learns from the visitor's own clicks. That turned into one of our best results.
-- **Seasons broke our first model.** A model tuned in July carried summer demand (swimwear) into September and lost on category order. We fixed it two ways: training the GRU across 11 earlier monthly windows, and a seasonality offset that makes the trees learn only each shopper's deviation from the store's current mix.
+- **Seasons broke our first model.** A model tuned in July carried summer demand (swimwear) into September and lost on category order. We fixed it two ways: training across 12 monthly windows, and a seasonality offset that makes the trees learn only each shopper's deviation from the store's current mix.
 - **The obvious idea was wrong.** We assumed budget shoppers want price low-to-high. On held-out data, the items they actually bought next ranked at 0.42 under that sort vs 0.87 under bestsellers: they buy cheap items, but popular ones. So we kept bestsellers and added the price filter first, a Budget picks rail and a budget meter instead.
 - **"Women first" is usually right.** H&M's shoppers are mostly ladieswear buyers, so a top-1 landing page almost never changed. Even shoppers with mostly menswear history put 58% of their next purchases in Ladieswear (shared household accounts). We switched to a full department order plus quick-access tiles, which surface the parent's Baby & Kids or the husband's Men without forcing the landing page.
 - **Strong baselines make gains look tiny.** Popularity order is already good, and most shoppers' layouts don't change, which dilutes the averages. We added confidence gates and report numbers for the shoppers whose layout actually changed.
@@ -222,27 +225,17 @@ npm run dev
 ```
 
 - Open http://localhost:3000 at 1280px or wider. The store also works on its own at `/store`.
-- No keys are required: Visa checkout is a local mock, and without an LLM key Run builds the layout from the model's rules (the terminal says so) and the concierge answers from a short script.
-- **Nebius (used first when set):** add `NEBIUS_API_KEY=...` to `frontend/.env.local`. Optional `NEBIUS_MODEL` overrides `deepseek-ai/DeepSeek-V4.1-Flash-1017`. The concierge's tools need this provider.
-- **Gemini:** add `GEMINI_API_KEY=...` to `frontend/.env.local` (free key from aistudio.google.com/apikey), then restart `npm run dev`. Optional `GEMINI_MODEL` overrides `gemini-3.5-flash`. Never put either in a `NEXT_PUBLIC_` variable.
+- **No keys are required:** Visa checkout is a local mock. Without an LLM key Run builds the layout from the model's rules and the concierge answers from a scripted set (the terminal says so).
+- **LLM:** add `NEBIUS_API_KEY=...` (DeepSeek, with tool calling for the concierge) or `GEMINI_API_KEY=...` (free key from aistudio.google.com/apikey) to `frontend/.env.local`, then restart `npm run dev`. See `frontend/.env.example`. Never put a key in a `NEXT_PUBLIC_` variable.
+- **Snowflake:** with the `SNOWFLAKE_*` variables set, the store loads each shopper's stored document and the shopper panel follows it. Without them the panel uses the hand-written fixtures in `frontend/public/model/fixtures/` (labelled as such in the terminal).
 
 **Rebuilding the models** (Python 3.12, needs the dataset via Git LFS; see the `h&m-model` and `model` branches): `python -m model.run_all` (H&M layout models), `python -m model all` (fused homepage model) and `python -m session_model all` (OTTO session model). Every branch README lists the inputs, outputs and expected numbers.
-
-## Demo (layout preview)
-
-1. The left panel lists **model output fixtures**: hand-written stand-ins for the H&M model's output (see `frontend/public/model/fixtures/README.md`).
-2. Press **Model** to see the model's output: the JSON the LLM reads (decisions, reasons, predicted mix, ranked products). The store doesn't change; the model never changes the site on its own.
-3. Press **LLM** to see a hand-written stand-in for the LLM's layout, run through the real pipeline (code copies in product ids, then the validator). Only this stage changes the store. **House default** goes back to the store everyone gets.
-4. The panel shows each field's reason (the model's own reason and class label, or the LLM's) and how many validator fixes were needed. The terminal logs each step.
-5. Browse the store in the frame: nav, hero, home rows, ads (top strip, hero, listing banner, grid tiles, popup, interstitial, sticky footer), sort, filters and cards all follow the layout.
-
-With Snowflake configured, the store also loads that shopper's homepage document on first paint and lets the live session model adjust browsing fields as they click.
 
 ## How a layout is built
 
 - `lib/layout/schema.ts`: the layout config (v2) as a zod schema. The LLM fills `LlmLayoutSchema`; it never writes product ids or URLs.
 - `lib/model/`: the model's `HomepageDoc` type, the H&M → store mapping, the model policy the validator applies, the For You list, and `modelLayout()` for the live Snowflake path.
-- `lib/layout/llm.ts`: the trimmed input the LLM reads, its prompt, and the layout schema converted for Gemini. `lib/server/gemini.ts` makes the call; `app/api/llm-layout` is the route Run uses.
+- `lib/layout/llm.ts`: the trimmed input the LLM reads, its prompt, and the layout schema converted for Gemini. `lib/server/llm.ts` makes the call; `app/api/llm-layout` is the route Run uses.
 - `lib/layout/pipeline.ts`: code copies the ranked products and basket into LLM output, then validates.
 - `lib/layout/validate.ts`: one validator for every source, run inside the store's `setLayout`. It fixes small problems and reports them, and falls back to the house default when a config is broken.
 - `lib/ads/catalog.ts`: the house ad catalog. `docs/design-guideline.md` is the LLM's guideline, generated by `npm run guideline`.
@@ -273,7 +266,7 @@ From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `n
 ## Tech stack
 
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind, shadcn/ui, Zustand.
-- **AI / ML:** PyTorch (GRU), LightGBM, scikit-learn, Gemini API, tree models exported to JSON and evaluated in TypeScript.
+- **AI / ML:** LightGBM, scikit-learn, DeepSeek on Nebius or the Gemini API, tree models exported to JSON and evaluated in TypeScript.
 - **Data:** DuckDB, Parquet, Snowflake, Supabase (Postgres with row-level security), Git LFS.
 - **Payments:** mock Visa Unified Checkout.
 
