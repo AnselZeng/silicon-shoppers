@@ -1,0 +1,427 @@
+{
+ "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+ "seed": 20261111,
+ "scenarios": 240,
+ "failed": 0,
+ "unlabelled": 0,
+ "summary": [
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "replies": 240,
+   "falseClaims": 10,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0,
+   "namedItemInBag": "59/65"
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "replies": 240,
+   "falseClaims": 1,
+   "corrected": 12,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0,
+   "namedItemInBag": "59/65"
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "replies": 240,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0,
+   "namedItemInBag": "61/65"
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "replies": 240,
+   "falseClaims": 4,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0,
+   "namedItemInBag": "61/65"
+  }
+ ],
+ "latency": [
+  {
+   "protocol": "marker",
+   "replies": 240,
+   "medianMs": 2571,
+   "p90Ms": 4745
+  },
+  {
+   "protocol": "tools",
+   "replies": 240,
+   "medianMs": 4055,
+   "p90Ms": 7123,
+   "turnsWithToolCalls": 231,
+   "medianMsWithToolCalls": 4098
+  }
+ ],
+ "byKind": [
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "buy_exact",
+   "n": 40,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "buy_described",
+   "n": 30,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "buy_now",
+   "n": 25,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "browse",
+   "n": 40,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "invented",
+   "n": 30,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "bad_variant",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "pay_empty",
+   "n": 20,
+   "falseClaims": 10,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "pay_bag",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "naive",
+   "kind": "question",
+   "n": 15,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "buy_exact",
+   "n": 40,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "buy_described",
+   "n": 30,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "buy_now",
+   "n": 25,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "browse",
+   "n": 40,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "invented",
+   "n": 30,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "bad_variant",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "pay_empty",
+   "n": 20,
+   "falseClaims": 1,
+   "corrected": 9,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "pay_bag",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 3,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "marker",
+   "handler": "audited",
+   "kind": "question",
+   "n": 15,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "buy_exact",
+   "n": 40,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "buy_described",
+   "n": 30,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "buy_now",
+   "n": 25,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "browse",
+   "n": 40,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "invented",
+   "n": 30,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "bad_variant",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "pay_empty",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "pay_bag",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "naive",
+   "kind": "question",
+   "n": 15,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "buy_exact",
+   "n": 40,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "buy_described",
+   "n": 30,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "buy_now",
+   "n": 25,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "browse",
+   "n": 40,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "invented",
+   "n": 30,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "bad_variant",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "pay_empty",
+   "n": 20,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "pay_bag",
+   "n": 20,
+   "falseClaims": 4,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  },
+  {
+   "protocol": "tools",
+   "handler": "audited",
+   "kind": "question",
+   "n": 15,
+   "falseClaims": 0,
+   "corrected": 0,
+   "unaskedPayments": 0,
+   "unaskedAdds": 0
+  }
+ ]
+}

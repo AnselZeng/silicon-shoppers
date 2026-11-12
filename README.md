@@ -15,6 +15,7 @@ Built at the LA Hacks AI Hackathon (UCLA, Oct 17 to 18, 2026) for the Visa chall
 - [Demo in 2 minutes](#demo-in-2-minutes)
 - [How it works](#how-it-works)
 - [Results](#results)
+- [Since the hackathon](#since-the-hackathon)
 - [Trust and responsibility](#trust-and-responsibility)
 - [Challenges we ran into](#challenges-we-ran-into)
 - [What we learned](#what-we-learned)
@@ -148,6 +149,31 @@ All results are **offline replays**: each layout is scored against what real sho
 
 ---
 
+## Since the hackathon
+
+The demo paper in `paper/` (ACM Web Conference 2027 demo track) describes the system as it is on this branch. What was added after the hackathon:
+
+- **A concierge that acts.** The chat bubble in the store (`frontend/components/store/Concierge.tsx`, `app/api/chat`) answers from the shopper's own context, rearranges the layout from a sentence ("more men friendly, navy first"), and shops: it adds items, asks before checkout and pays through the mock Visa flow.
+- **Tools.** With Nebius the model looks products up and acts through four server-side tools (`search_products`, `check_bag`, `add_to_bag`, `checkout`, in `lib/server/chatTools.ts`). An add is checked against the catalog before the reply is written. `CHAT_TOOLS=off`, or a provider without tool calling, falls back to a catalog in the prompt and an action line the model writes itself.
+- **The honesty layer** (`lib/store/agent.ts`). Every reply is executed and audited against real store state: payment only starts on the shopper's own words, a claimed add with no action is recovered from the reply, and a claim that did not happen gets a correction appended.
+- **One persona.** A persona read from this visit's clicks (`lib/model/livePersona.ts`) fills in until the refresh loop stores one scored on the shopper's whole history; the panel, terminal, layout and concierge all use the same one.
+- **Memory.** What the shopper told the concierge is stored with the event and re-applied on later visits (`app/api/prefs`); "forget what I told you" clears it.
+- **Snowflake runs the loop.** A scheduled task calls a Snowpark procedure every four minutes to rescore shoppers with new events; a nightly task retrains a small next-department model on store events, and the store reads its predictions (`backend/deploy/`). The laptop loop (`python -m server loop`) still works as a fallback.
+- **Replay.** `replay [shopper-id] [events]` in the terminal prints a shopper's stored events and every layout version as one timeline (`app/api/replay`).
+
+### How the concierge was measured
+
+`npx tsx scripts/eval-live.ts` (from `frontend/`, needs `NEBIUS_API_KEY`) sends 240 generated shopper requests through the real model under both protocols, executes every reply naively and through the audit, and has a separate model call label what each reply tells the shopper. Replies, labels and results are saved in `paper/eval/`; `--score` re-scores them without calling the model and `--seed=N` draws a different set.
+
+| 240 requests, DeepSeek-V4.1-Flash | False claims, naive | False claims, audited | Median reply |
+| --- | --- | --- | --- |
+| Model writes its own action line | 11 | 0 | 2.8 s |
+| Model uses tools | 0 | 0 | 6.1 s |
+
+All 11 false claims announced payment for an empty bag. These numbers are from the second request set (`--seed=7`); the first set found two gaps in the audit, which were fixed before the second was collected. One sample per request, one model, labels from a model.
+
+---
+
 ## Trust and responsibility
 
 - **Explains itself:** every block, tile, rail and badge carries a "Why am I seeing this?" reason.
@@ -196,7 +222,8 @@ npm run dev
 ```
 
 - Open http://localhost:3000 at 1280px or wider. The store also works on its own at `/store`.
-- No keys are required: Visa checkout is a local mock, and without a Gemini key Run builds the layout from the model's rules (the terminal says so).
+- No keys are required: Visa checkout is a local mock, and without an LLM key Run builds the layout from the model's rules (the terminal says so) and the concierge answers from a short script.
+- **Nebius (used first when set):** add `NEBIUS_API_KEY=...` to `frontend/.env.local`. Optional `NEBIUS_MODEL` overrides `deepseek-ai/DeepSeek-V4.1-Flash-1017`. The concierge's tools need this provider.
 - **Gemini:** add `GEMINI_API_KEY=...` to `frontend/.env.local` (free key from aistudio.google.com/apikey), then restart `npm run dev`. Optional `GEMINI_MODEL` overrides `gemini-3.5-flash`. Never put either in a `NEXT_PUBLIC_` variable.
 
 **Rebuilding the models** (Python 3.12, needs the dataset via Git LFS; see the `h&m-model` and `model` branches): `python -m model.run_all` (H&M layout models), `python -m model all` (fused homepage model) and `python -m session_model all` (OTTO session model). Every branch README lists the inputs, outputs and expected numbers.
@@ -222,7 +249,7 @@ With Snowflake configured, the store also loads that shopper's homepage document
 
 ## Commands
 
-From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `npm run guideline` (regenerate the design guideline), `npm run fixtures` (regenerate the model fixtures).
+From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `npx tsx scripts/eval-live.ts` (live concierge eval), `npm run guideline` (regenerate the design guideline), `npm run fixtures` (regenerate the model fixtures).
 
 ---
 
@@ -233,6 +260,8 @@ From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `n
 | `frontend/` | Next.js simulator and store: layout preview, terminal, SOCAL ATELIER |
 | `frontend/lib/model/` | Model runtime in the browser: session model, layout adapter, Snowflake homepage fetch |
 | `backend/` | Homepage and live-session models; the store falls back to defaults when Python is not configured |
+| `backend/deploy/` | The refresh loop and nightly retrain as Snowpark procedures and tasks, with tests (`python -m pytest deploy/tests`) |
+| `paper/` | Demo paper source, compiled PDF, and the saved eval replies and results |
 | branch `dataset` | dataset-v1: 100k H&M shopper profiles, leak-free time windows, scoring harness |
 | branch `dataset-fusion` | H&M + OTTO fused 37-value profiles, hosted on Supabase |
 | branch `h&m-model` | H&M layout models, store structure (department order, tiles, price mode), browser engine, demo JSON |
@@ -258,7 +287,7 @@ From `frontend/`: `npm run dev`, `npm run lint`, `npm run build`, `npm test`, `n
 - Run the one clean test on the reserved 2019 window, then a real A/B test.
 - Per-person profiles for shared household accounts, the reason Ladieswear dominates even for menswear buyers.
 
-Routes: `/` is the demo shell (layout preview, terminal, iframe of the store). `/store` is SOCAL ATELIER, including women, men, new in, sale, for you, search, product, and confirmation. The terminal logs `[tracker]`, `[model]`, `[layout]`, and `[visa]`.
+Routes: `/` is the demo shell (layout preview, terminal, iframe of the store). `/store` is SOCAL ATELIER, including women, men, new in, sale, for you, search, product, and confirmation. The terminal logs `[tracker]`, `[model]`, `[layout]`, `[llm]`, and `[visa]`.
 
 ---
 

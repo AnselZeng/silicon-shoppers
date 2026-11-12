@@ -6,6 +6,7 @@ import {
   BUY_INTENT_RE,
   confirmReply,
   NEW_ORDER_RE,
+  processReply,
   recoverClaimedAdd,
   runChatActions,
   shopperConfirmed,
@@ -271,5 +272,28 @@ describe("runChatActions", () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+})
+
+describe("found by the live eval", () => {
+  test("two confirmations in one message authorize checkout", () => {
+    expect(shopperConfirmed("that's all, pay now")).toBe(true)
+    expect(shopperConfirmed("ok, I'm done")).toBe(true)
+    expect(shopperConfirmed("yes, the navy one")).toBe(false)
+    expect(shopperConfirmed("that's all, but do I have to pay now?")).toBe(false)
+  })
+
+  test("a checkout that did not run is corrected even when the claim pattern misses the wording", () => {
+    useStorefront.setState({ bag: [], checkoutPhase: "idle", visaSession: null, order: null })
+    const empty = processReply("yeah I'm done", 'Wonderful, let\'s get you to payment!<<<ACTIONS>>>[{"action":"checkout"}]', () => {})
+    expect(empty.result.checkedOut).toBe(false)
+    expect(empty.notes.join(" ")).toMatch(/bag is actually empty/)
+
+    const tee = PRODUCTS[0]
+    runChatActions([{ action: "add_to_bag", productId: tee.id }], () => {})
+    const unasked = processReply(`order the ${tee.name}`, 'All set, your payment is underway.<<<ACTIONS>>>[{"action":"checkout"}]', () => {})
+    expect(unasked.result.checkedOut).toBe(false)
+    expect(unasked.pending).toBe(true)
+    expect(unasked.notes.join(" ")).toMatch(/Nothing has been charged yet/)
   })
 })

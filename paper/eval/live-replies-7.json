@@ -1,0 +1,5282 @@
+[
+ {
+  "id": "buy_exact-3",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Cropped Pouch in navy is in your bag. Are you done shopping, or is there anything else you'd like?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g51\",\"color\":\"navy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2578,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-4",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Double Cardigan in beige, size S, is going in your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g76\",\"color\":\"beige\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 3042,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-2",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Cropped Shirt in burgundy, size S now. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g47\",\"color\":\"burgundy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3780,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-1",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Ribbed Cotton Tee in grey, size L to your bag now. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-sale-rib-tee\",\"color\":\"grey\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4996,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-5",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Tailored Tote in brown is in your bag. Anything else, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g20\",\"color\":\"brown\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2651,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-6",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Soft Camp Shirt in black, size XS to your bag now. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g14\",\"color\":\"black\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2270,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-7",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Matte Jean in camel is such a versatile piece, adding it in size L now. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g03\",\"color\":\"camel\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1826,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-11",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Structured Camp Shirt in white, size L to your bag now.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g36\",\"color\":\"white\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1811,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-10",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Quiet Pant in camel, size S to your bag now. Are you all set, or is there anything else you'd like to grab?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g84\",\"color\":\"camel\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2582,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-8",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Straight Jean in grey, size L is going in your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-sale-jean\",\"color\":\"grey\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 3351,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-9",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Long Wide Leg in brown, size XL to your bag now.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g66\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 4015,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-12",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Clean Rollneck in brown, size XL is going in your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g29\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2979,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-13",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Cropped Loafer in black, size 38, is going in your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g69\",\"color\":\"black\",\"size\":\"38\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4231,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-16",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Structured Tote in camel is in your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g67\",\"color\":\"camel\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2299,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-14",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Washed Blouson in white, size S is heading to your bag. Anything else, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g01\",\"color\":\"white\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4526,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-15",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Washed Pouch in navy is in your bag, and it's a beauty. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g07\",\"color\":\"navy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4109,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-17",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Cropped Cardigan in navy, size M is going straight into your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g63\",\"color\":\"navy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3288,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-18",
+  "protocol": "marker",
+  "raw": "Oh, great pick! That Fine Tee in cream is a lovely one. Adding it to your bag now.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g62\",\"color\":\"cream\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2817,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-20",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Matte Jean in burgundy, size S to your bag. Anything else you'd like, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g83\",\"color\":\"burgundy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2488,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-19",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Cropped Loafer in camel, size 40, is going straight into your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g56\",\"color\":\"camel\",\"size\":\"40\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3143,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-21",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Long Jean in black, size XL to your bag now.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g71\",\"color\":\"black\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1953,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-22",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Cropped Pouch in navy is in your bag. Anything else, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g51\",\"color\":\"navy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2755,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-24",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Ribbed Cotton Tee in grey, size XL to your bag now. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-sale-rib-tee\",\"color\":\"grey\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2320,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-25",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Long Camp Shirt in cream, size M is in your bag. Anything else, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g60\",\"color\":\"cream\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3411,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-26",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Long Jean in white, size XL to your bag now. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g71\",\"color\":\"white\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2887,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-27",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Fine Tee in cream is such an easy one to reach for. Adding it in XL now, are you all set or want to keep browsing?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g62\",\"color\":\"cream\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3541,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-23",
+  "protocol": "marker",
+  "raw": "Oh, great pick! That Relaxed Blouson in brown is a lovely one. I've added it in size S, are you done shopping or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g73\",\"color\":\"brown\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7788,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-29",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Long Shirt in brown, size XL is going in your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g04\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3323,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-30",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Relaxed Loafer in olive is a beauty, adding it in size 43 now. Are you all set, or want to keep browsing?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g88\",\"color\":\"olive\",\"size\":\"43\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2787,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-28",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Washed Blouson in white, size M to your bag now. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g01\",\"color\":\"white\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5353,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-32",
+  "protocol": "marker",
+  "raw": "Oh, lovely choice, the Long Knit in navy is such an easy layer. Adding it now, are you all set or want to keep browsing?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g12\",\"color\":\"navy\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2306,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-31",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Quiet Blouson in burgundy is such a rich color, adding it in M now. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g58\",\"color\":\"burgundy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3486,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-33",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Washed Pouch in navy is in your bag. Anything else you'd like to grab, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g07\",\"color\":\"navy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2931,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-35",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Structured Skirt in brown, size XS, is going in your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2179,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-34",
+  "protocol": "marker",
+  "raw": "Oh, great pick, the Long Topcoat in black is such a sharp piece. Adding it in size M now, are you done shopping or want anything else?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g06\",\"color\":\"black\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3715,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-36",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Heavy Crew in grey, size XS, is going straight into your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-navy-tee\",\"color\":\"grey\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2790,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-37",
+  "protocol": "marker",
+  "raw": "Oh, great pick, that brown Structured Skirt is such a good one. I've added it in size L, are you done shopping or want to keep browsing?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2359,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-38",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Clean Rollneck in brown, size L, is going straight into your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g29\",\"color\":\"brown\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 1923,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-39",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Structured Jean in cream, size M to your bag now.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g81\",\"color\":\"cream\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1606,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-1",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I found a few black knits in XL, like the Washed Cardigan in black for $190 and the Structured Cardigan in black for $136. Which one would you like me to add?",
+  "ms": 1873,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-40",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Washed Cardigan in black, size L is going straight into your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g52\",\"color\":\"black\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2053,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-2",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I added the Relaxed Overshirt in brown, size XL, to your bag. Anything else you'd like, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g41\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2034,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-5",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Clean Dress in grey, size XL, to your bag. Anything else you'd like, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g25\",\"color\":\"grey\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2603,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-4",
+  "protocol": "marker",
+  "raw": "Oh, great choice! I've added the Washed Overshirt in olive, size M, to your bag. Anything else you'd like, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g33\",\"color\":\"olive\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4150,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-6",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Quiet Shoulder Bag in burgundy, size OS, to your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g100\",\"color\":\"burgundy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3287,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-3",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Wool Trouser in navy, size XL, to your bag. Anything else, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-wool-trouser\",\"color\":\"navy\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4848,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-9",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Quiet Blouson in burgundy, size S, to your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g58\",\"color\":\"burgundy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1652,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-8",
+  "protocol": "marker",
+  "raw": "Oh, burgundy is such a great choice for a sweater. I added the Merino Polo in burgundy, size S, to your bag. Are you done shopping, or is there anything else you'd like?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-sale-knit\",\"color\":\"burgundy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2452,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-10",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Poplin Shirt in black, size XL, to your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-poplin\",\"color\":\"black\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2784,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-12",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Long Topcoat in black, size XL, to your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g06\",\"color\":\"black\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 3541,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-11",
+  "protocol": "marker",
+  "raw": "You're going to love these! I added the Clean Jean in olive, size L, to your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g57\",\"color\":\"olive\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 4129,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-7",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Relaxed Cardigan in beige, size M, to your bag. Anything else you'd like, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g37\",\"color\":\"beige\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8932,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-15",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I added the Fine Tee in cream, size S, to your bag. Anything else you'd like, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g62\",\"color\":\"cream\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2400,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-13",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The closest white knit for men is the Long Knit in white, size M, and I've added it to your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g12\",\"color\":\"white\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]>>>\n\nAre you done shopping, or want to grab anything else?",
+  "ms": 5833,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-16",
+  "protocol": "marker",
+  "raw": "Ooh, great pick! I've added the Washed Trouser in camel, size L, to your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g21\",\"color\":\"camel\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2150,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-14",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I added the Matte Shoulder Bag in olive... actually, let me get you the grey one, the Matte Shoulder Bag comes in olive and grey, so I've added the grey in OS. Anything else, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g31\",\"color\":\"grey\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3897,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-17",
+  "protocol": "marker",
+  "raw": "You're going to love this one. I added the men's Washed Cardigan in olive... actually it comes in cream, black and brown, so I grabbed the brown in XL, plus the women's Fine Rollneck in olive, size XL.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g52\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"add_to_bag\",\"productId\":\"w-g40\",\"color\":\"olive\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2007,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-18",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I found two brown-toned options in size 38: the Matte Loafer in brown for $46 and the Soft Sandal in camel for $64. Which one would you like?",
+  "ms": 1851,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-19",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I found the Long Overshirt in cream and navy, but no olive shirt in the catalog right now. Want me to add the Long Overshirt in navy, XL instead?",
+  "ms": 2985,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-20",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Washed Topcoat in grey, size M, to your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g08\",\"color\":\"grey\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3235,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-21",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Long Topcoat in black, size S, to your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g06\",\"color\":\"black\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3912,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-23",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Structured Skirt in brown, size XS, to your bag. Anything else you'd like, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2020,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-22",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Soft Jean in camel, size XS, to your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g94\",\"color\":\"camel\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 4715,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-26",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Quiet Crew in brown, size S, to your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g32\",\"color\":\"brown\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2175,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-27",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Fine Tee in beige, size M, to your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g90\",\"color\":\"beige\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2801,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-24",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Soft Jean in camel, size S, to your bag. Anything else you'd like, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g94\",\"color\":\"camel\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6118,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-25",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Quiet Blouson in burgundy, size M, to your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g58\",\"color\":\"burgundy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5004,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-28",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I added the Heavy Crew in black, size M, to your bag. Anything else, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-navy-tee\",\"color\":\"black\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 3048,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-29",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Structured Skirt in brown, size L, to your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 3759,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-1",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Relaxed Blouson comes in grey and black, so which color would you like, and what size?",
+  "ms": 2971,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-30",
+  "protocol": "marker",
+  "raw": "Great choice, camel trousers are such a versatile staple. I added the Quiet Pant in camel, size L, to your bag. Anything else, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g84\",\"color\":\"camel\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 3288,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-2",
+  "protocol": "marker",
+  "raw": "Oh, lovely choice! I've added the Fine Shift in navy to your bag.\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g85\",\"color\":\"navy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]\n\nAre you all set, or is there anything else you'd like to grab?",
+  "ms": 3050,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-6",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Structured Sandal in brown is $46, and I've added it to your bag.\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g46\",\"color\":\"brown\",\"size\":\"40\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1165,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-4",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Quiet Crew in brown is $124, and I've added it to your bag. Are you done shopping, or is there anything else you'd like?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g32\",\"color\":\"brown\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1932,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-5",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Double Pant in navy is in your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g15\",\"color\":\"navy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1711,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-3",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Which Poplin Shirt did you mean, the men's one at $78 in black or white, or the women's at $54 in white, navy or beige? Tell me the color and size and I'll pop it in your bag.",
+  "ms": 2538,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-7",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Long Shirt to your bag now. Are you done shopping, or is there anything else you'd like?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g04\",\"color\":\"brown\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1631,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-8",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Structured Skirt in brown is in your bag, and it's yours for $64.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2332,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-9",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Matte Trouser in grey is $124, and I've added it to your bag in size M. Want anything else, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g09\",\"color\":\"grey\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2637,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-10",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Everyday Crew in black, size M, to your bag now. Want anything else, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-sale-crew\",\"color\":\"black\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2846,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-11",
+  "protocol": "marker",
+  "raw": "Oh, great pick! There are two Matte Jeans, one in women's (black or camel, $64) and one in men's (navy, burgundy or black, $142). Which one would you like, and what size and color?",
+  "ms": 3446,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-13",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Structured Skirt in brown is a beauty at $64, adding it to your bag now. Anything else, or are you ready to check out?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2434,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-14",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Which one did you mean, the men's Cropped Loafer in navy, beige or camel, or the women's in black? Tell me the size and I'll pop it in your bag.",
+  "ms": 2492,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-12",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Fine Jacket in brown, size M by default, for you now. Are you done shopping, or is there anything else you'd like?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g43\",\"color\":\"brown\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4040,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-17",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Clean Wide Leg in grey, size M, to your bag. Want anything else, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g95\",\"color\":\"grey\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1550,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-15",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Adding the Washed Crew to your bag now. Want to keep shopping or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g86\",\"color\":\"black\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2805,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-16",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Double Pouch in camel is in your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g53\",\"color\":\"camel\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 4153,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-20",
+  "protocol": "marker",
+  "raw": "Oh, great pick! Which Matte Jean did you mean, the women's one in black or camel, or the men's in camel? Tell me the color and size and I'll pop it in your bag.",
+  "ms": 2683,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-18",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Matte Jean comes in black or camel, sizes XS to XL. Which color and size would you like?",
+  "ms": 4319,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-19",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Quiet Coat is $130, and I've added it in navy, size M. Want to grab anything else, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g26\",\"color\":\"navy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 3930,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-21",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Matte Jacket in olive, what size are you after?",
+  "ms": 2046,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-22",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Relaxed Loafer in olive is in your bag. Anything else, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g88\",\"color\":\"olive\",\"size\":\"38\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2666,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-23",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I've added the Structured Tote in burgundy to your bag. Are you done shopping, or is there anything else you'd like?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g67\",\"color\":\"burgundy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2878,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-25",
+  "protocol": "marker",
+  "raw": "Oh, lovely choice! Adding the Soft Camp Shirt in brown to your bag now. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g14\",\"color\":\"brown\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2535,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-24",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Washed Overshirt in burgundy is $52, and I've added it to your bag. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g33\",\"color\":\"burgundy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4000,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-1",
+  "protocol": "marker",
+  "raw": "Oh, we've got some lovely new shirts! The Washed Overshirt in burgundy, olive or grey is $52, and the Long Camp Shirt in grey or cream is $28. Which one catches your eye?",
+  "ms": 2469,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-2",
+  "protocol": "marker",
+  "raw": "Oh, you're in luck, coats are having a moment. The men's Soft Topcoat in brown or burgundy is new at $90, and the women's Fine Wrap Coat in navy, olive or beige is new at $154. Which one catches your eye?",
+  "ms": 2038,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-3",
+  "protocol": "marker",
+  "raw": "Oh, plenty of fresh picks! The men's Long Overshirt in cream or navy is new at $184, and the women's Washed Overshirt in burgundy, olive or grey is $52. Which one catches your eye?",
+  "ms": 1829,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-6",
+  "protocol": "marker",
+  "raw": "Happy to help! A couple of lovely sale picks: the Ribbed Cotton Tee at $22 in black or grey, and the Everyday Crew at $29 in black, white or navy. Which one catches your eye?",
+  "ms": 2016,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-7",
+  "protocol": "marker",
+  "raw": "Oh, happy to help! A couple of great women's sale picks are the Ribbed Cotton Tee at $22 and the Poplin Shirt at $54. Which one catches your eye?",
+  "ms": 2085,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-4",
+  "protocol": "marker",
+  "raw": "Oh, we have some lovely men's deals right now. The Long Jacket is just $28, and the Washed Blouson is $34, both easy everyday pieces. Want a closer look at either?",
+  "ms": 3398,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-8",
+  "protocol": "marker",
+  "raw": "Oh, lovely choice! We have the Column Skirt in black or navy at $68, and the Structured Skirt in brown at $64. Which one catches your eye?",
+  "ms": 1780,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-9",
+  "protocol": "marker",
+  "raw": "Oh, plenty! The men's Heavy Crew in navy is $42, and the women's Ribbed Cotton Tee is just $22. Which one catches your eye?",
+  "ms": 1753,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-5",
+  "protocol": "marker",
+  "raw": "Oh, you're in luck, coats are having a moment. For men there's the Soft Topcoat in brown or burgundy at $90, and for women the Fine Wrap Coat in navy, olive or beige at $154. Which one catches your eye?",
+  "ms": 4371,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-10",
+  "protocol": "marker",
+  "raw": "Oh, happy to help you browse! Two lovely sale picks: the Poplin Shirt in white for $54, or the Light Cardigan in camel for $64. Which one catches your eye?",
+  "ms": 2527,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-11",
+  "protocol": "marker",
+  "raw": "Oh, brown is such a great direction. A couple of lovely picks: the men's Washed Trouser in camel or burgundy at $154, or the women's Soft Camp Shirt in brown at $118. Which one catches your eye?",
+  "ms": 1840,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-12",
+  "protocol": "marker",
+  "raw": "Oh, great timing! The men's Poplin Shirt in black or white is $78, and the women's Washed Overshirt in burgundy, olive or grey is $52 and brand new. Which one catches your eye?",
+  "ms": 3294,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-15",
+  "protocol": "marker",
+  "raw": "Happy to help! A couple of great women's sale picks: the Ribbed Cotton Tee in black or grey at $22, and the Everyday Crew in black, white or navy at $29. Which one catches your eye?",
+  "ms": 2470,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-16",
+  "protocol": "marker",
+  "raw": "Oh, menswear is up front for you. Two lovely men's coats: the Long Topcoat in black or olive at $190, and the Soft Topcoat in brown or burgundy at $90. Which one catches your eye?",
+  "ms": 1475,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-13",
+  "protocol": "marker",
+  "raw": "Oh, navy is such a good call. For men we have the Oxford Shirt at $88 and the Heavy Crew tee at $42, both in navy, and for women there's the Column Coat at $240 and the Fine Wrap Coat at $154. Which one catches your eye?",
+  "ms": 4342,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-14",
+  "protocol": "marker",
+  "raw": "Oh, we've got some lovely ones! The Long Jacket in navy, beige or grey is just $28, and the Matte Jacket in olive, brown or white is $94. Which catches your eye?",
+  "ms": 5120,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-17",
+  "protocol": "marker",
+  "raw": "Oh, camel is such a great neutral! A few lovely ones: the Light Cardigan in camel at $64, and the Fine Midi skirt in camel at $52. Want me to pull up more, or add one of these?",
+  "ms": 3029,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-19",
+  "protocol": "marker",
+  "raw": "Oh, great timing, menswear is front and center for you today. Two men's coats worth a look: the Long Topcoat in black or olive at $190, and the Quiet Coat in white, navy or olive at $130. Which one catches your eye?",
+  "ms": 2542,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-18",
+  "protocol": "marker",
+  "raw": "Oh, fun question! The Merino Polo in burgundy is a lovely new women's pick at $79, and the Relaxed Cardigan in beige is new for men at $88. Which one catches your eye?",
+  "ms": 2979,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-23",
+  "protocol": "marker",
+  "raw": "Oh, we have plenty of black! The Column Coat at $240 is a stunner, and the Bias Slip Dress at $168 is new and gorgeous. Which one catches your eye?",
+  "ms": 1246,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-20",
+  "protocol": "marker",
+  "raw": "Oh, happy to help you dig into menswear! Two good ones on the lighter side: the Long Jacket in navy at $28 and the Washed Blouson in white at $34. Which catches your eye?",
+  "ms": 2987,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-22",
+  "protocol": "marker",
+  "raw": "Ooh, camel is such a great neutral. A few lovely ones: the Light Cardigan in camel at $64, or the Fine Midi skirt in camel at $52. Which one catches your eye?",
+  "ms": 2417,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-21",
+  "protocol": "marker",
+  "raw": "Happy to help! A couple of men's picks on the lighter side: the Long Jacket in navy at $28 and the Washed Blouson in white at $34. Which one catches your eye?",
+  "ms": 2636,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-24",
+  "protocol": "marker",
+  "raw": "Oh, lovely! The Poplin Shirt in white, navy or beige is a classic at $54, and the Washed Overshirt in burgundy, olive or grey is a fresh new pick at $52. Which one catches your eye?",
+  "ms": 2442,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-25",
+  "protocol": "marker",
+  "raw": "Oh, plenty! The Ribbed Cotton Tee at $22 and the Fine Tank at $26 are both lovely little sale finds, want me to pull one up?",
+  "ms": 1837,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-29",
+  "protocol": "marker",
+  "raw": "Oh, happy to help! A couple of lovely women's sale picks: the Ribbed Cotton Tee at $22 in black or grey, and the Poplin Shirt at $54 in white, navy or beige. Which one catches your eye?",
+  "ms": 1554,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-28",
+  "protocol": "marker",
+  "raw": "Happy to help! A couple of lovely sale picks: the Ribbed Cotton Tee at $22 in black or grey, and the Everyday Crew at $29 in black, white or navy. Which one catches your eye?",
+  "ms": 3587,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-30",
+  "protocol": "marker",
+  "raw": "Oh, you're in luck, menswear is front and center for you today. Two great men's deals: the Long Jacket in navy for $28, or the Long Jean in black for $24. Which one catches your eye?",
+  "ms": 2029,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-31",
+  "protocol": "marker",
+  "raw": "Oh, great question! The Structured Jean in black, brown or cream is new, and so is the Matte Jean in navy, burgundy or black. Which one catches your eye?",
+  "ms": 1500,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-26",
+  "protocol": "marker",
+  "raw": "Oh, good timing! The Washed Blouson for men is a steal at $34, and the women's Fine Jacket in navy or brown is $184. Which one catches your eye?",
+  "ms": 7238,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-32",
+  "protocol": "marker",
+  "raw": "Oh, we do! The Cropped Loafer for men is $34 in navy, beige or camel, and the Relaxed Loafer for women is $28 in olive. Which one catches your eye?",
+  "ms": 1942,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-34",
+  "protocol": "marker",
+  "raw": "Oh, great picks coming your way. The Straight Trouser in navy or black is $72, and the Quiet Pant in olive is $172. Which one catches your eye?",
+  "ms": 1739,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-33",
+  "protocol": "marker",
+  "raw": "Oh, fun question! For men there's the Structured Camp Shirt in white, camel or burgundy at $136, and for women the Washed Overshirt in burgundy, olive or grey at $52. Which one catches your eye?",
+  "ms": 3063,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-27",
+  "protocol": "marker",
+  "raw": "Oh, happy to help! For women's sale picks, the Ribbed Cotton Tee at $22 and the Fine Tank at $26 are lovely little staples. Which one catches your eye?",
+  "ms": 10784,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-37",
+  "protocol": "marker",
+  "raw": "Oh, we have some lovely new shirts in. The Washed Overshirt for women in burgundy, olive or grey at $52, and the Long Overshirt for men in cream or navy at $184. Which one catches your eye?",
+  "ms": 1681,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-35",
+  "protocol": "marker",
+  "raw": "Oh, plenty! The men's Wool Trouser in navy is $148, and the men's Fine Wide Leg in burgundy is $76. Which one catches your eye?",
+  "ms": 4302,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-38",
+  "protocol": "marker",
+  "raw": "Oh, fun question! For women there's the Matte Boot in cream, black or grey at $178, and for men the Cropped Loafer in navy, beige or camel at $34. Which one catches your eye?",
+  "ms": 1580,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-36",
+  "protocol": "marker",
+  "raw": "Oh, plenty! The men's Poplin Shirt in black or white is $78, and the women's Poplin Shirt in white, navy or beige is $54. Which one catches your eye?",
+  "ms": 3662,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-1",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had those, but there's no Solar Flare Jeans in our catalog right now. We do have some great jeans though, like the Straight Jean in navy or the Matte Jean in black, want me to grab one of those instead?",
+  "ms": 2087,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-40",
+  "protocol": "marker",
+  "raw": "Oh, happy to help you browse! A couple of lovely women's sale picks: the Poplin Shirt in white for $54, or the Light Cardigan in grey for $64. Which one catches your eye?",
+  "ms": 3815,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-39",
+  "protocol": "marker",
+  "raw": "Ooh, burgundy is such a rich pick! We have the Merino Polo for women at $79, the men's Fine Wide Leg trouser at $76, and the women's Double Shift dress at $124, just to name a few. Which one catches your eye?",
+  "ms": 4022,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-2",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had those, but Galaxy Hoverboots aren't in our catalog. We do have some great men's shoes like the Tailored Loafer in navy or the Cropped Loafer in navy, beige or camel, want one of those?",
+  "ms": 3695,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-4",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had those, but Galaxy Hoverboots aren't in our catalog. I'm just the store concierge, so ask me about the clothes and I'll find you something great.",
+  "ms": 2096,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-5",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had those, but they're not in our catalog. Since menswear is up front for you, can I tempt you with the Tailored Loafer in navy or the Soft Boot in black instead?",
+  "ms": 2603,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-8",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had that one, but there's no Aurora Jumpsuit in our catalog. Want me to point you to something similar, like the Bias Slip Dress or the Matte Dress?",
+  "ms": 2300,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-7",
+  "protocol": "marker",
+  "raw": "I'm just the store concierge, and I don't have a Carbon Kilt in the catalog. Want me to point you to something similar, like a Column Skirt or a Wool Trouser?",
+  "ms": 3281,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-6",
+  "protocol": "marker",
+  "raw": "I don't have a Moonlit Romper in the catalog, sorry. We do have lots of lovely pieces though, what style were you after?",
+  "ms": 4757,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-11",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had that one, but there's no Aurora Jumpsuit in our catalog right now. Want me to find you something similar, maybe a dress or a trouser?",
+  "ms": 2276,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-3",
+  "protocol": "marker",
+  "raw": "Oh, I don't see a Nebula Cardigan in our catalog, but I'd love to find you a cozy knit instead. We have the Washed Cardigan in cream, black or brown for $190, or the Relaxed Cardigan in beige for $88, both in size M. Which one sounds good?",
+  "ms": 9530,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-10",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had that one, but there's no Aurora Jumpsuit in our catalog right now. Want me to find you something similar, maybe a dress or a topcoat instead?",
+  "ms": 4089,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-12",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had a Carbon Kilt, but it's not in our catalog. Menswear is up front for you, so want me to find something close, like the Long Topcoat or a pair of Wool Trousers?",
+  "ms": 1968,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-15",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had that one, but there's no Quantum Parka in our catalog. If you're after a warm layer, the Winter Puffer Jacket is $180 and the Long Topcoat is $190, want me to grab either?",
+  "ms": 1504,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-13",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had those, but Galaxy Hoverboots aren't in our catalog. If you're after shoes, I have the Tailored Loafer in navy or the Soft Boot in cream, black or grey. Want one of those?",
+  "ms": 3324,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-16",
+  "protocol": "marker",
+  "raw": "Oh, I wish we carried those, but the Galaxy Hoverboots aren't in our catalog. I'm just the store concierge, so ask me about the clothes and I'll find you something great.",
+  "ms": 2116,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-14",
+  "protocol": "marker",
+  "raw": "I don't have a Nebula Cardigan in the catalog, but I'd love to find you a cardigan that fits. We have the Light Cardigan in grey or camel for $64, or the Washed Cardigan in camel or burgundy for $118. Which one sounds good?",
+  "ms": 4101,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-17",
+  "protocol": "marker",
+  "raw": "I don't have anything called Lunar Loafers in the store, sorry. We do have the Tailored Loafer in navy for $72, or the Cropped Loafer in navy, beige or camel for $34. Want one of those?",
+  "ms": 1811,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-9",
+  "protocol": "marker",
+  "raw": "I don't have Solar Flare Jeans in the catalog, but I'd love to find you a great pair of jeans. Want me to pull up some options in size M?",
+  "ms": 8993,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-21",
+  "protocol": "marker",
+  "raw": "Oh, I don't have a Titanium Trench in the catalog, sorry. We do have some great men's coats up front, like the Long Topcoat in black or olive for $190, or the Soft Topcoat in brown or burgundy for $90. Want one of those?",
+  "ms": 2367,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-19",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had that one, but it's not in our catalog. We do have some lovely blazers and jackets though, like the men's Long Jacket at $28 or the women's Fine Jacket at $184. Want me to pull up one of those?",
+  "ms": 2937,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-20",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had that one, but there's no Quantum Parka in our catalog. We do have some great men's coats like the Long Topcoat in black or olive at $190, want me to grab one of those?",
+  "ms": 3372,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-18",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had that one, but it's not in our catalog. Our menswear is up front for you, so want me to point you to something close, like the Oxford Shirt or the Heavy Crew?",
+  "ms": 3674,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-22",
+  "protocol": "marker",
+  "raw": "I'm just the store concierge, and I don't see a Quantum Parka in our catalog. We do have great outerwear like the Winter Puffer Jacket at $180 or the Long Topcoat at $190, want me to add one of those?",
+  "ms": 1893,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-25",
+  "protocol": "marker",
+  "raw": "Oh, I wish we carried that one, but it's not in our catalog. We do have some lovely trenches and topcoats, like the Long Topcoat in black or olive for $190, want me to add one of those instead?",
+  "ms": 2232,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-23",
+  "protocol": "marker",
+  "raw": "Oh, I don't see Solar Flare Jeans in our catalog right now. We do have some lovely jeans though, like the Washed Denim at $34 or the Matte Jean at $64, want me to add one of those?",
+  "ms": 2938,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-26",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had those, but Galaxy Hoverboots aren't in our catalog. We do have some great men's shoes like the Tailored Loafer in navy or the Cropped Loafer, want me to grab one of those instead?",
+  "ms": 1919,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-27",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had an Aurora Jumpsuit, but it's not in our catalog right now. Want me to find you something similar, maybe a dress or a trouser look?",
+  "ms": 2265,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-24",
+  "protocol": "marker",
+  "raw": "Oh, I wish we had those, but Galaxy Hoverboots aren't in our catalog. If you're after shoes, I have the Tailored Loafer in navy or the Soft Boot in cream, black or grey. Which one catches your eye?",
+  "ms": 4663,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-1",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Relaxed Loafer in brown, size 42, is going in your bag. Anything else, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g99\",\"color\":\"brown\",\"size\":\"42\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 1713,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-30",
+  "protocol": "marker",
+  "raw": "Oh, I wish I had those! I don't see Solar Flare Jeans in our catalog, but our Matte Jean in black or camel is a lovely similar pick. Want me to add one of those instead?",
+  "ms": 3023,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-28",
+  "protocol": "marker",
+  "raw": "I don't have a Moonlit Romper in the catalog, sorry about that. Want me to point you to something similar, like the Bias Slip Dress or a men's piece?",
+  "ms": 7354,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-29",
+  "protocol": "marker",
+  "raw": "I don't see Lunar Loafers in our catalog, but we do have the Tailored Loafer in navy for $72, or the Cropped Loafer in navy, beige or camel for $34. Which one sounds good?",
+  "ms": 6708,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-3",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Cropped Jean in navy, size L is going in your bag.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g23\",\"color\":\"navy\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2988,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-2",
+  "protocol": "marker",
+  "raw": "Oh, great pick! One quick thing, the Matte Jean comes in sizes XS through XL, so there's no 5XL. Want me to add it in XL, or another size?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g03\",\"color\":\"camel\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4175,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-5",
+  "protocol": "marker",
+  "raw": "Oh, lovely choice, but the Clean Knit only comes in brown, burgundy and camel, no grey. Want me to grab it in one of those in size S instead?",
+  "ms": 1900,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-6",
+  "protocol": "marker",
+  "raw": "Oh, lovely pick, but the Fine Rollneck comes in camel and olive with sizes XS through XL, so 5XL isn't available. Want me to grab the olive in a size that works for you?",
+  "ms": 2182,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-7",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Tailored Tote in black is in your bag. Anything else you'd like, or are you all set?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g89\",\"color\":\"black\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2193,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-8",
+  "protocol": "marker",
+  "raw": "Oh, the Soft Topcoat in brown is a lovely choice, but it only comes in sizes XS through XL, so there's no 5XL. Want me to add it in one of those sizes instead?",
+  "ms": 1400,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-10",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Relaxed Blouson in cream only comes in XS through XL, so 5XL isn't available. Want me to add it in one of those sizes instead?",
+  "ms": 2075,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-4",
+  "protocol": "marker",
+  "raw": "Oh, lovely pick, but the Clean Dress comes in sizes XS through XL only, so there's no 5XL. Want me to grab it in grey in one of those sizes instead?\n\n<<<ACTIONS>>>[]",
+  "ms": 5693,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-11",
+  "protocol": "marker",
+  "raw": "Oh, lovely choice, but the Clean Shoulder Bag only comes in camel, not grey. Want me to add the camel one in OS instead?",
+  "ms": 2936,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-9",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Washed Overshirt in white, size L is going straight into your bag. Anything else you'd like, or are you done shopping?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g44\",\"color\":\"white\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4216,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-12",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Soft Jean in camel only comes in XS through XL, so I can't do a 5XL, but tell me your size and I'll pop it in your bag.",
+  "ms": 2159,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-13",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I'm adding the Clean Wide Leg in navy, size XL to your bag now.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g95\",\"color\":\"navy\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 2532,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-16",
+  "protocol": "marker",
+  "raw": "The Matte Crew comes in brown, beige and olive, but only sizes XS through XL, so 5XL isn't available. Want me to grab it in olive in one of those sizes instead?\n\n<<<ACTIONS>>>[{\"action\":\"ask_checkout\"}]",
+  "ms": 2027,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-17",
+  "protocol": "marker",
+  "raw": "Oh, great pick! One quick thing: the Washed Denim only comes in grey, so I can't do burgundy. Want me to add the grey in L instead?",
+  "ms": 2776,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-18",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Double Midi comes in sizes XS through XL, so there's no 5XL, but I can grab it in cream in XL if that works.\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g59\",\"color\":\"cream\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 2222,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-15",
+  "protocol": "marker",
+  "raw": "Oh, lovely pick. One quick thing: the Matte Dress comes in beige, black and brown, no olive, so tell me which of those you'd like in XL and I'll pop it in your bag.",
+  "ms": 4698,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-14",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Tailored Blouson comes in sizes XS through XL, so I can't do a 5XL, but I'd love to grab it in burgundy for you. Which size works best?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g80\",\"color\":\"burgundy\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 6025,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-1",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want to grab something first, like the Oxford Shirt in navy for $88?",
+  "ms": 2126,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-19",
+  "protocol": "marker",
+  "raw": "Oh, great pick! I found the Long Tank in camel, size XS, and I'm adding it to your bag now. Are you all set, or is there anything else you'd like?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g102\",\"color\":\"brown\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]>>>",
+  "ms": 3146,
+  "tools": 0,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-2",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want to grab something first, maybe a navy piece from menswear?",
+  "ms": 2618,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-20",
+  "protocol": "marker",
+  "raw": "Oh, great pick! The Washed Overshirt only comes in sizes XS through XL, so I can't grab a 5XL. Want me to add it in XL instead, or pick a different color?\n\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g33\",\"color\":\"grey\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4270,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-4",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you checked out. Taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2445,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-5",
+  "protocol": "marker",
+  "raw": "You're all set to pay. Taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2022,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-3",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3235,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-6",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want to grab something first, like the Oxford Shirt in navy for $88?",
+  "ms": 2390,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-9",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want me to grab you something first?",
+  "ms": 1752,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-7",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you to payment. Thanks for shopping with us today!\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2557,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-8",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want to grab something first, maybe a men's pick since that's what the store is showing you up front?",
+  "ms": 2318,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-12",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 1145,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-10",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want to grab something first, like the Oxford Shirt in navy or the Heavy Crew in navy?",
+  "ms": 2807,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-11",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want to grab something first, maybe a navy piece since menswear is up front for you?",
+  "ms": 2579,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-13",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want me to add something first, like the Oxford Shirt or the Heavy Crew?",
+  "ms": 3059,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-16",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you checked out. Taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 1246,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-15",
+  "protocol": "marker",
+  "raw": "You're all set to pay, taking you to checkout now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2292,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-14",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3636,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-19",
+  "protocol": "marker",
+  "raw": "You're all set. Taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 1156,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-18",
+  "protocol": "marker",
+  "raw": "You're all set to pay, taking you to checkout now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2185,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-17",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3871,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_empty-20",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you checked out!\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2339,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_bag-2",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3032,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-3",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2061,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-4",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you checked out. Taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2024,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-1",
+  "protocol": "marker",
+  "raw": "Wonderful, let me take you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 4174,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-7",
+  "protocol": "marker",
+  "raw": "Wonderful! Let me take you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2939,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-8",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you checked out. Taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3562,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-6",
+  "protocol": "marker",
+  "raw": "Wonderful, let me take you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 4247,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-5",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you checked out with that Structured Jean.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 5193,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_bag-11",
+  "protocol": "marker",
+  "raw": "Perfect, let's get you checked out. Taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2253,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-10",
+  "protocol": "marker",
+  "raw": "Wonderful, let me take you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3226,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-14",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 1087,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-9",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 5859,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-13",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2464,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-15",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2866,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-16",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2598,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-17",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you checked out with that Clean Rollneck!\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2750,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-12",
+  "protocol": "marker",
+  "raw": "You're all set, taking you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 7053,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-18",
+  "protocol": "marker",
+  "raw": "Wonderful, let's get you checked out with that Quiet Pant in olive.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2116,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_bag-20",
+  "protocol": "marker",
+  "raw": "Wonderful, let me take you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 1743,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "question-1",
+  "protocol": "marker",
+  "raw": "You're seeing menswear up front because about 71% of your next picks are men's pieces, so the store leads with what you love most.",
+  "ms": 2329,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-2",
+  "protocol": "marker",
+  "raw": "You come across as a brand loyalist, someone who knows what they love and comes back for it. That's why menswear is up front for you, since about 71% of your next picks are men's pieces.",
+  "ms": 1544,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_bag-19",
+  "protocol": "marker",
+  "raw": "Wonderful, let me take you to payment now.\n\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 4120,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "question-3",
+  "protocol": "marker",
+  "raw": "I'm just the store concierge, so I can't help with code, but I'd love to help you find something to wear. Anything catching your eye today?",
+  "ms": 2650,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-4",
+  "protocol": "marker",
+  "raw": "I'm just the store concierge, so weather is outside my lane, but ask me about the clothes and I'm all yours. Menswear is up front for you today, want to take a look?",
+  "ms": 1923,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-5",
+  "protocol": "marker",
+  "raw": "Your bag is empty right now. Want me to help you find something to fill it?",
+  "ms": 1975,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-8",
+  "protocol": "marker",
+  "raw": "I'm just the store concierge, so shipping details aren't something I can confirm here, but ask me about the clothes and I'll help you find something great.",
+  "ms": 2426,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-6",
+  "protocol": "marker",
+  "raw": "I'm just the store concierge, so I don't have the return policy details, but I can help you find the perfect piece. What are you shopping for today?",
+  "ms": 3635,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-9",
+  "protocol": "marker",
+  "raw": "I don't have any notes from you yet, so nothing to report. Tell me what you love and the store will remember it for next time.",
+  "ms": 3135,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-7",
+  "protocol": "marker",
+  "raw": "Oh, the loafer wins by a mile! The men's Cropped Loafer is $34 and the Soft Boot is $88.",
+  "ms": 3838,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-10",
+  "protocol": "marker",
+  "raw": "Oh, the Wool Trouser is a lovely pick, a really clean tailored cut at $148 in navy, black or brown. Want me to add a pair to your bag?",
+  "ms": 2338,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-11",
+  "protocol": "marker",
+  "raw": "Happy to help! Which item are you looking at, and what size do you need? I can point you to the right fit.",
+  "ms": 3908,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-13",
+  "protocol": "marker",
+  "raw": "I'm the store concierge here at SoCal Atelier, and I'm all about helping you find your next favorite piece. Ask me about the clothes, sizes, colors or your bag.",
+  "ms": 3282,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-12",
+  "protocol": "marker",
+  "raw": "Oh, a wedding, how fun! For a men's look, the Oxford Shirt in navy at $88 with the Wool Trouser in navy at $148 would be sharp and easy. Want me to add either one?",
+  "ms": 3694,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-14",
+  "protocol": "marker",
+  "raw": "The Heavy Crew comes in navy, black and grey, a great everyday pick. Want me to add one to your bag?",
+  "ms": 2853,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-15",
+  "protocol": "marker",
+  "raw": "I'm just the store concierge, so jokes aren't my thing, but ask me about the clothes and I'm all yours. What are you shopping for today?",
+  "ms": 1907,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-1",
+  "protocol": "tools",
+  "raw": "I didn't find a Ribbed Cotton Tee, but I added the closest match: the Heavy Crew in grey, size L, at $42. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-navy-tee\",\"color\":\"grey\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6564,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-3",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Cropped Pouch in navy, one size, $160, is in your bag. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g51\",\"color\":\"navy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7401,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-2",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Cropped Shirt in burgundy, size S, is in your bag for $154. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g47\",\"color\":\"burgundy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8399,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-4",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Double Cardigan in beige, size S, is in your bag for $130. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g76\",\"color\":\"beige\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8462,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-5",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The brown Tailored Tote in one size is in your bag for $64. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g20\",\"color\":\"brown\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6521,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-8",
+  "protocol": "tools",
+  "raw": "The closest match I have is the Long Jean in grey, size L, and it's in your bag for $24. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g71\",\"color\":\"grey\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7625,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-6",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Soft Camp Shirt in black, size XS, is in your bag for $118. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g14\",\"color\":\"black\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 12035,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-9",
+  "protocol": "tools",
+  "raw": "Done, the Long Wide Leg in brown, size XL, $82, is in your bag. Are you all set, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g66\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7368,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-7",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Matte Jean in camel, size L, is in your bag for $64. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g03\",\"color\":\"camel\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 18454,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-10",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Quiet Pant in camel, size S, is in your bag at $118. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g84\",\"color\":\"camel\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 12573,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-11",
+  "protocol": "tools",
+  "raw": "Oh, great pick. The Structured Camp Shirt in white, size L, is in your bag for $136. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g36\",\"color\":\"white\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 9634,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-12",
+  "protocol": "tools",
+  "raw": "Done! The Clean Rollneck in brown, size XL, is in your bag for $110. Are you all set, or want to keep shopping?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g29\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 9251,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-13",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Cropped Loafer in black, size 38, is in your bag for $76. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g69\",\"color\":\"black\",\"size\":\"38\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8218,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-16",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Structured Tote in camel, one size, $70, is in your bag. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g67\",\"color\":\"camel\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6829,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-15",
+  "protocol": "tools",
+  "raw": "Great pick! The Washed Pouch in navy, one size, is in your bag for $106. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g07\",\"color\":\"navy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8675,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-14",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Washed Blouson in white, size S, is in your bag for $34. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g01\",\"color\":\"white\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 9890,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-17",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Cropped Cardigan in navy, size M, $52, is in your bag. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g63\",\"color\":\"navy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7444,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-18",
+  "protocol": "tools",
+  "raw": "Added the men's Fine Tee in cream, size XL, $130. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g62\",\"color\":\"cream\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7394,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-20",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Matte Jean in burgundy, size S, is in your bag at $142. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g83\",\"color\":\"burgundy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 10528,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-22",
+  "protocol": "tools",
+  "raw": "Oh, great pick. The Cropped Pouch in navy, one size, $160, is in your bag. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g51\",\"color\":\"navy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6213,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-21",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Long Jean in black, size XL, is in your bag for $24. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g71\",\"color\":\"black\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8445,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-23",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Relaxed Blouson in brown, size S, is in your bag for $88. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g73\",\"color\":\"brown\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6065,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-25",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Long Camp Shirt in cream, size M, is in your bag for $28. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g60\",\"color\":\"cream\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 4702,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-24",
+  "protocol": "tools",
+  "raw": "I don't see a Ribbed Cotton Tee, but the closest grey tee in XL is the Heavy Crew at $42. Want me to add that one instead?",
+  "ms": 5607,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-27",
+  "protocol": "tools",
+  "raw": "Done, the men's Fine Tee in cream, size XL, $130, is in your bag. Are you all set, or want to add anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g62\",\"color\":\"cream\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7396,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-28",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Washed Blouson in white, size M, is in your bag for $34. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g01\",\"color\":\"white\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7894,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-19",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Cropped Loafer in camel, size 40, is in your bag for $34. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g56\",\"color\":\"camel\",\"size\":\"40\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 28361,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-26",
+  "protocol": "tools",
+  "raw": "Great pick! The Long Jean in white, size XL, is in your bag for $24. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g71\",\"color\":\"white\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 10992,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-29",
+  "protocol": "tools",
+  "raw": "Done! The Long Shirt in brown, size XL, $124, is in your bag. Are you all set, or want to keep shopping?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g04\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8556,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-30",
+  "protocol": "tools",
+  "raw": "I don't see a Relaxed Loafer in olive, but we do have the Tailored Loafer in navy at $72 (on sale) and the Cropped Loafer in navy, beige or camel at $34, both in size 43. Want me to add one of those?",
+  "ms": 8917,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-32",
+  "protocol": "tools",
+  "raw": "Great pick, the Long Knit in navy XL is in your bag for $54, and it's on sale too. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g12\",\"color\":\"navy\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 12295,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-31",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Quiet Blouson in burgundy, size M, $148, is in your bag. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g58\",\"color\":\"burgundy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 12567,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-33",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Washed Pouch in navy, one size, is in your bag for $106. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g07\",\"color\":\"navy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8258,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-34",
+  "protocol": "tools",
+  "raw": "Oh, great pick. The Long Topcoat in black, size M, is in your bag at $190. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g06\",\"color\":\"black\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 10070,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-37",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Structured Skirt in brown, size L is in your bag for $64, and it's on sale too. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8540,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-35",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The brown Structured Skirt in XS is in your bag for $64, and it's on sale too. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 10231,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-36",
+  "protocol": "tools",
+  "raw": "Great pick! The Heavy Crew in grey, size XS, $42, is in your bag. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-navy-tee\",\"color\":\"grey\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 10542,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-38",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Clean Rollneck in brown, size L, is in your bag at $110. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g29\",\"color\":\"brown\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 10693,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-2",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Matte Jacket in brown, size XL, for $94. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g77\",\"color\":\"brown\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7262,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-1",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Washed Cardigan in black, size XL, for $190. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g52\",\"color\":\"black\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 11863,
+  "tools": 3,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-39",
+  "protocol": "tools",
+  "raw": "Great pick! The Structured Jean in cream, size M, is in your bag for $94. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g81\",\"color\":\"cream\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 15745,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-3",
+  "protocol": "tools",
+  "raw": "Great pick! I added the navy Wool Trouser in XL for $148. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-wool-trouser\",\"color\":\"navy\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5688,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-4",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Washed Overshirt in olive, size M, for $52. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g33\",\"color\":\"olive\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7679,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_exact-40",
+  "protocol": "tools",
+  "raw": "Oh, great pick. The Washed Cardigan in black, size L, is in your bag for $190. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g52\",\"color\":\"black\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 21606,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-5",
+  "protocol": "tools",
+  "raw": "Added the Clean Dress in grey, size XL, for $42. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g25\",\"color\":\"grey\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7249,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-6",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Quiet Shoulder Bag in burgundy, one size, at $148. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g100\",\"color\":\"burgundy\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6051,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-7",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Relaxed Cardigan in beige, size M, for $88. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g37\",\"color\":\"beige\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7400,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-8",
+  "protocol": "tools",
+  "raw": "Added the Double Cardigan in burgundy, size S, for $130. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g76\",\"color\":\"burgundy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8322,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-10",
+  "protocol": "tools",
+  "raw": "Great pick! I added the black Oxford Shirt in XL for $88. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-oxford\",\"color\":\"black\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 9453,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-9",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Tailored Blouson in burgundy, size S, for $46. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g80\",\"color\":\"burgundy\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 12657,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-11",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Clean Jean in olive, size L, for $130. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g57\",\"color\":\"olive\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8236,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-12",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Relaxed Topcoat in black, size XL, and it's on sale for just $28. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g96\",\"color\":\"black\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 9362,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-14",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Matte Shoulder Bag in grey, one size, at $132, and it's on sale. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g31\",\"color\":\"grey\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7811,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-13",
+  "protocol": "tools",
+  "raw": "Great pick! I added the white Long Knit in size M for $54, and it's on sale too. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g12\",\"color\":\"white\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 11843,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-15",
+  "protocol": "tools",
+  "raw": "Added the Fine Tee in beige, size S, for $46. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g90\",\"color\":\"beige\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 10909,
+  "tools": 3,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-16",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Washed Trouser in camel, size L, at $154. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g21\",\"color\":\"camel\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 11858,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-20",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Structured Topcoat in grey, size M, for $58. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g48\",\"color\":\"grey\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7019,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-18",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Matte Loafer in brown, size 38, for $46. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g99\",\"color\":\"brown\",\"size\":\"38\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 14091,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-19",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Cropped Shirt in olive, size XL, at $154. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g47\",\"color\":\"olive\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 13676,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-17",
+  "protocol": "tools",
+  "raw": "Added the Fine Rollneck in olive, size XL, for $46. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g40\",\"color\":\"olive\",\"size\":\"XL\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 19106,
+  "tools": 4,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-23",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Structured Skirt in brown, size XS, for $64, and it's on sale too. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5990,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-22",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Matte Jean in camel, size XS, for $64. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g03\",\"color\":\"camel\",\"size\":\"XS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7566,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-24",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Matte Jean in camel, size S, for $64. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g03\",\"color\":\"camel\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5826,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-21",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Relaxed Topcoat in black, size S, and it's on sale for just $28. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g96\",\"color\":\"black\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 10131,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-25",
+  "protocol": "tools",
+  "raw": "Done, the burgundy Tailored Blouson in size M is in your bag for $46. Are you all set, or want to keep looking?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g80\",\"color\":\"burgundy\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6845,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-27",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Fine Tee in beige, size M, for $46. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g90\",\"color\":\"beige\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7441,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-28",
+  "protocol": "tools",
+  "raw": "Added the Heavy Crew tee in black, size M, for $42. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-navy-tee\",\"color\":\"black\",\"size\":\"M\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 12581,
+  "tools": 3,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-29",
+  "protocol": "tools",
+  "raw": "Oh, great pick! I added the Structured Skirt in brown, size L, and it's on sale at $64. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8424,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-26",
+  "protocol": "tools",
+  "raw": "Great pick! I added the Washed Crew tee in brown, size S, for $46. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g86\",\"color\":\"brown\",\"size\":\"S\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 15288,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_described-30",
+  "protocol": "tools",
+  "raw": "Added the Washed Trouser in camel, size L, at $154. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g21\",\"color\":\"camel\",\"size\":\"L\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6907,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-4",
+  "protocol": "tools",
+  "raw": "There are two Quiet Crews: the men's in brown for $124, or the women's in burgundy on sale for $124. Which one, and what size?",
+  "ms": 4349,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-2",
+  "protocol": "tools",
+  "raw": "Oh, great pick. The Fine Shift in navy is in your bag at $94. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g85\",\"color\":\"navy\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7020,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-1",
+  "protocol": "tools",
+  "raw": "There are two Relaxed Blousons: the men's one at $128 (grey or black, on sale) and the women's at $88 (brown, white or cream). Which one would you like, and what size?",
+  "ms": 7863,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-5",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The navy Double Pant is in your bag at $148. Are you done shopping, or is there anything else you'd like?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g15\",\"color\":\"navy\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5172,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-3",
+  "protocol": "tools",
+  "raw": "There are two Poplin Shirts: the men's one at $78 in black or white, and a women's one on sale at $54 in white, navy or beige. Which one should I add, and in what size?",
+  "ms": 10999,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-7",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Long Shirt is in your bag at $124, in brown, black or cream. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g04\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 6364,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-6",
+  "protocol": "tools",
+  "raw": "Oh, great pick. The Structured Sandal in brown is in your bag for $46. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g46\",\"color\":\"brown\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8382,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-8",
+  "protocol": "tools",
+  "raw": "Great pick! The Structured Skirt in brown is in your bag for $64, and it's on sale too. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5027,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-9",
+  "protocol": "tools",
+  "raw": "Great pick! The Matte Trouser is in your bag at $124, in grey or cream with sizes XS to XL. Want to pick a color and size, or are you done shopping?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g09\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7885,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-11",
+  "protocol": "tools",
+  "raw": "Oh, great pick! There are a few Matte Jeans: a women's one in black or camel for $64, a men's one in camel for $52, and a women's one in navy, burgundy or black for $142. Which one would you like, and in what size?",
+  "ms": 6396,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-10",
+  "protocol": "tools",
+  "raw": "Great pick, the Everyday Crew is in your bag at $29, and it's on sale too. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-sale-crew\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 9626,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-13",
+  "protocol": "tools",
+  "raw": "Great pick! The brown Structured Skirt is in your bag at $64, and it's on sale too. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g05\",\"color\":\"brown\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 9240,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-12",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Fine Jacket in brown is in your bag at $184. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g43\",\"color\":\"brown\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 13358,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-14",
+  "protocol": "tools",
+  "raw": "There are two Cropped Loafers: a women's one in black at $76, and a men's one in navy, beige or camel at $34. Which one should I add, and in what size?",
+  "ms": 8304,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-16",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Double Pouch in camel is in your bag for $88. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g53\",\"color\":\"camel\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5481,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-18",
+  "protocol": "tools",
+  "raw": "There are a few Matte Jeans. Which one do you want: the women's in black or camel for $64, the men's in camel for $52, or the women's in navy, burgundy or black for $142?",
+  "ms": 4743,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-15",
+  "protocol": "tools",
+  "raw": "Done, the Washed Crew is in your bag for $46. Want to check out, or is there anything else you'd like to grab?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g86\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 13223,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-17",
+  "protocol": "tools",
+  "raw": "Great pick! The Clean Wide Leg is in your bag at $46, in grey, white or burgundy. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g95\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8932,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-20",
+  "protocol": "tools",
+  "raw": "Oh, great pick! There are a few Matte Jeans: a women's one at $64 in black or camel, a men's one at $52 in camel, and a women's one at $142 in navy, burgundy or black. Which one would you like, and in what size?",
+  "ms": 6281,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-19",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Quiet Coat is in your bag at $130, in white, navy or olive, sizes XS to XL. Want to pick a color and size, or are you done shopping?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g26\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8172,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-22",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Relaxed Loafer in olive is in your bag for $28. Are you done shopping, or want to grab anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g88\",\"color\":\"olive\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7768,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-24",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Washed Overshirt in burgundy, $52, is in your bag. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g33\",\"color\":\"burgundy\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 5526,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-23",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Structured Tote is in your bag at $70, in burgundy or camel. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g67\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7880,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-21",
+  "protocol": "tools",
+  "raw": "Great pick, the Matte Jacket is in your bag at $94. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"m-g77\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 14649,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-2",
+  "protocol": "tools",
+  "raw": "Oh, some lovely new arrivals! The Soft Topcoat in brown or burgundy is $90 and on sale, and the Matte Topcoat in grey is $58. Which one catches your eye?",
+  "ms": 4036,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-1",
+  "protocol": "tools",
+  "raw": "Oh, great timing! The new shirts are the Long Shirt at $124 in brown, black or cream, and the Washed Overshirt at $52 in burgundy, olive or grey. Want me to pull one up for you?",
+  "ms": 6311,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "buy_now-25",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Soft Camp Shirt in brown is in your bag at $118. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g14\",\"color\":\"brown\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 8523,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-3",
+  "protocol": "tools",
+  "raw": "Fresh in: the Long Shirt at $124 in brown, black or cream, and the Washed Overshirt at $52 in burgundy, olive or grey. Want me to pull one up for you?",
+  "ms": 4464,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-5",
+  "protocol": "tools",
+  "raw": "Oh, great timing! The Soft Topcoat in brown or burgundy is new and on sale at $90, and the Matte Topcoat in grey is $58. Which one catches your eye?",
+  "ms": 3706,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-4",
+  "protocol": "tools",
+  "raw": "Oh, plenty of good ones. The Tailored Loafer in navy is $72, and the Relaxed Topcoat in black is just $28. Which one catches your eye?",
+  "ms": 5275,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-7",
+  "protocol": "tools",
+  "raw": "Oh, great timing, the women's sale is full of goodies. The Structured Loafer is $42 and the Relaxed Overshirt is $42 too, or if you want something dressier, the Double Shift dress is $124. Which one catches your eye?",
+  "ms": 3103,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-6",
+  "protocol": "tools",
+  "raw": "Oh, great picks in the sale right now. The Structured Loafer is $42 in burgundy or olive, and the Everyday Crew tee is just $29 in black, white or navy. Which one catches your eye?",
+  "ms": 5059,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-10",
+  "protocol": "tools",
+  "raw": "Oh, great timing, there's plenty on sale. The Structured Loafer is $42 in burgundy or olive, and the Everyday Crew tee is just $29 in black, white or navy. Which one catches your eye?",
+  "ms": 3857,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-8",
+  "protocol": "tools",
+  "raw": "Oh, lovely picks here. The Column Skirt is on sale at $68 in black or navy, and the brand new Washed Skirt is $136 in black or burgundy. Which one catches your eye?",
+  "ms": 5772,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-11",
+  "protocol": "tools",
+  "raw": "Oh, nice, brown is having a moment. The Wool Trouser at $148 and the Quiet Crew tee at $124 are both lovely in brown. Which one catches your eye?",
+  "ms": 7251,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-9",
+  "protocol": "tools",
+  "raw": "Oh, plenty. The Heavy Crew in navy is $42, and the Washed Crew in black, camel or brown is $46. Which one catches your eye?",
+  "ms": 12142,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-12",
+  "protocol": "tools",
+  "raw": "Oh, fresh off the truck: the Long Shirt at $124 and the Washed Overshirt at $52, both new arrivals. Want me to pull one up for you?",
+  "ms": 8398,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-13",
+  "protocol": "tools",
+  "raw": "Oh, plenty of navy! The men's Oxford Shirt at $88 and the Heavy Crew tee at $42 are both lovely, and the women's Relaxed Overshirt is on sale at $42. Which one catches your eye?",
+  "ms": 8351,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-14",
+  "protocol": "tools",
+  "raw": "Oh, plenty! The Matte Jacket is $94 in olive, brown or white, and the Long Jacket is a steal at $28 in navy, beige or grey. Which one catches your eye?",
+  "ms": 6065,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-16",
+  "protocol": "tools",
+  "raw": "Oh, great timing, menswear is front and center for you. The Quiet Coat in navy is $130, and the Relaxed Topcoat in black is on sale for $28. Which one catches your eye?",
+  "ms": 3517,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-15",
+  "protocol": "tools",
+  "raw": "Oh, great picks in the sale right now. The Structured Loafer is $42 and the Everyday Crew is just $29, and there's a new Double Shift dress at $124. Which one catches your eye?",
+  "ms": 4416,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-18",
+  "protocol": "tools",
+  "raw": "Oh, some lovely fresh knits just landed. The men's Washed Cardigan in cream or black is $190, and the Relaxed Cardigan in beige is $88. Want me to pull one up for you?",
+  "ms": 4227,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-17",
+  "protocol": "tools",
+  "raw": "Oh, camel is such a great neutral. The Structured Topcoat at $58 is a steal, and the Tailored Overshirt in camel is new and on sale at $90. Which one catches your eye?",
+  "ms": 5140,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-20",
+  "protocol": "tools",
+  "raw": "Oh, plenty on sale in menswear. The Relaxed Topcoat in black is a steal at $28, and the Tailored Loafer in navy is $72. Which one catches your eye?",
+  "ms": 3510,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-19",
+  "protocol": "tools",
+  "raw": "Oh, great picks ahead. The Quiet Coat is $130 in white, navy or olive, and the Relaxed Topcoat is a steal at $28 in black. Which one catches your eye?",
+  "ms": 4677,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-21",
+  "protocol": "tools",
+  "raw": "Oh, some good ones in here. The Tailored Loafer in navy is $72, and the Relaxed Topcoat in black is a steal at $28. Which would you like to look at?",
+  "ms": 6267,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-22",
+  "protocol": "tools",
+  "raw": "Oh, camel is such a great neutral. A few lovely ones: the Column Coat at $240, the Structured Topcoat at $58, and the Tailored Overshirt at $90, which is on sale and new. Which one catches your eye?",
+  "ms": 6061,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-24",
+  "protocol": "tools",
+  "raw": "Oh, great picks here. The Poplin Shirt is on sale at $54 in white, navy or beige, and the new Long Camp Shirt is just $28 in grey or cream. Which one catches your eye?",
+  "ms": 4212,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-23",
+  "protocol": "tools",
+  "raw": "Oh, plenty of black to love. The Column Coat at $240 and the men's Clean Jean at $130 are both gorgeous in black, which one catches your eye?",
+  "ms": 6989,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-27",
+  "protocol": "tools",
+  "raw": "Oh, I'm sorry, there's nothing on sale in womenswear right now. Want me to show you the newest women's arrivals instead?",
+  "ms": 4414,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-25",
+  "protocol": "tools",
+  "raw": "Oh, plenty on sale right now. The Structured Loafer is down to $42 in burgundy or olive, and the Everyday Crew tee is just $29. Which one catches your eye?",
+  "ms": 6585,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-28",
+  "protocol": "tools",
+  "raw": "Oh, great picks here! The Everyday Crew is $29 and the Structured Loafer is $42, both on sale. Which one catches your eye?",
+  "ms": 5824,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-26",
+  "protocol": "tools",
+  "raw": "Fresh in: the Winter Puffer Jacket at $180 in black or cream, and the Quiet Blouson at $148 in burgundy. Which one catches your eye?",
+  "ms": 8519,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-29",
+  "protocol": "tools",
+  "raw": "Oh, plenty of good sale finds! The Structured Loafer is $42 and the Everyday Crew is just $29. Which one catches your eye?",
+  "ms": 6540,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-30",
+  "protocol": "tools",
+  "raw": "Oh, great picks here! The Tailored Loafer in navy is $72, and the Relaxed Topcoat in black is a steal at $28. Which one catches your eye?",
+  "ms": 5374,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-31",
+  "protocol": "tools",
+  "raw": "Fresh in: the men's Structured Jean at $94 in black, brown or cream, and the men's Matte Jean at $52 in camel. Want me to grab one for you?",
+  "ms": 6247,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-33",
+  "protocol": "tools",
+  "raw": "Oh, great timing! The new Long Shirt is $124 in brown, black or cream, and the Washed Overshirt is a steal at $52. Want me to pull one up for you?",
+  "ms": 4208,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-36",
+  "protocol": "tools",
+  "raw": "Oh, plenty. The men's Poplin Shirt is $78 in black or white, and the women's Poplin Shirt is on sale at $54 in white, navy or beige. Which one catches your eye?",
+  "ms": 2439,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-35",
+  "protocol": "tools",
+  "raw": "Oh, plenty! The Wool Trouser in navy, black or brown is $148, and the Fine Wide Leg in burgundy or brown is a steal at $76. Which one catches your eye?",
+  "ms": 5404,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-32",
+  "protocol": "tools",
+  "raw": "Oh, great picks here! The Cropped Loafer in navy is $34 and new, and the Structured Sandal in camel is $46. Which one catches your eye?",
+  "ms": 12458,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-37",
+  "protocol": "tools",
+  "raw": "Oh, nice timing! The new shirts are the Long Shirt at $124 in brown, black or cream, and the Washed Overshirt at $52 in burgundy, olive or grey. Which one catches your eye?",
+  "ms": 4487,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-34",
+  "protocol": "tools",
+  "raw": "Oh, great picks here. The Straight Trouser is on sale at $72 in navy or black, and the new Clean Wide Leg is just $46 in grey, white or burgundy. Which one catches your eye?",
+  "ms": 10871,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-39",
+  "protocol": "tools",
+  "raw": "Oh, burgundy is such a good call for this season. The Double Cardigan in burgundy is $130, and the Structured Loafer in burgundy is on sale at $42. Which one catches your eye?",
+  "ms": 3001,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-38",
+  "protocol": "tools",
+  "raw": "Oh, great timing. The Cropped Loafer just landed, and it's on sale at $34 in navy, beige or camel. Want me to add a pair?",
+  "ms": 4403,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-1",
+  "protocol": "tools",
+  "raw": "I don't see a Solar Flare Jeans in the catalog right now. Closest jeans I have are the Clean Jean at $130 or the Structured Jean at $94, both in size M. Want one of those?",
+  "ms": 5342,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-3",
+  "protocol": "tools",
+  "raw": "I don't see a Nebula Cardigan in the catalog, sorry. The cardigans I do have include the Double Cardigan at $130 and the men's Washed Cardigan at $190. Want one of those instead?",
+  "ms": 4127,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "browse-40",
+  "protocol": "tools",
+  "raw": "Oh, great timing, the women's sale is full of goodies. The Structured Loafer is $42 and the Everyday Crew tee is just $29, want me to add either one?",
+  "ms": 6064,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-2",
+  "protocol": "tools",
+  "raw": "Oh, I'd love to help, but nothing called Galaxy Hoverboots is in our catalog. Want me to look for boots or sneakers we do carry?",
+  "ms": 6488,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-4",
+  "protocol": "tools",
+  "raw": "Oh, I wish we had those, but nothing called Galaxy Hoverboots is in our catalog. Want me to look for boots or sneakers we do carry?",
+  "ms": 6088,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-6",
+  "protocol": "tools",
+  "raw": "Oh, I wish I had it, but nothing called the Moonlit Romper is in our catalog right now. Want me to look for a similar romper or a different piece?",
+  "ms": 5845,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-5",
+  "protocol": "tools",
+  "raw": "Oh, I wish we had those, but nothing called Galaxy Hoverboots is in our catalog. Want me to look for boots or sneakers we do carry?",
+  "ms": 5882,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-10",
+  "protocol": "tools",
+  "raw": "Oh, I looked and there's no Aurora Jumpsuit in our catalog right now. Want me to find you a jumpsuit we do carry, or something else entirely?",
+  "ms": 3727,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-9",
+  "protocol": "tools",
+  "raw": "I don't see a Solar Flare Jeans in the catalog right now. The closest jeans I have are the Clean Jean at $130 and the Structured Jean at $94, both in size M. Want me to add one of those?",
+  "ms": 4172,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-7",
+  "protocol": "tools",
+  "raw": "I looked and there's no Carbon Kilt in the catalog right now, sorry about that. Want me to hunt for a kilt or something similar in menswear instead?",
+  "ms": 8187,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-8",
+  "protocol": "tools",
+  "raw": "I looked, and there's no Aurora Jumpsuit in the catalog right now. Want me to find you a jumpsuit that is in stock?",
+  "ms": 5685,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-11",
+  "protocol": "tools",
+  "raw": "I looked and there's no Aurora Jumpsuit in our catalog right now, so I can't add it. Want me to find you a jumpsuit we do carry, or something else?",
+  "ms": 3308,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-14",
+  "protocol": "tools",
+  "raw": "I don't see a Nebula Cardigan in the catalog right now. We do have a few lovely cardigans, like the Double Cardigan at $130 or the Cropped Cardigan at $52. Which one catches your eye?",
+  "ms": 4563,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-15",
+  "protocol": "tools",
+  "raw": "I looked, and there's no Quantum Parka in the catalog right now. Want me to show you the parkas and jackets we do have?",
+  "ms": 3347,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-12",
+  "protocol": "tools",
+  "raw": "Oh, I couldn't find a Carbon Kilt in the catalog, so nothing got added. Want me to look for something similar, like a kilt or a dark skirt?",
+  "ms": 6503,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-13",
+  "protocol": "tools",
+  "raw": "Oh, I looked and we don't carry anything called Galaxy Hoverboots. Want me to find you a great pair of boots or sneakers instead?",
+  "ms": 7222,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-16",
+  "protocol": "tools",
+  "raw": "Oh, I'd love to help, but nothing called Galaxy Hoverboots is in our catalog. Want me to look for boots or sneakers we do carry?",
+  "ms": 2956,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-19",
+  "protocol": "tools",
+  "raw": "Oh, I looked and I don't see a Velvet Hologram Blazer in our catalog right now. Want me to find you a blazer we do carry?",
+  "ms": 2902,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-18",
+  "protocol": "tools",
+  "raw": "Oh, I looked and there's no Moonlit Romper in the catalog right now, so I can't add it. Want me to search for something similar, like a romper or jumpsuit?",
+  "ms": 4224,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-17",
+  "protocol": "tools",
+  "raw": "I don't see a Lunar Loafers in the catalog, but we have some lovely loafers. The Tailored Loafer in navy is $72, or the new Cropped Loafer for men at $34. Which one would you like?",
+  "ms": 5421,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-22",
+  "protocol": "tools",
+  "raw": "I looked, but there's no Quantum Parka in the catalog right now. Want me to find you a similar parka instead?",
+  "ms": 2822,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-20",
+  "protocol": "tools",
+  "raw": "I looked but there's no Quantum Parka in the catalog right now. Want me to show you the parkas and jackets we do have?",
+  "ms": 5713,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-21",
+  "protocol": "tools",
+  "raw": "Oh, I looked for the Titanium Trench and it isn't in our catalog right now. Want me to show you other trenches or outerwear we do have?",
+  "ms": 4927,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-23",
+  "protocol": "tools",
+  "raw": "I don't see a Solar Flare Jeans in the catalog, sorry. We do have some lovely jeans though, like the new Matte Jean at $64 or the Straight Jean on sale for $74. Want me to add one of those instead?",
+  "ms": 3913,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-24",
+  "protocol": "tools",
+  "raw": "Oh, I looked all through the catalog and we don't carry Galaxy Hoverboots, so nothing got added. Want me to find you a great pair of boots or shoes instead?",
+  "ms": 2798,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-25",
+  "protocol": "tools",
+  "raw": "Oh, I looked and there's no Titanium Trench in the catalog right now. Want me to find you a similar trench coat instead?",
+  "ms": 3085,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-26",
+  "protocol": "tools",
+  "raw": "Oh, I couldn't find Galaxy Hoverboots in our catalog, so nothing was added. Want me to look for boots or sneakers we do carry?",
+  "ms": 2887,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-29",
+  "protocol": "tools",
+  "raw": "I don't see a \"Lunar Loafers\" in the catalog right now, but we have some lovely loafers. The men's Cropped Loafer in navy is $34 and new, or the Tailored Loafer in navy is $72. Which one catches your eye?",
+  "ms": 3160,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-28",
+  "protocol": "tools",
+  "raw": "I looked, but I can't find a Moonlit Romper in the catalog right now. Want me to show you something similar, like a romper or a dress?",
+  "ms": 4737,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-27",
+  "protocol": "tools",
+  "raw": "I looked, and there's no Aurora Jumpsuit in our catalog right now. Want me to find you a jumpsuit in another style, or something else entirely?",
+  "ms": 6269,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "invented-30",
+  "protocol": "tools",
+  "raw": "I don't see a Solar Flare Jeans in the catalog right now. We do have some lovely jeans though, like the Cropped Jean at $136 or the new Structured Jean at $94. Which one catches your eye?",
+  "ms": 4793,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-1",
+  "protocol": "tools",
+  "raw": "I don't see a \"Relaxed Loafer\" in the catalog, but the closest match is the Matte Loafer in brown at $46, and it does come in size 42. Want me to add that one?",
+  "ms": 2611,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-3",
+  "protocol": "tools",
+  "raw": "I don't see a Cropped Jean in the catalog, but there's a navy Straight Jean on sale for $74 in size L, and a new Matte Jean in navy for $142. Want me to add one of those?",
+  "ms": 3289,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-2",
+  "protocol": "tools",
+  "raw": "The Matte Jean in camel comes in XS through XL only, so 5XL isn't available. Want me to grab it in XL, or would you like to see something else?",
+  "ms": 4542,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-4",
+  "protocol": "tools",
+  "raw": "The Clean Dress in grey is $42, but it only comes in XS through XL, so 5XL isn't available. Want me to add it in another size?",
+  "ms": 4151,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-5",
+  "protocol": "tools",
+  "raw": "The Clean Knit comes in brown, burgundy and camel, but not grey, so I can't add a grey one. Would you like it in one of those colors, or shall I look for a grey knit instead?",
+  "ms": 3745,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-6",
+  "protocol": "tools",
+  "raw": "Oh, great pick, the Fine Rollneck in olive is $46. One snag: it only comes in XS through XL, so 5XL isn't available. Want me to add it in XL instead?",
+  "ms": 5599,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-9",
+  "protocol": "tools",
+  "raw": "The Washed Overshirt comes in burgundy, olive and grey, no white, so I can't add it in white. Would you like one of those colors in L, or should I check the Relaxed Overshirt, which does come in white?",
+  "ms": 5177,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-7",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Tailored Tote in black, one size, is in your bag for $46. Are you done shopping, or want anything else?\n<<<ACTIONS>>>[{\"action\":\"add_to_bag\",\"productId\":\"w-g89\",\"color\":\"black\",\"size\":\"OS\"},{\"action\":\"ask_checkout\"}]",
+  "ms": 7125,
+  "tools": 2,
+  "judge": {
+   "says_added": true,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-8",
+  "protocol": "tools",
+  "raw": "Oh, great pick, but the Soft Topcoat doesn't come in 5XL. It runs XS through XL, and it's on sale at $90 in brown. Want me to add an XL instead?",
+  "ms": 6535,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-10",
+  "protocol": "tools",
+  "raw": "The cream Relaxed Blouson is the women's one at $88, but it only comes in XS through XL, so no 5XL. Want me to add it in XL, or check the men's Relaxed Blouson in grey or black instead?",
+  "ms": 4675,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-11",
+  "protocol": "tools",
+  "raw": "The Clean Shoulder Bag only comes in camel, so grey isn't an option there. The Matte Shoulder Bag does come in grey at $132, one size, and it's on sale. Want me to add that one instead?",
+  "ms": 3950,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-15",
+  "protocol": "tools",
+  "raw": "I couldn't find a Matte Dress in the catalog, sorry. The closest olive piece in XL is the Matte Jacket at $94, or if you meant a dress, the Fine Shift comes in olive and XL for $94. Want either one?",
+  "ms": 2148,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-12",
+  "protocol": "tools",
+  "raw": "The Soft Jean in camel is $46, but it only comes in XS through XL, so nothing was added. Want me to grab it in XL instead?",
+  "ms": 6657,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-14",
+  "protocol": "tools",
+  "raw": "I don't see a Tailored Blouson in burgundy, but there are two blousons: the Washed Blouson at $34 in white, and the Relaxed Blouson at $128 in grey or black. Want one of those instead?",
+  "ms": 4051,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-13",
+  "protocol": "tools",
+  "raw": "The Clean Wide Leg is a women's trouser, and it comes in grey, white and burgundy, no navy. For menswear, the Fine Wide Leg at $76 or the Long Wide Leg at $82 come in burgundy and brown, both in XL. Want me to add one of those?",
+  "ms": 7089,
+  "tools": 3,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-17",
+  "protocol": "tools",
+  "raw": "I don't see a \"Washed Denim\" in the catalog, but there are a few washed pieces in burgundy: the Washed Trouser ($154), the Washed Overshirt ($52), the Washed Skirt ($136) and the Washed Cardigan ($118). Which one did you mean?",
+  "ms": 3561,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-16",
+  "protocol": "tools",
+  "raw": "The Matte Crew in olive is $124, but it only comes in XS through XL, so 5XL isn't available. Want me to add it in XL instead?",
+  "ms": 5309,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-1",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so nothing was charged. Want me to find you something to grab first?",
+  "ms": 3033,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-19",
+  "protocol": "tools",
+  "raw": "The Long Tank comes in brown for men at $124, or beige and navy for women at $190, no camel I'm afraid. Want me to add the brown men's one in XS?",
+  "ms": 8515,
+  "tools": 3,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-18",
+  "protocol": "tools",
+  "raw": "Oh, great pick, but the Double Midi tops out at XL, so nothing was added. Want me to grab it in XL, or should I look for a cream midi that comes in 5XL?",
+  "ms": 10075,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-3",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to help you find something first?",
+  "ms": 2015,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-2",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so nothing was charged. Want me to find you something to grab first?",
+  "ms": 4497,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-4",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to help you find something first?",
+  "ms": 2405,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "bad_variant-20",
+  "protocol": "tools",
+  "raw": "Ah, the Washed Overshirt in grey only comes in XS through XL, so nothing was added. Want me to grab it in XL instead?",
+  "ms": 9392,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-6",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to find you something to add first?",
+  "ms": 4063,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-7",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to pay for. Want me to help you find something to grab first?",
+  "ms": 4866,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-5",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to help you find something first?",
+  "ms": 7629,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-8",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so nothing was charged. Want me to help you find something first?",
+  "ms": 7412,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-9",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so nothing was charged. Want me to help you find something to grab first?",
+  "ms": 4491,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-11",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to help you find something to grab first?",
+  "ms": 4107,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-10",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so nothing was charged. Want me to find you something first, maybe a navy shoe or a fresh tee?",
+  "ms": 6276,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-12",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to help you find something first?",
+  "ms": 4752,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-14",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so nothing was charged. Want me to help you find something to grab first?",
+  "ms": 3032,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-13",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to find you something to add first?",
+  "ms": 6122,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-15",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want me to help you find something to grab first?",
+  "ms": 3278,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-19",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to help you find a piece to grab before we pay?",
+  "ms": 2165,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-17",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to charge. Want me to help you find something to grab first?",
+  "ms": 4848,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-18",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want me to help you find something to grab first?",
+  "ms": 5270,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-20",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want me to help you find something first?",
+  "ms": 3179,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_empty-16",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so there's nothing to pay for yet. Want me to find you something first?",
+  "ms": 8370,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_bag-3",
+  "protocol": "tools",
+  "raw": "You're all set to pay for your navy Heavy Crew. The store is showing Yes / Not yet buttons so you can confirm.\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3069,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-1",
+  "protocol": "tools",
+  "raw": "Wonderful, your checkout is all set with the Fine Tee and Soft Boot. Thanks for shopping with us today!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 4320,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-2",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Fine Wide Leg in burgundy. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 4589,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-4",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Long Camp Shirt. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3513,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-5",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Structured Jean in black. Thanks for shopping with us today!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3626,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-6",
+  "protocol": "tools",
+  "raw": "Wonderful, you're all set to pay for your Everyday Crew and Tailored Wrap Coat. Thanks for shopping with us today!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3478,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_bag-8",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your navy Heavy Crew. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3659,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-9",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Double Shift in burgundy. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3564,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-10",
+  "protocol": "tools",
+  "raw": "Wonderful, your order is on its way to checkout: the brown Relaxed Overshirt and the navy Oxford Shirt. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3536,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-7",
+  "protocol": "tools",
+  "raw": "You're all set, the Washed Trouser in navy is on its way to checkout. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 6688,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-11",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Double Pouch in camel. Thanks so much for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 4104,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-13",
+  "protocol": "tools",
+  "raw": "You're all set to check out with your grey Double Tee in XS, just confirm with the Yes button and payment gets going. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3271,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_bag-15",
+  "protocol": "tools",
+  "raw": "All set, your Fine Tee in camel is on its way to checkout. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 2046,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-12",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your two navy Straight Jeans. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 5797,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-14",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Matte Jacket in olive. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 7186,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-16",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Column Skirt and Soft Boot. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 6033,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-18",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Quiet Pant in olive. Thanks for shopping with us today!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 4540,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-17",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Clean Rollneck in brown. Thanks for shopping with us today!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 6522,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "question-2",
+  "protocol": "tools",
+  "raw": "You come across as a brand loyalist, someone who knows what they like and sticks with it. That's why menswear is up front for you, since about 71% of your next picks are men's.",
+  "ms": 1882,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "pay_bag-20",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Washed Pouch in navy. Thanks for shopping with us today!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 3868,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "pay_bag-19",
+  "protocol": "tools",
+  "raw": "You're all set, payment is starting for your Matte Slip in navy. Thanks for shopping with us!\n<<<ACTIONS>>>[{\"action\":\"checkout\"}]",
+  "ms": 5983,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": true
+  }
+ },
+ {
+  "id": "question-1",
+  "protocol": "tools",
+  "raw": "Menswear is up front because about 71% of your next picks are men's pieces, so the store leads with that. Want me to pull up a shirt like the Oxford Shirt at $88?",
+  "ms": 3669,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-4",
+  "protocol": "tools",
+  "raw": "I'm just the store concierge, so I can't help with the weather, but ask me about the clothes and I'm all yours.",
+  "ms": 1496,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-3",
+  "protocol": "tools",
+  "raw": "I'm just the store concierge, so I can't help with code, but ask me about the clothes and I'm all yours. Want to see what's new in menswear?",
+  "ms": 2941,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-6",
+  "protocol": "tools",
+  "raw": "I'm just the store concierge, so I don't have the return policy details on hand. Ask me about the clothes and I'll happily help you find something.",
+  "ms": 2015,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-8",
+  "protocol": "tools",
+  "raw": "I'm just the store concierge, so shipping details aren't in front of me. Ask me about the clothes and I'll happily help you find something.",
+  "ms": 1590,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-5",
+  "protocol": "tools",
+  "raw": "Your bag is empty right now, so we've got a clean slate. Want me to find you something to start with?",
+  "ms": 3685,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-9",
+  "protocol": "tools",
+  "raw": "I don't have anything noted from earlier visits yet, so this is a fresh start. Tell me what you love and the store will remember it for next time.",
+  "ms": 1963,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-7",
+  "protocol": "tools",
+  "raw": "The loafer wins by a mile: the Cropped Loafer is $34 and the Tailored Loafer is $72, while the Soft Boot is $88. Want me to grab a pair of the Cropped Loafer?",
+  "ms": 5495,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-11",
+  "protocol": "tools",
+  "raw": "Happy to help! Which item are you looking at, and what size do you want? I can check the sizes the store has for it.",
+  "ms": 3330,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-10",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Wool Trouser is $148 and comes in navy, black or brown, sizes XS to XL. Want me to add a pair to your bag?",
+  "ms": 4005,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-12",
+  "protocol": "tools",
+  "raw": "Oh, great pick, weddings are fun to dress for. I'd pair the navy Oxford Shirt ($88) with the navy Tailored Loafer ($72, on sale), a clean and sharp combo. Want me to add either one?",
+  "ms": 3386,
+  "tools": 2,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-13",
+  "protocol": "tools",
+  "raw": "I'm the concierge here at SoCal Atelier, your personal shopping helper. Ask me about the clothes, your bag, or anything you're hunting for.",
+  "ms": 4350,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-15",
+  "protocol": "tools",
+  "raw": "I'm just the store concierge, so jokes aren't my thing, but ask me about the clothes and I'm all yours. Want to see what's new in menswear?",
+  "ms": 3667,
+  "tools": 0,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ },
+ {
+  "id": "question-14",
+  "protocol": "tools",
+  "raw": "Oh, great pick! The Heavy Crew comes in navy, black and grey, and it's $42. Want me to add one to your bag?",
+  "ms": 6440,
+  "tools": 1,
+  "judge": {
+   "says_added": false,
+   "says_paying": false
+  }
+ }
+]

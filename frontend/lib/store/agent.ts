@@ -35,7 +35,10 @@ export function confirmReply(message: string): "yes" | "no" | null {
 
 /** Whether the shopper's own words authorize a real checkout right now. */
 export function shopperConfirmed(message: string): boolean {
-  return SHORT_YES_RE.test(message) || CHECKOUT_WORDS_RE.test(message)
+  if (SHORT_YES_RE.test(message) || CHECKOUT_WORDS_RE.test(message)) return true
+  // Two confirmations in one breath ("that's all, pay now") are still a confirmation.
+  const parts = message.split(/[,.;!]+|and/i).map((part) => part.trim()).filter(Boolean)
+  return parts.length > 1 && parts.every((part) => SHORT_YES_RE.test(part))
 }
 
 // The model's prose claims an add or a payment — verified against what really ran.
@@ -232,6 +235,7 @@ export function processReply(
   // done", "check me out") allows a model checkout; anything else downgrades it
   // to the Yes/No prompt so a "purchase X" request can never skip the ask.
   const confirmed = shopperConfirmed(message)
+  const wantedCheckout = actions.some((a) => a.action === "checkout")
   const safe = actions.map((a): ChatAction =>
     a.action === "checkout" && !confirmed ? { action: "ask_checkout" } : a,
   )
@@ -277,11 +281,15 @@ export function processReply(
         : "Hmm, that did not make it into your bag. Tell me the item again and I will grab it!",
     )
   }
-  if (CLAIM_PAY_RE.test(text) && !result.checkedOut) {
+  // A checkout the model asked for but that did not run is corrected whatever words it used:
+  // the action itself is the evidence, the claim pattern is only the fallback.
+  if (!result.checkedOut && (wantedCheckout || CLAIM_PAY_RE.test(text))) {
     notes.push(
       useStorefront.getState().bag.length === 0
         ? "Your bag is actually empty right now, tell me what to add first!"
-        : "Checkout did not kick off, say check me out and I will run it!",
+        : wantedCheckout && !confirmed
+          ? "Nothing has been charged yet, tap Yes below when you are ready to pay."
+          : "Checkout did not kick off, say check me out and I will run it!",
     )
   }
   return { text, result, pending, notes }
